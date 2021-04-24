@@ -1,6 +1,7 @@
 from django.db import models
 from decimal import Decimal
 from uuid import uuid4
+from django.contrib.auth.models import User
 
 def random_cover_filename(instance, filename):
     ext = filename.split('.')[-1]
@@ -11,6 +12,11 @@ def random_screen_filename(instance, filename):
     ext = filename.split('.')[-1]
     filename = '{}.{}'.format(uuid4().hex, ext)
     return 'screenshots/' + filename
+
+def random_avatar_filename(instance, filename):
+    ext = filename.split('.')[-1]
+    filename = '{}.{}'.format(uuid4().hex, ext)
+    return 'avatars/' + filename
 
 class Platform(models.Model):
     name = models.CharField(max_length=50)
@@ -60,3 +66,7 @@ class Game(models.Model):
 
     def __str__(self):
         return self.name + " (" + str(self.year) + ")"
+
+class UserProfile(models.Model):
+    avatar = models.ImageField(upload_to=random_avatar_filename, null=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
