@@ -4,7 +4,7 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	
-	<title>MyGameList :: {{ game.name }} ({{ game.year }})</title>
+	<title>{{ game.name }} ({{ game.year }}) :: MyGameList</title>
 	
 	<meta name="twitter:card" content="summary" />
 	<meta name="twitter:title" content="MyGameList :: {{ game.name }} ({{ game.year }})" />
@@ -50,15 +50,7 @@
 		</div>
 	</nav>
 	<div class="container">
-		<div class="row">
-			<div class="col-md-12">
-				<ul class="nav justify-content-center">
-					{% for platform in game.platforms.all %}
-					<a href="{% url 'games:platform' platform.id platform.name|slugify %}">{{ platform.name }}</a>{% if not forloop.last %} | {% endif %}
-					{% endfor %}
-				</ul>
-			</div>
-		</div><br>
+		
 		<div class="row justify-content-md-center">
 			<div class="col-md-4" align="center">
 				<br>
