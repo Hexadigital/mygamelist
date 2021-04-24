@@ -1,0 +1,9 @@
+{% if latest_games %}
+    <ul>
+    {% for game in latest_games %}
+        <li><a href="{% url 'games:game' game.id game.name|slugify %}">{{ game.name }} ({{ game.year }})</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No games are available.</p>
+{% endif %}

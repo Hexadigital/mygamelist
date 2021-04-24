@@ -1,0 +1,116 @@
+{% load static %}
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	
+	<title>MyGameList :: {{ game.name }} ({{ game.year }})</title>
+	
+	<meta name="twitter:card" content="summary" />
+	<meta name="twitter:title" content="MyGameList :: {{ game.name }} ({{ game.year }})" />
+	<meta name="twitter:description" content="{{ game.description|truncatechars:200 }}" />
+	<meta name="twitter:image" content="{{ game.image.url }}" />
+	
+	<link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+	<link href="{% static 'css/style.css' %}" rel="stylesheet">
+	
+	<style>
+		body {
+			background-image: url("{% static 'bgdark.png' %}");
+			background-repeat: repeat;
+			color: white;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+				<ul class="nav justify-content-center">
+					<li class="nav-item">
+						<a class="nav-link active" href="#">Home</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="#">My List</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12">
+				<ul class="nav justify-content-center">
+					{% for platform in game.platforms.all %}
+					<a href="{% url 'games:platform' platform.id platform.name|slugify %}">{{ platform.name }}</a>{% if not forloop.last %} | {% endif %}
+					{% endfor %}
+				</ul>
+			</div>
+		</div><br>
+		<div class="row justify-content-md-center">
+			<div class="col-md-4" align="center">
+				<br>
+				<img style="max-height:400px;max-width:100%;" src="{{ game.image.url }}"><br>
+				<br>
+			</div>
+			<div class="col-md-8 align-self-center">
+				<video style="max-width:100%; height:auto" controls><source src="{{ game.trailer_link }}" type="video/webm" />Your browser does not support WEBM.</video>
+			</div>
+			<div class="col-md-4" align="center">
+				<blockquote class="blockquote">
+					<button class="btn btn-primary" type="button">Add to List</button>
+				</blockquote>
+				<blockquote class="blockquote">
+					{% if game.main_link != '' %}
+					<a href="{{ game.main_link }}"><img src="{% static 'icons/website.png' %}"></a>
+					{% endif %}
+					{% if game.steam_link != '' %}
+					<a href="{{ game.steam_link }}"><img src="{% static 'icons/steam.png' %}"></a>
+					{% endif %}
+					{% if game.wikipedia_link != '' %}
+					<a href="{{ game.wikipedia_link }}"><img src="{% static 'icons/wikipedia.png' %}"></a>
+					{% endif %}
+					{% if game.howlongtobeat_link != '' %}
+					<a href="{{ game.howlongtobeat_link }}"><img src="{% static 'icons/hl2b.png' %}"></a>
+					{% endif %}
+					{% if game.gamefaqs_link != '' %}
+					<a href="{{ game.gamefaqs_link }}"><img src="{% static 'icons/gamefaqs.png' %}"></a>
+					{% endif %}
+					{% if game.mobygames_link != '' %}
+					<a href="{{ game.mobygames_link }}"><img src="{% static 'icons/mobygames.png' %}"></a>
+					{% endif %}
+					{% if game.winehq_link != '' %}
+					<a href="{{ game.winehq_link }}"><img src="{% static 'icons/winehq.png' %}"></a>
+					{% endif %}
+					{% if game.vndb_link != '' %}
+					<a href="{{ game.vndb_link }}"><img src="{% static 'icons/vndb.png' %}"></a>
+					{% endif %}
+				</blockquote>
+				<blockquote class="blockquote">
+					<p class="mb-0">
+						Genres:<br>{% for genre in game.genres.all %}
+							<a href="{% url 'games:genre' genre.id genre.name|slugify %}">{{ genre.name }}</a>{% if not forloop.last %}, {% endif %}
+								{% endfor %}
+					</p>
+				</blockquote>
+				<blockquote class="blockquote">
+						<button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">Show Tags</button><br>
+						<div class="collapse" id="collapseExample">{% for tag in game.tags.all|dictsort:"name" %}
+								<a href="{% url 'games:tag' tag.id tag.name|slugify %}">{{ tag.name }}</a>{% if not forloop.last %}, {% endif %}
+								{% endfor %}</div>
+						<small class="text-muted">May contain spoilers</small><br>
+				</blockquote>
+			</div>
+			<div class="col-md-8" align="center">
+				<img style="max-height:500px;max-width:24%;object-fit: contain;" src="{{ game.screen1.url }}">
+				<img style="max-height:500px;max-width:24%;object-fit: contain;" src="{{ game.screen2.url }}">
+				<img style="max-height:500px;max-width:24%;object-fit: contain;" src="{{ game.screen3.url }}">
+				<img style="max-height:500px;max-width:24%;object-fit: contain;" src="{{ game.screen4.url }}">
+				<br><br>
+				{{ game.description }}
+			</div>
+		</div>
+	</div>
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/scripts.js' %}"></script>
+</body>
