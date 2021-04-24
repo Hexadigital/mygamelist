@@ -1,3 +1,7 @@
+mygamelist/mygamelist/settings.py
+mygamelist/media/*
+mygamelist/games/static/*
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
