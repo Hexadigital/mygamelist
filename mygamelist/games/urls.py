@@ -1,6 +1,7 @@
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib.auth import views as auth_views
 
 from . import views
 
@@ -14,4 +15,5 @@ urlpatterns = [
     path('platform/<int:pk>/<str:name>/', views.PlatformView.as_view(), name='platform'),
     path('game/<int:pk>/', views.GameView.as_view(), name='game'),
     path('game/<int:pk>/<str:name>/', views.GameView.as_view(), name='game'),
+    path('login/', auth_views.LoginView.as_view(template_name='games/login.html'), name='login'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
