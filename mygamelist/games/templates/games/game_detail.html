@@ -105,10 +105,10 @@
 				</blockquote>
 			</div>
 			<div class="col-md-8" align="center">
-				<img style="max-height:500px;max-width:24%;object-fit: contain;" src="{{ game.screen1.url }}">
-				<img style="max-height:500px;max-width:24%;object-fit: contain;" src="{{ game.screen2.url }}">
-				<img style="max-height:500px;max-width:24%;object-fit: contain;" src="{{ game.screen3.url }}">
-				<img style="max-height:500px;max-width:24%;object-fit: contain;" src="{{ game.screen4.url }}">
+				<img style="max-height:500px;max-width:24%;object-fit: contain;" src="{{ game.screen1.url }}" onclick="lightbox.init(this,220);">
+				<img style="max-height:500px;max-width:24%;object-fit: contain;" src="{{ game.screen2.url }}" onclick="lightbox.init(this,220);">
+				<img style="max-height:500px;max-width:24%;object-fit: contain;" src="{{ game.screen3.url }}" onclick="lightbox.init(this,220);">
+				<img style="max-height:500px;max-width:24%;object-fit: contain;" src="{{ game.screen4.url }}" onclick="lightbox.init(this,220);">
 				<br><br>
 				{{ game.description }}
 			</div>
@@ -119,6 +119,8 @@
 			<a href="https://github.com/Frostflake/mygamelist">GitHub</a>
 		</div>
 	</div>
+	<div id="lightbox" class="lightbox hidden"></div>
+	<div id="curtain" class="curtain hidden"></div>
 
     <script src="{% static 'js/jquery.min.js' %}"></script>
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
