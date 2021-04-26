@@ -4,10 +4,10 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	
-	<title>Login :: Remember Games</title>
+	<title>Register :: Remember Games</title>
 	
 	<meta name="twitter:card" content="summary" />
-	<meta name="twitter:title" content="Login :: Remember Games" />
+	<meta name="twitter:title" content="Register :: Remember Games" />
 	<meta name="twitter:description" content="Remember Games is a website you can use to track games you've played." />
 	<meta name="twitter:image" content="" />
 	
@@ -57,27 +57,22 @@
 	<div class="container">
 		<div class="row h-100">
 			<div class="col-md-12 my-auto" align="center">
-				{% if form.errors %}
-				<p>Your username and password didn't match. Please try again.</p>
-				{% endif %}
+				<h3>Register</h3>
 				{% if user.is_authenticated %}
-				You are already logged in!
+					You are already logged in!
 				{% else %}
-				<form method="post" action="{% url 'games:login' %}">
+					<form method="post">
 					{% csrf_token %}
-					<table>
-						<tr>
-							<td>{{ form.username.label_tag }}</td>
-							<td>{{ form.username }}</td>
-						</tr>
-						<tr>
-							<td>{{ form.password.label_tag }}</td>
-							<td>{{ form.password }}</td>
-						</tr>
-					</table>
-					<input type="submit" value="login">
-					<input type="hidden" name="next" value="{{ next }}">
-				</form>
+					{% for field in form %}
+					<p>
+					{{ field }}
+					{% for error in field.errors %}
+					<p style="color: red">{{ error }}</p>
+					{% endfor %}
+					</p>
+					{% endfor %}
+					<button type="submit">Sign up</button>
+					</form>
 				{% endif %}
 			</div>
 		</div>
