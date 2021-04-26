@@ -35,13 +35,13 @@
 		<a class="nav-link" href="/">Home</a>
 		</li>
 		<li class="nav-item">
-		<a class="nav-link" href="#">Game List</a>
+		<a class="nav-link" href="{% url 'games:gamelist' %}">Game List</a>
 		</li>
 		<li class="nav-item">
-		<a class="nav-link" href="#">Browse</a>
+		<a class="nav-link" href="{% url 'games:browse' %}">Browse</a>
 		</li>
 		<li class="nav-item">
-		<a class="nav-link" href="#">Forums</a>
+		<a class="nav-link" href="{% url 'games:forums' %}">Forums</a>
 		</li>
 		</ul>
 		{% if user.is_authenticated %}

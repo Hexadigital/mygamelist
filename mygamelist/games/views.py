@@ -1,8 +1,7 @@
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, render, redirect
+from django.shortcuts import render, redirect
 from django.views import generic
 from django.contrib.auth import login, authenticate
-from django.contrib.auth.forms import UserCreationForm
 
 from .models import Game, Genre, Platform, Tag
 from .forms import SignUpForm
@@ -25,6 +24,15 @@ class PlatformView(generic.DetailView):
 
 class GameView(generic.DetailView):
     model = Game
+
+class BrowseView(generic.View):
+    pass
+
+class GameListView(generic.View):
+    pass
+
+class ForumView(generic.View):
+    pass
 
 def register(request):
     if request.method == 'POST':
