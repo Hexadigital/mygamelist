@@ -76,8 +76,9 @@
 						</tr>
 					</table>
 					<input type="submit" value="login">
-					<input type="hidden" name="next" value="{{ next }}">
+					<input type="hidden" name="next" value="{% url 'games:index' %}">
 				</form>
+				Not registered? <a href="{% url 'games:register' %}">Create an account</a>
 				{% endif %}
 			</div>
 		</div>
