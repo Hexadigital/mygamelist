@@ -11,7 +11,7 @@ class IndexView(generic.ListView):
     context_object_name = 'latest_games'
 
     def get_queryset(self):
-        return Game.objects.order_by('name')
+        return Game.objects.order_by('-id')[:25]
 
 class TagView(generic.DetailView):
     model = Tag
