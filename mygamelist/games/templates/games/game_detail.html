@@ -93,6 +93,12 @@
 					{% if game.vndb_link != '' %}
 					<a href="{{ game.vndb_link }}" target="_blank" rel="noopener noreferrer"><img src="{% static 'icons/vndb.png' %}"></a>
 					{% endif %}
+					{% if game.pcgamingwiki_link != '' %}
+					<a href="{{ game.pcgamingwiki_link }}" target="_blank" rel="noopener noreferrer"><img src="{% static 'icons/pcgamingwiki.png' %}"></a>
+					{% endif %}
+				</blockquote>
+				<blockquote class="blockquote">
+					<span title="Currently using popularity scores.">Score: {{ game.magic_number|floatformat:"0" }}%</span>
 				</blockquote>
 				<blockquote class="blockquote">
 					<p class="mb-0">
