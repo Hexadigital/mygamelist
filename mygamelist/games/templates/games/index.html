@@ -54,18 +54,14 @@
 		{% endif %}
 		</div>
 	</nav>
-	<div class="container">
+	<div class="container-fluid">
+		<div class="row">
 		{% for game in latest_games %}
-		{% if forloop.first %}
-		<div class="row justify-content-md-center">
-		{% endif %}
-			<div class="col d-flex align-items-center justify-content-md-center">
-			<a href="{% url 'games:game' game.id game.name|slugify %}"><img style="object-fit:contain;max-height:250px;max-width:250px;" src="{{ game.image.url }}"></a>
+			<div class="col d-flex align-items-md-center justify-content-md-center">
+			<a href="{% url 'games:game' game.id game.name|slugify %}"><img class="rounded mx-auto d-block" style="object-fit:contain;max-height:250px;max-width:250px;" src="{{ game.image.url }}"></a>
 			</div>
-		{% if forloop.revcounter|divisibleby:5 or forloop.last %}
-		</div>
-		{% endif %}
 		{% endfor %}
+		</div>
 	</div>
 	<div class="footer">
 		<div class="col-md-12" align="center">
