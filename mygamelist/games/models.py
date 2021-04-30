@@ -68,5 +68,7 @@ class Game(models.Model):
         return self.name + " (" + str(self.year) + ")"
 
 class UserProfile(models.Model):
-    avatar = models.ImageField(upload_to=random_avatar_filename, null=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    avatar = models.ImageField(upload_to=random_avatar_filename, null=True)
+    games_added = models.IntegerField(default=0)
+    edits_made = models.IntegerField(default=0)
