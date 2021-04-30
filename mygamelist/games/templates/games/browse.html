@@ -4,10 +4,10 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	
-	<title>{{ tag.name }} :: Remember Games</title>
+	<title>Browse :: Remember Games</title>
 	
 	<meta name="twitter:card" content="summary" />
-	<meta name="twitter:title" content="{{ tag.name }} :: Remember Games" />
+	<meta name="twitter:title" content="Browse :: Remember Games" />
 	<meta name="twitter:description" content="Remember Games is a website you can use to track games you've played." />
 	<meta name="twitter:image" content="" />
 	
@@ -38,7 +38,7 @@
 		<a class="nav-link" href="{% url 'games:gamelist' %}">Game List</a>
 		</li>
 		<li class="nav-item">
-		<a class="nav-link" href="{% url 'games:browse' %}">Browse</a>
+		<a class="nav-link active" href="{% url 'games:browse' %}">Browse</a>
 		</li>
 		<li class="nav-item">
 		<a class="nav-link" href="{% url 'games:forums' %}">Forums</a>
@@ -55,7 +55,6 @@
 		</div>
 	</nav>
 	<div class="container-fluid">
-		<center><h3>Games tagged with "{{ tag.name }}":</h3></center>
 		<div class="row">
 		{% for game in game_list %}
 			{% if game.image %}

@@ -2,19 +2,27 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views import generic
 from django.contrib.auth import login, authenticate
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from .models import Game, Genre, Platform, Tag
 from .forms import SignUpForm
 
-class IndexView(generic.ListView):
-    template_name = 'games/index.html'
-    context_object_name = 'latest_games'
+def IndexView(request):
+    return render(request, 'games/index.html', {'latest_games': Game.objects.order_by('-id')[:25]})
 
-    def get_queryset(self):
-        return Game.objects.order_by('-id')[:25]
+def GamesTaggedWithView(request, tag_id, name=None):
+    tag = Tag.objects.get(id=tag_id)
+    game_list = Game.objects.filter(tags=tag).order_by('-id')
+    page = request.GET.get('page', 1)
 
-class TagView(generic.DetailView):
-    model = Tag
+    paginator = Paginator(game_list, 25)
+    try:
+        paginated_results = paginator.page(page)
+    except PageNotAnInteger:
+        paginated_results = paginator.page(1)
+    except EmptyPage:
+        paginated_results = paginator.page(paginator.num_pages)
+    return render(request, 'games/tag_detail.html', {'game_list': paginated_results, 'tag': tag})
 
 class GenreView(generic.DetailView):
     model = Genre
@@ -25,8 +33,18 @@ class PlatformView(generic.DetailView):
 class GameView(generic.DetailView):
     model = Game
 
-class BrowseView(generic.View):
-    pass
+def BrowseView(request):
+    game_list = Game.objects.all().order_by('-id')
+    page = request.GET.get('page', 1)
+
+    paginator = Paginator(game_list, 25)
+    try:
+        paginated_results = paginator.page(page)
+    except PageNotAnInteger:
+        paginated_results = paginator.page(1)
+    except EmptyPage:
+        paginated_results = paginator.page(paginator.num_pages)
+    return render(request, 'games/browse.html', {'game_list': paginated_results})
 
 class GameListView(generic.View):
     pass
