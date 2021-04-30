@@ -59,7 +59,7 @@
 		{% for game in game_list %}
 			{% if game.image %}
 			<div class="col d-flex align-items-md-center justify-content-md-center">
-			<a href="{% url 'games:game' game.id game.name|slugify %}"><img class="rounded mx-auto d-block" style="object-fit:contain;max-height:250px;max-width:250px;" src="{{ game.image.url }}"></a>
+			<a href="{% url 'games:game' game.id game.name|slugify %}"><img class="rounded mx-auto d-block" style="object-fit:contain;max-height:250px;max-width:167px;" src="{{ game.image.url }}"></a>
 			</div>
 			{% endif %}
 		{% endfor %}
