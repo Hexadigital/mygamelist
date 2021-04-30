@@ -62,7 +62,11 @@
 				<br>
 			</div>
 			<div class="col-md-8 align-self-center">
+				{% if game.trailer_link != '' %}
 				<video style="max-width:100%; height:auto" controls><source src="{{ game.trailer_link }}" type="video/webm" />Your browser does not support WEBM.</video>
+				{% else %}
+				<img style="max-height:400px;max-width:100%;" src="{% static 'no_trailer.png' %}"><br>
+				{% endif %}
 			</div>
 			<div class="col-md-4" align="center">
 				{% if user.is_authenticated %}<blockquote class="blockquote">
