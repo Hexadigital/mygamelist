@@ -58,13 +58,9 @@
 	</nav>
 	<div class="container-fluid">
 		<div class="row">
-		{% for game in latest_games %}
-			{% if game.image %}
-			<div class="col d-flex align-items-md-center justify-content-md-center">
-			<a href="{% url 'games:game' game.id game.name|slugify %}"><img class="rounded mx-auto d-block" style="object-fit:contain;max-height:250px;max-width:167px;" src="{{ game.image.url }}"></a>
+			<div class="col-md-12" align="center">
+				<h1>Under Construction</h1>
 			</div>
-			{% endif %}
-		{% endfor %}
 		</div>
 	</div>
 	<div class="footer">
