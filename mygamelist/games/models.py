@@ -41,7 +41,7 @@ class Genre(models.Model):
         return self.name
 
 class Game(models.Model):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=150)
     year = models.IntegerField()
     magic_number = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
     trailer_link = models.URLField(max_length=250, blank=True, default='')
