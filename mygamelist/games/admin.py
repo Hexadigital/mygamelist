@@ -5,7 +5,7 @@ from django.db.models import ManyToManyField
 from django.forms import CheckboxSelectMultiple
 
 # Register your models here.
-from .models import Game, Genre, Platform, Tag, UserProfile
+from .models import Game, Genre, Platform, Tag, UserProfile, UserGameListEntry
 
 class UserProfileInline(admin.StackedInline):
     model = UserProfile
@@ -28,3 +28,4 @@ admin.site.register(Game, GameAdmin)
 admin.site.register(Genre)
 admin.site.register(Platform)
 admin.site.register(Tag)
+admin.site.register(UserGameListEntry)

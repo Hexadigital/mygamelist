@@ -72,3 +72,21 @@ class UserProfile(models.Model):
     avatar = models.ImageField(upload_to=random_avatar_filename, null=True)
     games_added = models.IntegerField(default=0)
     edits_made = models.IntegerField(default=0)
+
+class UserGameListEntry(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    game = models.ForeignKey(Game, on_delete=models.CASCADE)
+    platform = models.ForeignKey(Platform, on_delete=models.CASCADE)
+    statuses = [
+        ("PLAY", "Playing"),
+        ("CMPL", "Completed"),
+        ("DROP", "Dropped"),
+        ("HOLD", "Paused"),
+        ("PLAN", "Plan to Play")
+    ]
+    status = models.CharField(max_length=4, choices=statuses, default="PLAN")
+    score = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
+    hours = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    comments = models.CharField(max_length=500, blank=True, default='')
+    start_date = models.DateField(blank=True, null=True)
+    stop_date = models.DateField(blank=True, null=True)
