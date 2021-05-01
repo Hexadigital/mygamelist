@@ -8,7 +8,8 @@ from . import views
 app_name = 'games'
 urlpatterns = [
     path('', views.IndexView, name='index'),
-    path('genre/<int:pk>/<str:name>/', views.GenreView.as_view(), name='genre'),
+    path('genre/<int:genre_id>/', views.GenreView, name='genre'),
+    path('genre/<int:genre_id>/<str:name>/', views.GenreView, name='genre'),
     path('tag/<int:tag_id>/', views.GamesTaggedWithView, name='tag'),
     path('tag/<int:tag_id>/<str:name>/', views.GamesTaggedWithView, name='tag'),
     path('platform/<int:pk>/', views.PlatformView.as_view(), name='platform'),

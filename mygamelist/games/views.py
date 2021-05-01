@@ -8,8 +8,7 @@ from .models import Game, Genre, Platform, Tag, User
 from .forms import SignUpForm
 
 def IndexView(request):
-    sexual_content = Tag.objects.get(name="Sexual Content")
-    return render(request, 'games/index.html', {'latest_games': Game.objects.exclude(tags=sexual_content).order_by('-id')[:25]})
+    return render(request, 'games/index.html', {})
 
 def GamesTaggedWithView(request, tag_id, name=None):
     sexual_content = Tag.objects.get(name="Sexual Content")
@@ -30,8 +29,20 @@ def ProfileView(request, user_id, name=None):
     selected_user = User.objects.get(id=user_id)
     return render(request, 'games/profile.html', {'selected_user': selected_user})
 
-class GenreView(generic.DetailView):
-    model = Genre
+def GenreView(request, genre_id, name=None):
+    sexual_content = Tag.objects.get(name="Sexual Content")
+    genre = Genre.objects.get(id=genre_id)
+    game_list = Game.objects.filter(genres=genre).exclude(tags=sexual_content).order_by('-id')
+    page = request.GET.get('page', 1)
+
+    paginator = Paginator(game_list, 25)
+    try:
+        paginated_results = paginator.page(page)
+    except PageNotAnInteger:
+        paginated_results = paginator.page(1)
+    except EmptyPage:
+        paginated_results = paginator.page(paginator.num_pages)
+    return render(request, 'games/genre_detail.html', {'game_list': paginated_results, 'genre': genre})
 
 class PlatformView(generic.DetailView):
     model = Platform
