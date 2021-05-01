@@ -4,7 +4,7 @@ from django.views import generic
 from django.contrib.auth import login, authenticate
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-from .models import Game, Genre, Platform, Tag
+from .models import Game, Genre, Platform, Tag, User
 from .forms import SignUpForm
 
 def IndexView(request):
@@ -25,6 +25,10 @@ def GamesTaggedWithView(request, tag_id, name=None):
     except EmptyPage:
         paginated_results = paginator.page(paginator.num_pages)
     return render(request, 'games/tag_detail.html', {'game_list': paginated_results, 'tag': tag})
+
+def ProfileView(request, user_id, name=None):
+    selected_user = User.objects.get(id=user_id)
+    return render(request, 'games/profile.html', {'selected_user': selected_user})
 
 class GenreView(generic.DetailView):
     model = Genre
