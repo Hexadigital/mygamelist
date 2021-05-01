@@ -9,7 +9,7 @@
 	<meta name="twitter:card" content="summary" />
 	<meta name="twitter:title" content="{{ selected_user.username }} :: Remember Games" />
 	<meta name="twitter:description" content="Remember Games is a website you can use to track games you've played." />
-	<meta name="twitter:image" content="{{ selected_user.userprofile.avatar.url }}" />
+	<meta name="twitter:image" content="{% if selected_user.userprofile.avatar %}{{ selected_user.userprofile.avatar.url }}{% else %}{% static 'default_avatar.png' %}{% endif %}" />
 	
 	<link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
 	<link href="{% static 'css/style.css' %}" rel="stylesheet">
