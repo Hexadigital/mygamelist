@@ -8,11 +8,13 @@ from .models import Game, Genre, Platform, Tag
 from .forms import SignUpForm
 
 def IndexView(request):
-    return render(request, 'games/index.html', {'latest_games': Game.objects.order_by('-id')[:25]})
+    sexual_content = Tag.objects.get(name="Sexual Content")
+    return render(request, 'games/index.html', {'latest_games': Game.objects.exclude(tags=sexual_content).order_by('-id')[:25]})
 
 def GamesTaggedWithView(request, tag_id, name=None):
+    sexual_content = Tag.objects.get(name="Sexual Content")
     tag = Tag.objects.get(id=tag_id)
-    game_list = Game.objects.filter(tags=tag).order_by('-id')
+    game_list = Game.objects.filter(tags=tag).exclude(tags=sexual_content).order_by('-id')
     page = request.GET.get('page', 1)
 
     paginator = Paginator(game_list, 25)
@@ -34,7 +36,8 @@ class GameView(generic.DetailView):
     model = Game
 
 def BrowseView(request):
-    game_list = Game.objects.all().order_by('-id')
+    sexual_content = Tag.objects.get(name="Sexual Content")
+    game_list = Game.objects.exclude(tags=sexual_content).order_by('-id')
     page = request.GET.get('page', 1)
 
     paginator = Paginator(game_list, 25)
