@@ -71,7 +71,7 @@
                 </div>
                 <ul class="profile-header-tab nav nav-tabs nav-tabs-v2">
                     <li class="nav-item">
-                        <a href="{% url 'games:profile' selected_user.id selected_user.username|slugify 'activity' %}" class="nav-link{% if tab == 'activity' %} active{% endif %}">
+                        <a href="{% url 'games:profile' selected_user.id selected_user.username|slugify %}" class="nav-link{% if not tab %} active{% endif %}">
                             <div class="nav-field">Activity</div>
                         </a>
                     </li>
