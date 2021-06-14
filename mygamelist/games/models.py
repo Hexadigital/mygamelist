@@ -93,3 +93,25 @@ class UserGameListEntry(models.Model):
 
     def __str__(self):
         return self.user.username + " - " + self.game.name
+
+class ManualUserGameListEntry(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=150)
+    year = models.IntegerField()
+    platform = models.ForeignKey(Platform, on_delete=models.CASCADE)
+    statuses = [
+        ("PLAY", "Playing"),
+        ("CMPL", "Completed"),
+        ("DROP", "Dropped"),
+        ("HOLD", "Paused"),
+        ("PLAN", "Plan to Play")
+    ]
+    status = models.CharField(max_length=4, choices=statuses, default="PLAN")
+    score = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
+    hours = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    comments = models.CharField(max_length=500, blank=True, default='')
+    start_date = models.DateField(blank=True, null=True)
+    stop_date = models.DateField(blank=True, null=True)
+
+    def __str__(self):
+        return self.user.username + " - " + self.name
