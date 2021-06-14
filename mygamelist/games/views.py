@@ -34,13 +34,34 @@ def ProfileView(request, user_id, name=None, tab=None):
         game_list = UserGameListEntry.objects.filter(user=user_id)
         manual_list = ManualUserGameListEntry.objects.filter(user=user_id)
         playing_list = {}
+        completed_list = {}
+        dropped_list = {}
+        hold_list = {}
+        planning_list = {}
         for entry in game_list:
             if entry.status == "PLAY":
                 playing_list[entry.game.name] = {'game_id': entry.game.id, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments}
+            elif entry.status == "CMPL":
+                completed_list[entry.game.name] = {'game_id': entry.game.id, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments}
+            elif entry.status == "HOLD":
+                hold_list[entry.game.name] = {'game_id': entry.game.id, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments}
+            elif entry.status == "DROP":
+                dropped_list[entry.game.name] = {'game_id': entry.game.id, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments}
+            elif entry.status == "PLAN":
+                planning_list[entry.game.name] = {'game_id': entry.game.id, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments}
         for entry in manual_list:
             if entry.status == "PLAY":
                 playing_list[entry.name] = {'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments}
-        return render(request, 'games/profile.html', {'selected_user': selected_user, 'tab': tab, 'playing_list': playing_list})
+            elif entry.status == "CMPL":
+                completed_list[entry.game.name] = {'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments}
+            elif entry.status == "HOLD":
+                hold_list[entry.game.name] = {'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments}
+            elif entry.status == "DROP":
+                dropped_list[entry.game.name] = {'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments}
+            elif entry.status == "PLAN":
+                planning_list[entry.game.name] = {'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments}
+        return render(request, 'games/profile.html', {'selected_user': selected_user, 'tab': tab, 'playing_list': playing_list, 'completed_list': completed_list,
+                                                      'dropped_list': dropped_list, 'hold_list': hold_list, 'planning_list': planning_list})
     if tab == "social":
         return render(request, 'games/profile.html', {'selected_user': selected_user, 'tab': tab})
     if tab == "stats":

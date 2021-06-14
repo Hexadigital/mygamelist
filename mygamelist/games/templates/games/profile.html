@@ -12,14 +12,21 @@
 	<meta name="twitter:image" content="{% if selected_user.userprofile.avatar %}{{ selected_user.userprofile.avatar.url }}{% else %}{% static 'default_avatar.png' %}{% endif %}" />
 	
 	<link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
-	<link href="{% static 'css/style.css' %}" rel="stylesheet">
 	<link href="{% static 'css/profile.css' %}" rel="stylesheet">
+	<link href="{% static 'css/style.css' %}" rel="stylesheet">
 	
 	<style>
 		body {
 			background-image: url("{% static 'bgdark.png' %}");
 			background-repeat: repeat;
 			color: white;
+		}
+		a.gamelink {
+			color: #CCBADC;
+			text-decoration: none;
+		}
+		table {
+			text-align: center;
 		}
 	</style>
 </head>
@@ -115,22 +122,98 @@
 					<div class="col-xl-12">
 						<div class="tab-content p-0">
 							{% if tab == 'list' %}
-							<h3>Playing</h3>
-							<table border="0" cellpadding="0" cellspacing="0" width="100%">
+							<table class="table table-hover table-striped table-dark">
+							<tr><td colspan="5"><h3><center>Playing</center></h3></td></tr>
 							<tr>
-							<td class="table_header">Game Title</td>
-							<td class="table_header">Score</td>
-							<td class="table_header" nowrap>Platform</td>
-							<td class="table_header">Hours</td>
-							<td class="table_header" nowrap>Comments</td>
+							<th scope="col">Game Title</th>
+							<th scope="col">Platform</th>
+							<th scope="col">Score</th>
+							<th scope="col">Hours</th>
+							<th scope="col">Flags</th>
 							</tr>
 								{% for entry_name, entry in playing_list.items %}
 								<tr>
-									<td>{% if entry.game_id %}<a href="{% url 'games:game' entry.game_id entry_name|slugify %}">{% endif %}{{ entry_name }}{% if entry.game_id %}</a>{% endif %}</td>
-									<td>{{ entry.score }}</td>
+									<td>{% if entry.game_id %}<a class="gamelink" href="{% url 'games:game' entry.game_id entry_name|slugify %}">{% endif %}{{ entry_name }}{% if entry.game_id %}</a>{% endif %}</td>
 									<td>{{ entry.platform.name }}</td>
+									<td>{{ entry.score }}</td>
 									<td>{{ entry.hours }}</td>
-									<td>{% if entry.comments %}<div title="{{ entry.comments }}"><u>Hover</u></div>{% endif %}</td>
+									<td>{% if entry.comments %}<div title="{{ entry.comments }}">&#x1F4AC;</div>{% endif %}</td>
+								</tr>
+								{% endfor %}
+							</table>
+							<table class="table table-hover table-striped table-dark">
+							<tr><td colspan="5"><h3><center>Completed</center></h3></td></tr>
+							<tr>
+							<th scope="col">Game Title</th>
+							<th scope="col">Platform</th>
+							<th scope="col">Score</th>
+							<th scope="col">Hours</th>
+							<th scope="col">Flags</th>
+							</tr>
+								{% for entry_name, entry in completed_list.items %}
+								<tr>
+									<td>{% if entry.game_id %}<a class="gamelink" href="{% url 'games:game' entry.game_id entry_name|slugify %}">{% endif %}{{ entry_name }}{% if entry.game_id %}</a>{% endif %}</td>
+									<td>{{ entry.platform.name }}</td>
+									<td>{{ entry.score }}</td>
+									<td>{{ entry.hours }}</td>
+									<td>{% if entry.comments %}<div title="{{ entry.comments }}">&#x1F4AC;</div>{% endif %}</td>
+								</tr>
+								{% endfor %}
+							</table>
+							<table class="table table-hover table-striped table-dark">
+							<tr><td colspan="5"><h3><center>On Hold</center></h3></td></tr>
+							<tr>
+							<th scope="col">Game Title</th>
+							<th scope="col">Platform</th>
+							<th scope="col">Score</th>
+							<th scope="col">Hours</th>
+							<th scope="col">Flags</th>
+							</tr>
+								{% for entry_name, entry in hold_list.items %}
+								<tr>
+									<td>{% if entry.game_id %}<a class="gamelink" href="{% url 'games:game' entry.game_id entry_name|slugify %}">{% endif %}{{ entry_name }}{% if entry.game_id %}</a>{% endif %}</td>
+									<td>{{ entry.platform.name }}</td>
+									<td>{{ entry.score }}</td>
+									<td>{{ entry.hours }}</td>
+									<td>{% if entry.comments %}<div title="{{ entry.comments }}">&#x1F4AC;</div>{% endif %}</td>
+								</tr>
+								{% endfor %}
+							</table>
+							<table class="table table-hover table-striped table-dark">
+							<tr><td colspan="5"><h3><center>Dropped</center></h3></td></tr>
+							<tr>
+							<th scope="col">Game Title</th>
+							<th scope="col">Platform</th>
+							<th scope="col">Score</th>
+							<th scope="col">Hours</th>
+							<th scope="col">Flags</th>
+							</tr>
+								{% for entry_name, entry in dropped_list.items %}
+								<tr>
+									<td>{% if entry.game_id %}<a class="gamelink" href="{% url 'games:game' entry.game_id entry_name|slugify %}">{% endif %}{{ entry_name }}{% if entry.game_id %}</a>{% endif %}</td>
+									<td>{{ entry.platform.name }}</td>
+									<td>{{ entry.score }}</td>
+									<td>{{ entry.hours }}</td>
+									<td>{% if entry.comments %}<div title="{{ entry.comments }}">&#x1F4AC;</div>{% endif %}</td>
+								</tr>
+								{% endfor %}
+							</table>
+							<table class="table table-hover table-striped table-dark">
+							<tr><td colspan="5"><h3><center>Plan to Play</center></h3></td></tr>
+							<tr>
+							<th scope="col">Game Title</th>
+							<th scope="col">Platform</th>
+							<th scope="col">Score</th>
+							<th scope="col">Hours</th>
+							<th scope="col">Flags</th>
+							</tr>
+								{% for entry_name, entry in planning_list.items %}
+								<tr>
+									<td>{% if entry.game_id %}<a class="gamelink" href="{% url 'games:game' entry.game_id entry_name|slugify %}">{% endif %}{{ entry_name }}{% if entry.game_id %}</a>{% endif %}</td>
+									<td>{{ entry.platform.name }}</td>
+									<td>{{ entry.score }}</td>
+									<td>{{ entry.hours }}</td>
+									<td>{% if entry.comments %}<div title="{{ entry.comments }}">&#x1F4AC;</div>{% endif %}</td>
 								</tr>
 								{% endfor %}
 							</table>
@@ -147,8 +230,6 @@
 			<a href="https://github.com/Frostflake/mygamelist">GitHub</a>
 		</div>
 	</div>
-	<div id="lightbox" class="lightbox hidden"></div>
-	<div id="curtain" class="curtain hidden"></div>
 
 	<script src="{% static 'js/jquery.min.js' %}"></script>
 	<script src="{% static 'js/bootstrap.min.js' %}"></script>
