@@ -90,3 +90,6 @@ class UserGameListEntry(models.Model):
     comments = models.CharField(max_length=500, blank=True, default='')
     start_date = models.DateField(blank=True, null=True)
     stop_date = models.DateField(blank=True, null=True)
+
+    def __str__(self):
+        return self.user.username + " - " + self.game.name
