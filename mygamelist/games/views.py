@@ -4,7 +4,7 @@ from django.views import generic
 from django.contrib.auth import login, authenticate
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-from .models import Game, Genre, Platform, Tag, User
+from .models import Game, Genre, Platform, Tag, User, UserGameListEntry, ManualUserGameListEntry
 from .forms import SignUpForm
 
 def IndexView(request):
@@ -27,7 +27,26 @@ def GamesTaggedWithView(request, tag_id, name=None):
 
 def ProfileView(request, user_id, name=None, tab=None):
     selected_user = User.objects.get(id=user_id)
-    return render(request, 'games/profile.html', {'selected_user': selected_user, 'tab': tab})
+    # Activity
+    if tab is None:
+        return render(request, 'games/profile.html', {'selected_user': selected_user, 'tab': tab})
+    if tab == "list":
+        game_list = UserGameListEntry.objects.filter(user=user_id)
+        manual_list = ManualUserGameListEntry.objects.filter(user=user_id)
+        playing_list = {}
+        for entry in game_list:
+            if entry.status == "PLAY":
+                playing_list[entry.game.name] = {'game_id': entry.game.id, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments}
+        for entry in manual_list:
+            if entry.status == "PLAY":
+                playing_list[entry.name] = {'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments}
+        return render(request, 'games/profile.html', {'selected_user': selected_user, 'tab': tab, 'playing_list': playing_list})
+    if tab == "social":
+        return render(request, 'games/profile.html', {'selected_user': selected_user, 'tab': tab})
+    if tab == "stats":
+        return render(request, 'games/profile.html', {'selected_user': selected_user, 'tab': tab})
+    if tab == "contrib":
+        return render(request, 'games/profile.html', {'selected_user': selected_user, 'tab': tab})
 
 def GenreView(request, genre_id, name=None):
     sexual_content = Tag.objects.get(name="Sexual Content")

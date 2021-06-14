@@ -58,69 +58,89 @@
 		</div>
 	</nav>
 <div class="container">
-    <div class="profile">
-        <div class="profile-header">
-            <div class="profile-header-cover"></div>
-            <div class="profile-header-content">
-                <div class="profile-header-img">
-                    {% if selected_user.userprofile.avatar %}
-                    <img class="rounded-circle" src="{{ selected_user.userprofile.avatar.url }}">
-                    {% else %}
-                    <img class="rounded-circle" src="{% static 'default_avatar.png' %}">
-                    {% endif %}
-                </div>
-                <ul class="profile-header-tab nav nav-tabs nav-tabs-v2">
-                    <li class="nav-item">
-                        <a href="{% url 'games:profile' selected_user.id selected_user.username|slugify %}" class="nav-link{% if not tab %} active{% endif %}">
-                            <div class="nav-field">Activity</div>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{% url 'games:profile' selected_user.id selected_user.username|slugify 'list' %}" class="nav-link{% if tab == 'list' %} active{% endif %}">
-                            <div class="nav-field">Game List</div>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{% url 'games:profile' selected_user.id selected_user.username|slugify 'social' %}" class="nav-link{% if tab == 'social' %} active{% endif %}">
-                            <div class="nav-field">Social</div>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{% url 'games:profile' selected_user.id selected_user.username|slugify 'stats' %}" class="nav-link{% if tab == 'stats' %} active{% endif %}">
-                            <div class="nav-field">Stats</div>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{% url 'games:profile' selected_user.id selected_user.username|slugify 'contrib' %}" class="nav-link{% if tab == 'contrib' %} active{% endif %}">
-                            <div class="nav-field">Contributions</div>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
+	<div class="profile">
+		<div class="profile-header">
+			<div class="profile-header-cover"></div>
+			<div class="profile-header-content">
+				<div class="profile-header-img">
+					{% if selected_user.userprofile.avatar %}
+					<img class="rounded-circle" src="{{ selected_user.userprofile.avatar.url }}">
+					{% else %}
+					<img class="rounded-circle" src="{% static 'default_avatar.png' %}">
+					{% endif %}
+				</div>
+				<ul class="profile-header-tab nav nav-tabs nav-tabs-v2">
+					<li class="nav-item">
+						<a href="{% url 'games:profile' selected_user.id selected_user.username|slugify %}" class="nav-link{% if not tab %} active{% endif %}">
+							<div class="nav-field">Activity</div>
+						</a>
+					</li>
+					<li class="nav-item">
+						<a href="{% url 'games:profile' selected_user.id selected_user.username|slugify 'list' %}" class="nav-link{% if tab == 'list' %} active{% endif %}">
+							<div class="nav-field">Game List</div>
+						</a>
+					</li>
+					<li class="nav-item">
+						<a href="{% url 'games:profile' selected_user.id selected_user.username|slugify 'social' %}" class="nav-link{% if tab == 'social' %} active{% endif %}">
+							<div class="nav-field">Social</div>
+						</a>
+					</li>
+					<li class="nav-item">
+						<a href="{% url 'games:profile' selected_user.id selected_user.username|slugify 'stats' %}" class="nav-link{% if tab == 'stats' %} active{% endif %}">
+							<div class="nav-field">Stats</div>
+						</a>
+					</li>
+					<li class="nav-item">
+						<a href="{% url 'games:profile' selected_user.id selected_user.username|slugify 'contrib' %}" class="nav-link{% if tab == 'contrib' %} active{% endif %}">
+							<div class="nav-field">Contributions</div>
+						</a>
+					</li>
+				</ul>
+			</div>
+		</div>
 
-        <div class="profile-container">
-            <div class="profile-sidebar">
-                <div class="desktop-sticky-top">
-                    <h4>{{ selected_user.username }}</h4>
-                    <div class="font-weight-600 mb-3 text-muted mt-n2">{{ selected_user.userprofile.title }}</div>
-                    <!--<p>
-                        Description
-                    </p>-->
-                </div>
-            </div>
+		<div class="profile-container">
+			<div class="profile-sidebar">
+				<div class="desktop-sticky-top">
+					<h4>{{ selected_user.username }}</h4>
+					<div class="font-weight-600 mb-3 text-muted mt-n2">{{ selected_user.userprofile.title }}</div>
+					<!--<p>
+						Description
+					</p>-->
+				</div>
+			</div>
 
-            <div class="profile-content">
-                <div class="row">
-                    <div class="col-xl-12">
-                        <div class="tab-content p-0">
-                            
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+			<div class="profile-content">
+				<div class="row">
+					<div class="col-xl-12">
+						<div class="tab-content p-0">
+							{% if tab == 'list' %}
+							<h3>Playing</h3>
+							<table border="0" cellpadding="0" cellspacing="0" width="100%">
+							<tr>
+							<td class="table_header">Game Title</td>
+							<td class="table_header">Score</td>
+							<td class="table_header" nowrap>Platform</td>
+							<td class="table_header">Hours</td>
+							<td class="table_header" nowrap>Comments</td>
+							</tr>
+								{% for entry_name, entry in playing_list.items %}
+								<tr>
+									<td>{% if entry.game_id %}<a href="{% url 'games:game' entry.game_id entry_name|slugify %}">{% endif %}{{ entry_name }}{% if entry.game_id %}</a>{% endif %}</td>
+									<td>{{ entry.score }}</td>
+									<td>{{ entry.platform.name }}</td>
+									<td>{{ entry.hours }}</td>
+									<td>{% if entry.comments %}<div title="{{ entry.comments }}"><u>Hover</u></div>{% endif %}</td>
+								</tr>
+								{% endfor %}
+							</table>
+							{% endif %}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 	<div class="footer">
 		<div class="col-md-12" align="center">
