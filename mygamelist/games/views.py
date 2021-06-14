@@ -25,9 +25,9 @@ def GamesTaggedWithView(request, tag_id, name=None):
         paginated_results = paginator.page(paginator.num_pages)
     return render(request, 'games/tag_detail.html', {'game_list': paginated_results, 'tag': tag})
 
-def ProfileView(request, user_id, name=None):
+def ProfileView(request, user_id, name=None, tab=None):
     selected_user = User.objects.get(id=user_id)
-    return render(request, 'games/profile.html', {'selected_user': selected_user})
+    return render(request, 'games/profile.html', {'selected_user': selected_user, 'tab': tab})
 
 def GenreView(request, genre_id, name=None):
     sexual_content = Tag.objects.get(name="Sexual Content")

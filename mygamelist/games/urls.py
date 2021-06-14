@@ -18,6 +18,7 @@ urlpatterns = [
     path('game/<int:pk>/<str:name>/', views.GameView.as_view(), name='game'),
     path('user/<int:user_id>/', views.ProfileView, name='profile'),
     path('user/<int:user_id>/<str:name>/', views.ProfileView, name='profile'),
+    path('user/<int:user_id>/<str:name>/<str:tab>/', views.ProfileView, name='profile'),
     path('login/', auth_views.LoginView.as_view(template_name='games/login.html'), name='login'),
     path('register/', views.register, name='register'),
     path('gamelist/', views.IndexView, name='gamelist'),
