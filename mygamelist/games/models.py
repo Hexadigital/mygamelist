@@ -82,7 +82,8 @@ class UserGameListEntry(models.Model):
         ("CMPL", "Completed"),
         ("DROP", "Dropped"),
         ("HOLD", "Paused"),
-        ("PLAN", "Plan to Play")
+        ("PLAN", "Plan to Play"),
+        ("IMPT", "Imported")
     ]
     status = models.CharField(max_length=4, choices=statuses, default="PLAN")
     score = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
@@ -90,6 +91,7 @@ class UserGameListEntry(models.Model):
     comments = models.CharField(max_length=500, blank=True, default='')
     start_date = models.DateField(blank=True, null=True)
     stop_date = models.DateField(blank=True, null=True)
+    times_replayed = models.IntegerField(default=0)
 
     def __str__(self):
         return self.user.username + " - " + self.game.name
@@ -97,14 +99,14 @@ class UserGameListEntry(models.Model):
 class ManualUserGameListEntry(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=150)
-    year = models.IntegerField()
     platform = models.ForeignKey(Platform, on_delete=models.CASCADE)
     statuses = [
         ("PLAY", "Playing"),
         ("CMPL", "Completed"),
         ("DROP", "Dropped"),
         ("HOLD", "Paused"),
-        ("PLAN", "Plan to Play")
+        ("PLAN", "Plan to Play"),
+        ("IMPT", "Imported")
     ]
     status = models.CharField(max_length=4, choices=statuses, default="PLAN")
     score = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
@@ -112,6 +114,7 @@ class ManualUserGameListEntry(models.Model):
     comments = models.CharField(max_length=500, blank=True, default='')
     start_date = models.DateField(blank=True, null=True)
     stop_date = models.DateField(blank=True, null=True)
+    times_replayed = models.IntegerField(default=0)
 
     def __str__(self):
         return self.user.username + " - " + self.name

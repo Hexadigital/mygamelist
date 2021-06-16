@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views import generic
@@ -40,26 +41,35 @@ def ProfileView(request, user_id, name=None, tab=None):
         planning_list = {}
         for entry in game_list:
             if entry.status == "PLAY":
-                playing_list[entry.game.name] = {'game_id': entry.game.id, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments}
+                playing_list[entry.game.name] = {'game_id': entry.game.id, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed}
             elif entry.status == "CMPL":
-                completed_list[entry.game.name] = {'game_id': entry.game.id, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments}
+                completed_list[entry.game.name] = {'game_id': entry.game.id, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed}
             elif entry.status == "HOLD":
-                hold_list[entry.game.name] = {'game_id': entry.game.id, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments}
+                hold_list[entry.game.name] = {'game_id': entry.game.id, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed}
             elif entry.status == "DROP":
-                dropped_list[entry.game.name] = {'game_id': entry.game.id, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments}
+                dropped_list[entry.game.name] = {'game_id': entry.game.id, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed}
             elif entry.status == "PLAN":
-                planning_list[entry.game.name] = {'game_id': entry.game.id, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments}
+                planning_list[entry.game.name] = {'game_id': entry.game.id, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed}
         for entry in manual_list:
             if entry.status == "PLAY":
-                playing_list[entry.name] = {'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments}
+                playing_list[entry.name] = {'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed}
             elif entry.status == "CMPL":
-                completed_list[entry.game.name] = {'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments}
+                completed_list[entry.name] = {'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed}
             elif entry.status == "HOLD":
-                hold_list[entry.game.name] = {'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments}
+                hold_list[entry.name] = {'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed}
             elif entry.status == "DROP":
-                dropped_list[entry.game.name] = {'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments}
+                dropped_list[entry.name] = {'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed}
             elif entry.status == "PLAN":
-                planning_list[entry.game.name] = {'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments}
+                planning_list[entry.name] = {'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed}
+        # Sort dicts
+        playing_list = OrderedDict(sorted(playing_list.items()))
+        completed_list = OrderedDict(sorted(completed_list.items()))
+        dropped_list = OrderedDict(sorted(dropped_list.items()))
+        hold_list = OrderedDict(sorted(hold_list.items()))
+        planning_list = OrderedDict(sorted(planning_list.items()))
+        
+        
+        
         return render(request, 'games/profile.html', {'selected_user': selected_user, 'tab': tab, 'playing_list': playing_list, 'completed_list': completed_list,
                                                       'dropped_list': dropped_list, 'hold_list': hold_list, 'planning_list': planning_list})
     if tab == "social":
