@@ -22,6 +22,8 @@ urlpatterns = [
     path('login/', auth_views.LoginView.as_view(template_name='games/login.html'), name='login'),
     path('register/', views.register, name='register'),
     path('gamelist/', views.GameListView, name='gamelist'),
+    path('gamelist/<str:edit_type>', views.GameListView, name='gamelist'),
+    path('gamelist/<str:edit_type>/<int:entry_id>', views.GameListView, name='gamelist'),
     path('browse/', views.BrowseView, name='browse'),
     path('forums/', views.IndexView, name='forums')
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

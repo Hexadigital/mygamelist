@@ -96,7 +96,7 @@ def BrowseView(request):
     return render(request, 'games/browse.html', {'game_list': paginated_results})
 
 @login_required(login_url='/login/')
-def GameListView(request):
+def GameListView(request, edit_type=None, entry_id=None):
     status_conversion = {
         "PLAY":"Playing",
         "CMPL":"Completed",
@@ -110,9 +110,9 @@ def GameListView(request):
     manual_list = ManualUserGameListEntry.objects.filter(user=user_id)
     total_list = {"Playing": {}, "Completed": {}, "On Hold": {}, "Dropped": {}, "Plan to Play": {}, "Imported": {}}
     for entry in game_list:
-        total_list[status_conversion[entry.status]][entry.game.name] = {'game_id': entry.game.id, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed}
+        total_list[status_conversion[entry.status]][entry.game.name] = {'id': entry.game.id, 'game_id': entry.game.id, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed, 'edit_type': 'edit'}
     for entry in manual_list:
-        total_list[status_conversion[entry.status]][entry.name] = {'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed}
+        total_list[status_conversion[entry.status]][entry.name] = {'id': entry.id, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed, 'edit_type': 'edit-manual'}
     # Sort dicts
     for status in total_list.keys():
         total_list[status] = OrderedDict(sorted(total_list[status].items()))

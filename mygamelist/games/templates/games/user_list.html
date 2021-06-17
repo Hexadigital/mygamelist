@@ -4,12 +4,11 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	
-	<title>{{ selected_user.username }} :: Remember Games</title>
+	<title>My Games :: Remember Games</title>
 	
 	<meta name="twitter:card" content="summary" />
-	<meta name="twitter:title" content="{{ selected_user.username }} :: Remember Games" />
+	<meta name="twitter:title" content="My Games :: Remember Games" />
 	<meta name="twitter:description" content="Remember Games is a website you can use to track games you've played." />
-	<meta name="twitter:image" content="{% if selected_user.userprofile.avatar %}{{ selected_user.userprofile.avatar.url }}{% else %}{% static 'default_avatar.png' %}{% endif %}" />
 	
 	<link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
 	<link href="{% static 'css/style.css' %}" rel="stylesheet">
@@ -65,12 +64,14 @@
 	</nav>
 	<div class="container">
 		<div class="row">
+			<a href="{% url 'games:gamelist' 'add-manual' %}" class="gamelink">Add Game Manually</a><br>
 			{% for status, game_list in total_list.items %}
 				{% if status != 'Imported' %}
 					<table class="table table-hover table-striped table-dark">
-					<tr><td colspan="5"><h3><center>{{ status }}</center></h3></td></tr>
+					<tr><td colspan="6"><h3><center>{{ status }}</center></h3></td></tr>
 					<tr>
-					<th scope="col" width="50%">Game Title</th>
+					<th scope="col" width="5%">Actions</th>
+					<th scope="col" width="45%">Game Title</th>
 					<th scope="col" width="15%">Platform</th>
 					<th scope="col" width="10%">Score</th>
 					<th scope="col" width="10%">Hours</th>
@@ -78,6 +79,7 @@
 					</tr>
 						{% for entry_name, entry in game_list.items %}
 						<tr>
+							<td><a href="{% url 'games:gamelist' entry.edit_type entry.id %}">&#x2699;</a></td>
 							<td>{% if entry.game_id %}<a class="gamelink" href="{% url 'games:game' entry.game_id entry_name|slugify %}">{% endif %}{{ entry_name }}{% if entry.game_id %}</a>{% endif %}</td>
 							<td>{{ entry.platform.name }}</td>
 							<td>{{ entry.score }}</td>
