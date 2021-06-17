@@ -96,8 +96,27 @@ def BrowseView(request):
     return render(request, 'games/browse.html', {'game_list': paginated_results})
 
 @login_required(login_url='/login/')
-class GameListView(generic.View):
-    pass
+def GameListView(request):
+    status_conversion = {
+        "PLAY":"Playing",
+        "CMPL":"Completed",
+        "HOLD":"On Hold",
+        "DROP":"Dropped",
+        "PLAN":"Plan to Play",
+        "IMPT": "Imported"
+    }
+    user_id = request.user.id
+    game_list = UserGameListEntry.objects.filter(user=user_id)
+    manual_list = ManualUserGameListEntry.objects.filter(user=user_id)
+    total_list = {"Playing": {}, "Completed": {}, "On Hold": {}, "Dropped": {}, "Plan to Play": {}, "Imported": {}}
+    for entry in game_list:
+        total_list[status_conversion[entry.status]][entry.game.name] = {'game_id': entry.game.id, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed}
+    for entry in manual_list:
+        total_list[status_conversion[entry.status]][entry.name] = {'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed}
+    # Sort dicts
+    for status in total_list.keys():
+        total_list[status] = OrderedDict(sorted(total_list[status].items()))
+    return render(request, 'games/user_list.html', {'total_list': total_list})
 
 class ForumView(generic.View):
     pass
