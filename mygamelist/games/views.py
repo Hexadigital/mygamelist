@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views import generic
 from django.contrib.auth import login, authenticate
+from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from .models import Game, Genre, Platform, Tag, User, UserGameListEntry, ManualUserGameListEntry
@@ -32,46 +33,26 @@ def ProfileView(request, user_id, name=None, tab=None):
     if tab is None:
         return render(request, 'games/profile.html', {'selected_user': selected_user, 'tab': tab})
     if tab == "list":
+        status_conversion = {
+            "PLAY":"Playing",
+            "CMPL":"Completed",
+            "HOLD":"On Hold",
+            "DROP":"Dropped",
+            "PLAN":"Plan to Play",
+            "IMPT": "Imported"
+        }
         game_list = UserGameListEntry.objects.filter(user=user_id)
         manual_list = ManualUserGameListEntry.objects.filter(user=user_id)
-        playing_list = {}
-        completed_list = {}
-        dropped_list = {}
-        hold_list = {}
-        planning_list = {}
+        total_list = {"Playing": {}, "Completed": {}, "On Hold": {}, "Dropped": {}, "Plan to Play": {}, "Imported": {}}
         for entry in game_list:
-            if entry.status == "PLAY":
-                playing_list[entry.game.name] = {'game_id': entry.game.id, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed}
-            elif entry.status == "CMPL":
-                completed_list[entry.game.name] = {'game_id': entry.game.id, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed}
-            elif entry.status == "HOLD":
-                hold_list[entry.game.name] = {'game_id': entry.game.id, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed}
-            elif entry.status == "DROP":
-                dropped_list[entry.game.name] = {'game_id': entry.game.id, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed}
-            elif entry.status == "PLAN":
-                planning_list[entry.game.name] = {'game_id': entry.game.id, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed}
+            total_list[status_conversion[entry.status]][entry.game.name] = {'game_id': entry.game.id, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed}
         for entry in manual_list:
-            if entry.status == "PLAY":
-                playing_list[entry.name] = {'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed}
-            elif entry.status == "CMPL":
-                completed_list[entry.name] = {'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed}
-            elif entry.status == "HOLD":
-                hold_list[entry.name] = {'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed}
-            elif entry.status == "DROP":
-                dropped_list[entry.name] = {'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed}
-            elif entry.status == "PLAN":
-                planning_list[entry.name] = {'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed}
+            total_list[status_conversion[entry.status]][entry.name] = {'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed}
         # Sort dicts
-        playing_list = OrderedDict(sorted(playing_list.items()))
-        completed_list = OrderedDict(sorted(completed_list.items()))
-        dropped_list = OrderedDict(sorted(dropped_list.items()))
-        hold_list = OrderedDict(sorted(hold_list.items()))
-        planning_list = OrderedDict(sorted(planning_list.items()))
-        
-        
-        
-        return render(request, 'games/profile.html', {'selected_user': selected_user, 'tab': tab, 'playing_list': playing_list, 'completed_list': completed_list,
-                                                      'dropped_list': dropped_list, 'hold_list': hold_list, 'planning_list': planning_list})
+        for status in total_list.keys():
+            total_list[status] = OrderedDict(sorted(total_list[status].items()))
+
+        return render(request, 'games/profile.html', {'selected_user': selected_user, 'tab': tab, 'total_list': total_list})
     if tab == "social":
         return render(request, 'games/profile.html', {'selected_user': selected_user, 'tab': tab})
     if tab == "stats":
@@ -114,6 +95,7 @@ def BrowseView(request):
         paginated_results = paginator.page(paginator.num_pages)
     return render(request, 'games/browse.html', {'game_list': paginated_results})
 
+@login_required(login_url='/login/')
 class GameListView(generic.View):
     pass
 
