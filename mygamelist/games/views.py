@@ -197,6 +197,35 @@ def GameListView(request, edit_type=None, entry_id=None):
         else:
             form = ManualGameForm()
         return render(request, 'games/edit_game_entry.html', {'form': form, 'game_id': entry_id, 'game_entry': game_entry})
+    elif edit_type == 'add-manual':
+        if request.method == 'POST':
+            # create a form instance and populate it with data from the request:
+            form = ManualGameForm(request.POST)
+            # check whether it's valid:
+            if form.is_valid():
+                # Create entry
+                game_entry = ManualUserGameListEntry()
+                game_entry.user = request.user
+                game_entry.name = form.cleaned_data['name']
+                game_entry.platform = form.cleaned_data['platform']
+                game_entry.status = form.cleaned_data['status']
+                if form.cleaned_data['score'] == 0.0 or form.cleaned_data['score'] == None:
+                    game_entry.score = None
+                else:
+                    game_entry.score = max(min(form.cleaned_data['score'], 10.00), 0.00)
+                if form.cleaned_data['hours'] == 0.0 or form.cleaned_data['hours'] == None:
+                    game_entry.hours = None
+                else:
+                    game_entry.hours = form.cleaned_data['hours']
+                game_entry.comments = form.cleaned_data['comments']
+                game_entry.start_date = form.cleaned_data['start_date']
+                game_entry.stop_date = form.cleaned_data['stop_date']
+                game_entry.times_replayed = max(min(form.cleaned_data['times_replayed'], 999), 0)
+                game_entry.save()
+                return HttpResponseRedirect('/gamelist/')
+        else:
+            form = ManualGameForm()
+        return render(request, 'games/add_manual_game.html', {'form': form})
     else:
         raise Http404
 
