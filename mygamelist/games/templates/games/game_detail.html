@@ -104,7 +104,7 @@
 					{% endif %}
 				</blockquote>
 				<blockquote class="blockquote">
-					<span title="Currently using popularity scores.">Score: {{ game.magic_number|floatformat:"0" }}%</span>
+					<span title="Rated by {{ users_rated }} user(s).">Score: {% if user_score %}{{ user_score|floatformat:"0" }}%{% else %}None{% endif %}</span>
 				</blockquote>
 				<blockquote class="blockquote">
 					<p class="mb-0">

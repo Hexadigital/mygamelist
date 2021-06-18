@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from .models import Game, Genre, Platform, Tag, User, UserGameListEntry, ManualUserGameListEntry
-from .forms import SignUpForm, ManualGameForm
+from .forms import SignUpForm, ManualGameForm, GameEntryForm
 
 def IndexView(request):
     return render(request, 'games/index.html', {})
@@ -78,8 +78,17 @@ def GenreView(request, genre_id, name=None):
 class PlatformView(generic.DetailView):
     model = Platform
 
-class GameView(generic.DetailView):
-    model = Game
+def GameView(request, game_id, name=None):
+    game = Game.objects.get(id=game_id)
+    game_entries = UserGameListEntry.objects.filter(game=game)
+    user_scores = []
+    for entry in game_entries:
+        if entry.score is not None:
+            user_scores.append(entry.score * 10)
+    if len(user_scores) > 0:
+        return render(request, 'games/game_detail.html', {'game': game, 'user_score':sum(user_scores)/len(user_scores), 'users_rated':len(user_scores)})
+    else:
+        return render(request, 'games/game_detail.html', {'game': game, 'user_score':None, 'users_rated':0})
 
 def BrowseView(request):
     sexual_content = Tag.objects.get(name="Sexual Content")
@@ -156,6 +165,38 @@ def GameListView(request, edit_type=None, entry_id=None):
         else:
             form = ManualGameForm()
         return render(request, 'games/edit_manual_game.html', {'form': form, 'game_entry': game_entry})
+    elif edit_type == 'edit':
+        game_entry = UserGameListEntry.objects.get(game=Game.objects.get(id=entry_id),user=request.user)
+        # Does this entry exist?
+        if game_entry is None:
+            raise Http404
+        if request.method == 'POST':
+            # create a form instance and populate it with data from the request:
+            form = GameEntryForm(request.POST)
+            # check whether it's valid:
+            print(form.is_valid())
+            print(form.errors)
+            if form.is_valid():
+                # Update entry
+                game_entry.platform = form.cleaned_data['platform']
+                game_entry.status = form.cleaned_data['status']
+                if form.cleaned_data['score'] == 0.0 or form.cleaned_data['score'] == None:
+                    game_entry.score = None
+                else:
+                    game_entry.score = max(min(form.cleaned_data['score'], 10.00), 0.00)
+                if form.cleaned_data['hours'] == 0.0 or form.cleaned_data['hours'] == None:
+                    game_entry.hours = None
+                else:
+                    game_entry.hours = form.cleaned_data['hours']
+                game_entry.comments = form.cleaned_data['comments']
+                game_entry.start_date = form.cleaned_data['start_date']
+                game_entry.stop_date = form.cleaned_data['stop_date']
+                game_entry.times_replayed = max(min(form.cleaned_data['times_replayed'], 999), 0)
+                game_entry.save()
+                return HttpResponseRedirect('/gamelist/')
+        else:
+            form = ManualGameForm()
+        return render(request, 'games/edit_game_entry.html', {'form': form, 'game_id': entry_id, 'game_entry': game_entry})
     else:
         raise Http404
 
