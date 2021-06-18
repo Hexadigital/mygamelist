@@ -139,8 +139,14 @@ def GameListView(request, edit_type=None, entry_id=None):
                 game_entry.name = form.cleaned_data['name']
                 game_entry.platform = form.cleaned_data['platform']
                 game_entry.status = form.cleaned_data['status']
-                game_entry.score = max(min(form.cleaned_data['score'], 10.00), 0.00)
-                game_entry.hours = form.cleaned_data['hours']
+                if form.cleaned_data['score'] == 0.0 or form.cleaned_data['score'] == None:
+                    game_entry.score = None
+                else:
+                    game_entry.score = max(min(form.cleaned_data['score'], 10.00), 0.00)
+                if form.cleaned_data['hours'] == 0.0 or form.cleaned_data['hours'] == None:
+                    game_entry.hours = None
+                else:
+                    game_entry.hours = form.cleaned_data['hours']
                 game_entry.comments = form.cleaned_data['comments']
                 game_entry.start_date = form.cleaned_data['start_date']
                 game_entry.stop_date = form.cleaned_data['stop_date']
