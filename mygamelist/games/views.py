@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.views import generic
 from django.contrib.auth import login, authenticate
@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from .models import Game, Genre, Platform, Tag, User, UserGameListEntry, ManualUserGameListEntry
-from .forms import SignUpForm
+from .forms import SignUpForm, ManualGameForm
 
 def IndexView(request):
     return render(request, 'games/index.html', {})
@@ -106,17 +106,52 @@ def GameListView(request, edit_type=None, entry_id=None):
         "IMPT": "Imported"
     }
     user_id = request.user.id
-    game_list = UserGameListEntry.objects.filter(user=user_id)
-    manual_list = ManualUserGameListEntry.objects.filter(user=user_id)
-    total_list = {"Playing": {}, "Completed": {}, "On Hold": {}, "Dropped": {}, "Plan to Play": {}, "Imported": {}}
-    for entry in game_list:
-        total_list[status_conversion[entry.status]][entry.game.name] = {'id': entry.game.id, 'game_id': entry.game.id, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed, 'edit_type': 'edit'}
-    for entry in manual_list:
-        total_list[status_conversion[entry.status]][entry.name] = {'id': entry.id, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed, 'edit_type': 'edit-manual'}
-    # Sort dicts
-    for status in total_list.keys():
-        total_list[status] = OrderedDict(sorted(total_list[status].items()))
-    return render(request, 'games/user_list.html', {'total_list': total_list})
+    # Viewing list
+    if edit_type is None:
+        game_list = UserGameListEntry.objects.filter(user=user_id)
+        manual_list = ManualUserGameListEntry.objects.filter(user=user_id)
+        total_list = {"Playing": {}, "Completed": {}, "On Hold": {}, "Dropped": {}, "Plan to Play": {}, "Imported": {}}
+        for entry in game_list:
+            total_list[status_conversion[entry.status]][entry.game.name] = {'id': entry.game.id, 'game_id': entry.game.id, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed, 'edit_type': 'edit'}
+        for entry in manual_list:
+            total_list[status_conversion[entry.status]][entry.name] = {'id': entry.id, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed, 'edit_type': 'edit-manual'}
+        # Sort dicts
+        for status in total_list.keys():
+            total_list[status] = OrderedDict(sorted(total_list[status].items()))
+        return render(request, 'games/user_list.html', {'total_list': total_list, 'edit_type': edit_type})
+    # Manual game edit
+    elif edit_type == 'edit-manual':
+        game_entry = ManualUserGameListEntry.objects.get(id=entry_id)
+        # Does this entry exist?
+        if game_entry is None:
+            raise Http404
+        # Does this belong to the logged in user?
+        if game_entry.user.id != user_id:
+            raise Http404
+        if request.method == 'POST':
+            # create a form instance and populate it with data from the request:
+            form = ManualGameForm(request.POST)
+            # check whether it's valid:
+            print(form.is_valid())
+            print(form.errors)
+            if form.is_valid():
+                # Update entry
+                game_entry.name = form.cleaned_data['name']
+                game_entry.platform = form.cleaned_data['platform']
+                game_entry.status = form.cleaned_data['status']
+                game_entry.score = max(min(form.cleaned_data['score'], 10.00), 0.00)
+                game_entry.hours = form.cleaned_data['hours']
+                game_entry.comments = form.cleaned_data['comments']
+                game_entry.start_date = form.cleaned_data['start_date']
+                game_entry.stop_date = form.cleaned_data['stop_date']
+                game_entry.times_replayed = max(min(form.cleaned_data['times_replayed'], 999), 0)
+                game_entry.save()
+                return HttpResponseRedirect('/gamelist/')
+        else:
+            form = ManualGameForm()
+        return render(request, 'games/edit_manual_game.html', {'form': form, 'game_entry': game_entry})
+    else:
+        raise Http404
 
 class ForumView(generic.View):
     pass

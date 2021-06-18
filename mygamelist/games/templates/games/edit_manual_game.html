@@ -64,33 +64,57 @@
 	</nav>
 	<div class="container">
 		<div class="row">
-			<a href="{% url 'games:gamelist' 'add-manual' %}" class="gamelink">Add Game Manually</a><br>
-			{% for status, game_list in total_list.items %}
-				<table class="table table-hover table-striped table-dark">
-				<tr><td colspan="6"><h3><center>{{ status }}</center></h3></td></tr>
-				<tr>
-				<th scope="col" width="5%">Actions</th>
-				<th scope="col" width="45%">Game Title</th>
-				<th scope="col" width="15%">Platform</th>
-				<th scope="col" width="10%">Score</th>
-				<th scope="col" width="10%">Hours</th>
-				<th scope="col" width="15%">Flags</th>
-				</tr>
-					{% for entry_name, entry in game_list.items %}
-					<tr>
-						<td><a href="{% url 'games:gamelist' entry.edit_type entry.id %}">&#x2699;</a></td>
-						<td>{% if entry.game_id %}<a class="gamelink" href="{% url 'games:game' entry.game_id entry_name|slugify %}">{% endif %}{{ entry_name }}{% if entry.game_id %}</a>{% endif %}</td>
-						<td>{% if entry.platform.shorthand %}{{ entry.platform.shorthand }}{% else %}{{ entry.platform.name }}{% endif %}</td>
-						<td>{{ entry.score }}</td>
-						<td>{{ entry.hours }}</td>
-						<td>
-							{% if entry.comments %}<span title="{{ entry.comments }}">&#x1F4AC;</span>{% endif %}
-							{% if entry.times_replayed > 0 %}<span title="Replayed {{ entry.times_replayed }} time{% if entry.times_replayed > 1 %}s{% endif %}!">&#x1F501;</span>{% endif %}
-						</td>
-					</tr>
-					{% endfor %}
-				</table>
-			{% endfor %}
+			<form action="{% url 'games:gamelist' 'edit-manual' game_entry.id %}" method="post">
+				{% csrf_token %}
+				{{ form.errors }}
+				<div class="fieldWrapper">
+					<label for="id_name">Game Name:</label>
+					<input type="text" name="name" maxlength="150" required="" value="{{ game_entry.name }}" id="id_name">
+				</div>
+				<div class="fieldWrapper">
+					<label for="id_platform">Platform:</label>
+					<select name="platform">
+						{% for choice in form.platform.field.choices %}
+							<option value="{{ choice.0 }}"{% if choice.0 == game_entry.platform.id %} selected=""{% endif %}>{{ choice.1 }}</option>
+						{% endfor %}
+					</select>
+				</div>
+				<div class="fieldWrapper">
+					<label for="id_status">Status:</label>
+					<select name="status" id="id_status">
+						<option value="PLAN"{% if game_entry.status == 'PLAN' %} selected=""{% endif %}>Plan to Play</option>
+						<option value="PLAY"{% if game_entry.status == 'PLAY' %} selected=""{% endif %}>Playing</option>
+						<option value="CMPL"{% if game_entry.status == 'CMPL' %} selected=""{% endif %}>Completed</option>
+						<option value="DROP"{% if game_entry.status == 'DROP' %} selected=""{% endif %}>Dropped</option>
+						<option value="HOLD"{% if game_entry.status == 'HOLD' %} selected=""{% endif %}>Paused</option>
+					</select>
+				</div>
+				<div class="fieldWrapper">
+					<label for="id_score">Score:</label>
+					<input type="number" name="score" step="0.25" value="{{ game_entry.score }}" id="id_score">
+				</div>
+				<div class="fieldWrapper">
+					<label for="id_hours">Hours:</label>
+					<input type="number" name="hours" step="0.25" value="{{ game_entry.hours }}" id="id_hours">
+				</div>
+				<div class="fieldWrapper">
+					<label for="id_start_date">Start Date:</label>
+					<input type="text" name="start_date" id="id_start_date" value="{{ game_entry.start_date|date:'Y-m-d' }}" placeholder="YYYY-MM-DD">
+				</div>
+				<div class="fieldWrapper">
+					<label for="id_stop_date">Stop Date:</label>
+					<input type="text" name="stop_date" id="id_stop_date" value="{{ game_entry.stop_date|date:'Y-m-d' }}" placeholder="YYYY-MM-DD">
+				</div>
+				<div class="fieldWrapper">
+					<label for="id_times_replayed">Times Replayed:</label>
+					<input type="number" name="times_replayed" required="" value="{{ game_entry.times_replayed }}" id="id_times_replayed">
+				</div>
+				<div class="fieldWrapper">
+					<label for="id_comments">Comments:</label>
+					<input type="text" name="comments" maxlength="500" value="{{ game_entry.comments }}" id="id_comments">
+				</div>
+				<input type="submit" value="Edit">
+			</form>
 		</div>
 	</div>
 	<div class="footer">

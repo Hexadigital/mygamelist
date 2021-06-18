@@ -21,6 +21,10 @@ def random_avatar_filename(instance, filename):
 class Platform(models.Model):
     name = models.CharField(max_length=50)
     category = models.CharField(max_length=50)
+    shorthand = models.CharField(max_length=50, blank=True, default='')
+
+    class Meta:
+        ordering = ['category', 'name']
 
     def __str__(self):
         return self.category + " - " + self.name
@@ -78,11 +82,11 @@ class UserGameListEntry(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     platform = models.ForeignKey(Platform, on_delete=models.CASCADE)
     statuses = [
+        ("PLAN", "Plan to Play"),
         ("PLAY", "Playing"),
         ("CMPL", "Completed"),
         ("DROP", "Dropped"),
         ("HOLD", "Paused"),
-        ("PLAN", "Plan to Play"),
         ("IMPT", "Imported")
     ]
     status = models.CharField(max_length=4, choices=statuses, default="PLAN")
