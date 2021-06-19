@@ -82,13 +82,15 @@ def GameView(request, game_id, name=None):
     game = Game.objects.get(id=game_id)
     game_entries = UserGameListEntry.objects.filter(game=game)
     user_scores = []
+    user_counts = {'PLAN':0, 'PLAY':0, 'CMPL':0, 'HOLD':0, 'DROP':0, 'IMPT':0}
     for entry in game_entries:
         if entry.score is not None:
             user_scores.append(entry.score * 10)
+        user_counts[entry.status] += 1
     if len(user_scores) > 0:
-        return render(request, 'games/game_detail.html', {'game': game, 'user_score':sum(user_scores)/len(user_scores), 'users_rated':len(user_scores)})
+        return render(request, 'games/game_detail.html', {'game': game, 'user_score':sum(user_scores)/len(user_scores), 'users_rated':len(user_scores), 'user_counts':user_counts})
     else:
-        return render(request, 'games/game_detail.html', {'game': game, 'user_score':None, 'users_rated':0})
+        return render(request, 'games/game_detail.html', {'game': game, 'user_score':None, 'users_rated':0, 'user_counts':user_counts})
 
 def BrowseView(request):
     sexual_content = Tag.objects.get(name="Sexual Content")

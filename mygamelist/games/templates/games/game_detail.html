@@ -114,8 +114,8 @@
 					</p>
 				</blockquote>
 				<blockquote class="blockquote">
-						<button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">Show Tags</button><br>
-						<div class="collapse" id="collapseExample">{% for tag in game.tags.all|dictsort:"name" %}
+						<button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#gametags" aria-expanded="false" aria-controls="gametags">Show Tags</button><br>
+						<div class="collapse" id="gametags">{% for tag in game.tags.all|dictsort:"name" %}
 								<a href="{% url 'games:tag' tag.id tag.name|slugify %}">{{ tag.name }}</a>{% if not forloop.last %}, {% endif %}
 								{% endfor %}</div>
 						<small class="text-muted">May contain spoilers</small><br>
@@ -127,7 +127,14 @@
 				<img style="max-height:500px;max-width:24%;object-fit: contain;" src="{{ game.screen3.url }}" onclick="lightbox.init(this,220);">
 				<img style="max-height:500px;max-width:24%;object-fit: contain;" src="{{ game.screen4.url }}" onclick="lightbox.init(this,220);">
 				<br><br>
-				{{ game.description }}
+				<h4>
+					<span class="badge badge-secondary">Planning<br>{{ user_counts.PLAN }}</span>
+					<span class="badge badge-primary">Playing<br>{{ user_counts.PLAY }}</span>
+					<span class="badge badge-success">Completed<br>{{ user_counts.CMPL }}</span>
+					<span class="badge badge-warning">On Hold<br>{{ user_counts.HOLD }}</span>
+					<span class="badge badge-danger">Dropped<br>{{ user_counts.DROP }}</span>
+				</h4>
+				<p>{{ game.description }}</p>
 			</div>
 		</div>
 	</div>
