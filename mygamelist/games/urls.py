@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import include, path
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
@@ -24,6 +24,5 @@ urlpatterns = [
     path('gamelist/', views.GameListView, name='gamelist'),
     path('gamelist/<str:edit_type>', views.GameListView, name='gamelist'),
     path('gamelist/<str:edit_type>/<int:entry_id>', views.GameListView, name='gamelist'),
-    path('browse/', views.BrowseView, name='browse'),
-    path('forums/', views.IndexView, name='forums')
+    path('browse/', views.BrowseView, name='browse')
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
