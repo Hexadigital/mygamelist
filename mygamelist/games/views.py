@@ -79,8 +79,24 @@ class PlatformView(generic.DetailView):
     model = Platform
 
 def GameView(request, game_id, name=None):
+    status_conversion = {
+        "PLAY":"Playing",
+        "CMPL":"Completed",
+        "HOLD":"On Hold",
+        "DROP":"Dropped",
+        "PLAN":"Plan to Play",
+        "IMPT": "Imported"
+    }
     game = Game.objects.get(id=game_id)
     game_entries = UserGameListEntry.objects.filter(game=game)
+    if request.user.is_authenticated:
+        try:
+            game_entry = UserGameListEntry.objects.get(game=Game.objects.get(id=game_id),user=request.user)
+            game_entry.status = status_conversion[game_entry.status]
+        except UserGameListEntry.DoesNotExist:
+            game_entry = None
+    else:
+        game_entry = None
     user_scores = []
     user_counts = {'PLAN':0, 'PLAY':0, 'CMPL':0, 'HOLD':0, 'DROP':0, 'IMPT':0}
     for entry in game_entries:
@@ -88,9 +104,9 @@ def GameView(request, game_id, name=None):
             user_scores.append(entry.score * 10)
         user_counts[entry.status] += 1
     if len(user_scores) > 0:
-        return render(request, 'games/game_detail.html', {'game': game, 'user_score':sum(user_scores)/len(user_scores), 'users_rated':len(user_scores), 'user_counts':user_counts})
+        return render(request, 'games/game_detail.html', {'game': game, 'user_score':sum(user_scores)/len(user_scores), 'users_rated':len(user_scores), 'user_counts':user_counts, 'game_entry': game_entry})
     else:
-        return render(request, 'games/game_detail.html', {'game': game, 'user_score':None, 'users_rated':0, 'user_counts':user_counts})
+        return render(request, 'games/game_detail.html', {'game': game, 'user_score':None, 'users_rated':0, 'user_counts':user_counts, 'game_entry': game_entry})
 
 def BrowseView(request):
     sexual_content = Tag.objects.get(name="Sexual Content")
@@ -132,9 +148,9 @@ def GameListView(request, edit_type=None, entry_id=None):
         return render(request, 'games/user_list.html', {'total_list': total_list, 'edit_type': edit_type})
     # Manual game edit
     elif edit_type == 'edit-manual':
-        game_entry = ManualUserGameListEntry.objects.get(id=entry_id)
-        # Does this entry exist?
-        if game_entry is None:
+        try:
+            game_entry = ManualUserGameListEntry.objects.get(id=entry_id)
+        except ManualUserGameListEntry.DoesNotExist:
             raise Http404
         # Does this belong to the logged in user?
         if game_entry.user.id != user_id:
@@ -168,10 +184,16 @@ def GameListView(request, edit_type=None, entry_id=None):
             form = ManualGameForm()
         return render(request, 'games/edit_manual_game.html', {'form': form, 'game_entry': game_entry})
     elif edit_type == 'edit':
-        game_entry = UserGameListEntry.objects.get(game=Game.objects.get(id=entry_id),user=request.user)
-        # Does this entry exist?
-        if game_entry is None:
+        try:
+            game = Game.objects.get(id=entry_id)
+        except Game.DoesNotExist:
             raise Http404
+        try:
+            game_entry = UserGameListEntry.objects.get(game=game,user=request.user)
+        except UserGameListEntry.DoesNotExist:
+            game_entry = UserGameListEntry()
+            game_entry.user = request.user
+            game_entry.game = game
         if request.method == 'POST':
             # create a form instance and populate it with data from the request:
             form = GameEntryForm(request.POST)

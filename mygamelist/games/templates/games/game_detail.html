@@ -71,9 +71,13 @@
 				{% endif %}
 			</div>
 			<div class="col-md-4" align="center">
-				{% if user.is_authenticated %}<blockquote class="blockquote">
-					<button class="btn btn-primary" type="button">Add to List</button>
-				</blockquote>{% endif %}
+				<blockquote class="blockquote">
+					{% if not game_entry %}
+						<a class="btn btn-primary" role="button" href="{% url 'games:gamelist' 'edit' game.id %}">Add to List</a>
+					{% elif game_entry %}
+						<a class="btn btn-primary" role="button" href="{% url 'games:gamelist' 'edit' game.id %}">{{ game_entry.status }}</a>
+					{% endif %}
+				</blockquote>
 				<blockquote class="blockquote">
 					{% if game.main_link != '' %}
 					<a href="{{ game.main_link }}" target="_blank" rel="noopener noreferrer"><img src="{% static 'icons/website.png' %}"></a>
