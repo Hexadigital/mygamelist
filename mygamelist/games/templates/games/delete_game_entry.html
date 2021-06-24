@@ -63,42 +63,16 @@
 		</div>
 	</nav>
 	<div class="container">
-		<div class="row">
-			<a href="{% url 'games:gamelist' 'add-manual' %}" class="gamelink">Add Game Manually</a><br>
-			{% for status, game_list in total_list.items %}
-				<table class="table table-hover table-striped table-dark">
-				<tr><td colspan="6"><h3><center>{{ status }}</center></h3></td></tr>
-				<tr>
-				<th scope="col" width="5%">Actions</th>
-				<th scope="col" width="45%">Game Title</th>
-				<th scope="col" width="15%">Platform</th>
-				<th scope="col" width="10%">Score</th>
-				<th scope="col" width="10%">Hours</th>
-				<th scope="col" width="15%">Flags</th>
-				</tr>
-					{% for entry_name, entry in game_list.items %}
-					<tr>
-						<td>
-							<a href="{% url 'games:gamelist' entry.edit_type entry.id %}">&#x2699;</a>
-							<a href="{% url 'games:gamelist' entry.delete_type entry.id %}">&#x1F5D1;</a>
-						</td>
-						<td>{% if entry.game_id %}<a class="gamelink" href="{% url 'games:game' entry.game_id entry_name|slugify %}">{% endif %}{{ entry_name }}{% if entry.game_id %}</a>{% endif %}</td>
-						<td>{% if entry.platform.shorthand %}{{ entry.platform.shorthand }}{% else %}{{ entry.platform.name }}{% endif %}</td>
-						<td>{{ entry.score }}</td>
-						<td>{{ entry.hours }}</td>
-						<td>
-							{% if entry.comments %}<span title="{{ entry.comments }}">&#x1F4AC;</span>{% endif %}
-							{% if entry.times_replayed > 0 %}<span title="Replayed {{ entry.times_replayed }} time{% if entry.times_replayed > 1 %}s{% endif %}!">&#x1F501;</span>{% endif %}
-						</td>
-					</tr>
-					{% endfor %}
-				</table>
-			{% endfor %}
-		</div>
-	</div>
-	<div class="footer">
+		<br><br><br>
 		<div class="col-md-12" align="center">
-			<a href="https://github.com/Frostflake/mygamelist">GitHub</a>
+			<form action="{% url 'games:gamelist' 'delete' game_id %}" method="post">
+				{% csrf_token %}
+				<div class="fieldWrapper">
+					Are you sure you want to delete <b>{{ game_entry.game.name }}</b>?
+				</div><br>
+				<button class="btn btn-danger" type="submit">Delete</button>
+			</form>
+			<form action="{% url 'games:gamelist' %}" method="get"><button class="btn btn-primary" type="submit">Cancel</button></form>
 		</div>
 	</div>
 

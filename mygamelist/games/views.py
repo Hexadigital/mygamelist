@@ -139,13 +139,36 @@ def GameListView(request, edit_type=None, entry_id=None):
         manual_list = ManualUserGameListEntry.objects.filter(user=user_id)
         total_list = {"Playing": {}, "Completed": {}, "On Hold": {}, "Dropped": {}, "Plan to Play": {}, "Imported": {}}
         for entry in game_list:
-            total_list[status_conversion[entry.status]][entry.game.name] = {'id': entry.game.id, 'game_id': entry.game.id, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed, 'edit_type': 'edit'}
+            total_list[status_conversion[entry.status]][entry.game.name] = {'id': entry.game.id, 'game_id': entry.game.id, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed, 'edit_type': 'edit', 'delete_type': 'delete'}
         for entry in manual_list:
-            total_list[status_conversion[entry.status]][entry.name] = {'id': entry.id, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed, 'edit_type': 'edit-manual'}
+            total_list[status_conversion[entry.status]][entry.name] = {'id': entry.id, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed, 'edit_type': 'edit-manual', 'delete_type': 'delete-manual'}
         # Sort dicts
         for status in total_list.keys():
             total_list[status] = OrderedDict(sorted(total_list[status].items()))
         return render(request, 'games/user_list.html', {'total_list': total_list, 'edit_type': edit_type})
+    # Manual game deletion
+    elif edit_type == 'delete-manual':
+        try:
+            game_entry = ManualUserGameListEntry.objects.get(id=entry_id)
+        except ManualUserGameListEntry.DoesNotExist:
+            raise Http404
+        # Does this belong to the logged in user?
+        if game_entry.user.id != user_id:
+            raise Http404
+        if request.method == 'POST':
+            game_entry.delete()
+            return HttpResponseRedirect('/gamelist/')
+        return render(request, 'games/delete_manual_entry.html', {'game_entry': game_entry})
+    elif edit_type == 'delete':
+        try:
+            game = Game.objects.get(id=entry_id)
+            game_entry = UserGameListEntry.objects.get(game=game,user=request.user)
+        except (Game.DoesNotExist, UserGameListEntry.DoesNotExist):
+            raise Http404
+        if request.method == 'POST':
+            game_entry.delete()
+            return HttpResponseRedirect('/gamelist/')
+        return render(request, 'games/delete_game_entry.html', {'game_id': entry_id, 'game_entry': game_entry})
     # Manual game edit
     elif edit_type == 'edit-manual':
         try:
