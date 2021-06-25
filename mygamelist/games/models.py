@@ -122,3 +122,19 @@ class ManualUserGameListEntry(models.Model):
 
     def __str__(self):
         return self.user.username + " - " + self.name
+
+class UserGameStatus(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    game = models.ForeignKey(Game, on_delete=models.CASCADE)
+    statuses = [
+        ("PLAY", "Playing"),
+        ("CMPL", "Completed"),
+        ("DROP", "Dropped"),
+        ("HOLD", "Paused"),
+        ("PLAN", "Plan to Play")
+    ]
+    status = models.CharField(max_length=4, choices=statuses)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.user.username + " " + self.status + " " + self.game.name

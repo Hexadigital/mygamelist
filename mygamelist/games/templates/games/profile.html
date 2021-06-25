@@ -1,4 +1,5 @@
 {% load static %}
+{% load humanize %}
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -121,7 +122,39 @@
 				<div class="row">
 					<div class="col-xl-12">
 						<div class="tab-content p-0">
-							{% if tab == 'list' %}
+							{% if not tab or tab == 'activity' %}
+								{% for activity in activities %}
+									<div class="text-white bg-dark mb-3 rounded" style="max-width: 100%">
+										<div class="row align-items-center">
+											<div class="col-md-auto" style="width:80px;">
+												<img class="rounded" src="{{ activity.game.image.url }}" style="max-width: 80px; height: 130px; object-fit: cover;">
+											</div>
+											<div class="col">
+												<div class="card-header d-flex justify-content-between">
+													<a class="gamelink" href="{% url 'games:profile' activity.user.id activity.user.username|slugify %}"> <img class="rounded" src="{{ activity.user.userprofile.avatar.url }}" style="max-width: 40px; height: 40px; margin-right:10px;">{{ activity.user.username }}</a>
+													{{ activity.created_at|naturaltime }}
+												</div>
+												<div class="card-body">
+													<p class="card-text">
+														{% if activity.status == "PLAN" %}
+															Plans to play 
+														{% elif activity.status == "PLAY" %}
+															Started playing 
+														{% elif activity.status == "CMPL" %}
+															Completed
+														{% elif activity.status == "DROP" %}
+															Dropped 
+														{% elif activity.status == "HOLD" %}
+															Paused 
+														{% endif %}
+														<a class="gamelink" href="{% url 'games:game' activity.game.id activity.game.name|slugify %}">{{ activity.game.name }}</a>
+													</p>
+												</div>
+											</div>
+										</div>
+									</div>
+								{% endfor %}
+							{% elif tab == 'list' %}
 								{% for status, game_list in total_list.items %}
 									{% if status != 'Imported' %}
 										<table class="table table-hover table-striped table-dark">

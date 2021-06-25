@@ -6,7 +6,8 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-from .models import Game, Genre, Platform, Tag, User, UserGameListEntry, ManualUserGameListEntry
+from .models import Game, Genre, Platform, Tag, User, UserGameListEntry, ManualUserGameListEntry, UserGameStatus
+from .models import UserGameStatus
 from .forms import SignUpForm, ManualGameForm, GameEntryForm
 
 def IndexView(request):
@@ -30,9 +31,19 @@ def GamesTaggedWithView(request, tag_id, name=None):
 def ProfileView(request, user_id, name=None, tab=None):
     selected_user = User.objects.get(id=user_id)
     # Activity
-    if tab is None:
-        return render(request, 'games/profile.html', {'selected_user': selected_user, 'tab': tab})
-    if tab == "list":
+    if tab is None or tab == 'activity':
+        status_list = UserGameStatus.objects.filter(user=user_id).order_by('-id')
+        page = request.GET.get('page', 1)
+
+        paginator = Paginator(status_list, 25)
+        try:
+            paginated_results = paginator.page(page)
+        except PageNotAnInteger:
+            paginated_results = paginator.page(1)
+        except EmptyPage:
+            paginated_results = paginator.page(paginator.num_pages)
+        return render(request, 'games/profile.html', {'selected_user': selected_user, 'tab': tab, 'activities': paginated_results})
+    elif tab == "list":
         status_conversion = {
             "PLAY":"Playing",
             "CMPL":"Completed",
@@ -53,12 +64,14 @@ def ProfileView(request, user_id, name=None, tab=None):
             total_list[status] = OrderedDict(sorted(total_list[status].items()))
 
         return render(request, 'games/profile.html', {'selected_user': selected_user, 'tab': tab, 'total_list': total_list})
-    if tab == "social":
+    elif tab == "social":
         return render(request, 'games/profile.html', {'selected_user': selected_user, 'tab': tab})
-    if tab == "stats":
+    elif tab == "stats":
         return render(request, 'games/profile.html', {'selected_user': selected_user, 'tab': tab})
-    if tab == "contrib":
+    elif tab == "contrib":
         return render(request, 'games/profile.html', {'selected_user': selected_user, 'tab': tab})
+    else:
+        raise Http404
 
 def GenreView(request, genre_id, name=None):
     sexual_content = Tag.objects.get(name="Sexual Content")
@@ -211,12 +224,14 @@ def GameListView(request, edit_type=None, entry_id=None):
             game = Game.objects.get(id=entry_id)
         except Game.DoesNotExist:
             raise Http404
+        new = False
         try:
             game_entry = UserGameListEntry.objects.get(game=game,user=request.user)
         except UserGameListEntry.DoesNotExist:
             game_entry = UserGameListEntry()
             game_entry.user = request.user
             game_entry.game = game
+            new = True
         if request.method == 'POST':
             # create a form instance and populate it with data from the request:
             form = GameEntryForm(request.POST)
@@ -225,6 +240,12 @@ def GameListView(request, edit_type=None, entry_id=None):
             print(form.errors)
             if form.is_valid():
                 # Update entry
+                if (game_entry.status != form.cleaned_data['status']) or new:
+                    activity = UserGameStatus()
+                    activity.user = request.user
+                    activity.game = game
+                    activity.status = form.cleaned_data['status']
+                    activity.save()
                 game_entry.platform = form.cleaned_data['platform']
                 game_entry.status = form.cleaned_data['status']
                 if form.cleaned_data['score'] == 0.0 or form.cleaned_data['score'] == None:
