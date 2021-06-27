@@ -11,7 +11,21 @@ from .models import UserGameStatus
 from .forms import SignUpForm, ManualGameForm, GameEntryForm
 
 def IndexView(request):
-    return render(request, 'games/index.html', {})
+    if request.user.is_authenticated:
+        status_list = UserGameStatus.objects.filter(user=request.user).order_by('-id')
+    else:
+        status_list = UserGameStatus.objects.order_by('-id')
+    latest_games = Game.objects.order_by('-id')[:8]
+    page = request.GET.get('page', 1)
+
+    paginator = Paginator(status_list, 25)
+    try:
+        paginated_results = paginator.page(page)
+    except PageNotAnInteger:
+        paginated_results = paginator.page(1)
+    except EmptyPage:
+        paginated_results = paginator.page(paginator.num_pages)
+    return render(request, 'games/index.html', {'activities': paginated_results, 'latest_games': latest_games})
 
 def GamesTaggedWithView(request, tag_id, name=None):
     sexual_content = Tag.objects.get(name="Sexual Content")
