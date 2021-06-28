@@ -6,7 +6,7 @@ from django.views import generic
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.db.models import Count
+from django.db.models import Count, Q
 
 from .models import Game, Genre, Platform, Tag, User, UserGameListEntry, ManualUserGameListEntry, UserGameStatus
 from .models import UserGameStatus
@@ -141,7 +141,11 @@ def GameView(request, game_id, name=None):
 
 def BrowseView(request):
     sexual_content = Tag.objects.get(name="Sexual Content")
-    game_list = Game.objects.exclude(tags=sexual_content).order_by('-id')
+    query = request.GET.get('search')
+    if query:
+        game_list = Game.objects.filter(Q(name__icontains=query)).exclude(tags=sexual_content).order_by('-id')
+    else:
+        game_list = Game.objects.exclude(tags=sexual_content).order_by('-id')
     page = request.GET.get('page', 1)
 
     paginator = Paginator(game_list, 25)

@@ -58,6 +58,14 @@
 	</nav>
 	<div class="container-fluid">
 		<div class="row">
+			<div class="col-md-12" align="center">
+				<form method="GET" >
+					<input type="text" name="search" value="{{ request.GET.search }}" placeholder="Game Name">
+					<button type="btn" class="btn btn-primary" type="submit">Search</button>
+				</form>
+			</div>
+		</div>
+		<div class="row">
 		{% for game in game_list %}
 			{% if game.image %}
 			<div class="col d-flex align-items-md-center justify-content-md-center">

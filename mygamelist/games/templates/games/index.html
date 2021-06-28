@@ -25,9 +25,6 @@
 			color: #CCBADC;
 			text-decoration: none;
 		}
-		table {
-			text-align: center;
-		}
 	</style>
 </head>
 
@@ -68,7 +65,7 @@
 		<br>
 		<div class="row">
 			<div class="col-1" align="center"></div>
-			<div class="col-7" align="center">
+			<div class="col-7">
 				{% for activity in activities %}
 					<div class="text-white bg-dark mb-3 rounded" style="max-width: 100%">
 						<div class="row align-items-center">
@@ -105,7 +102,7 @@
 				<div class="text-white bg-dark mb-3 rounded" style="max-width: 100%">
 					<div class="card-header justify-content-between">Recently Added</div>
 					{% for game in latest_games %}
-						<a href="{% url 'games:game' game.id game.name|slugify %}"><img class="rounded mx-auto" style="object-fit:contain;max-height:150px;max-width:24%;margin-top:5px;margin-bottom:5px;" src="{{ game.image.url }}"></a>
+						<a href="{% url 'games:game' game.id game.name|slugify %}"><img class="rounded mx-auto" style="object-fit:contain;max-height:150px;max-width:23%;margin-top:5px;margin-bottom:5px;" src="{{ game.image.url }}"></a>
 					{% endfor %}
 				</div>
 			</div>
