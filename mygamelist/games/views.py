@@ -1,3 +1,4 @@
+import datetime
 from collections import OrderedDict
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import render, redirect
@@ -5,6 +6,7 @@ from django.views import generic
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db.models import Count
 
 from .models import Game, Genre, Platform, Tag, User, UserGameListEntry, ManualUserGameListEntry, UserGameStatus
 from .models import UserGameStatus
@@ -17,6 +19,7 @@ def IndexView(request):
         status_list = UserGameStatus.objects.order_by('-id')
     sexual_content = Tag.objects.get(name="Sexual Content")
     latest_games = Game.objects.exclude(tags=sexual_content).order_by('-id')[:8]
+    #popular_games = UserGameStatus.objects.exclude(game__tags=sexual_content).values("game", "game__image", "game__name").filter(created_at__lte=datetime.datetime.today(), created_at__gt=datetime.datetime.today()-datetime.timedelta(days=30)).annotate(count=Count('game')).order_by("-count")[:8]
     page = request.GET.get('page', 1)
 
     paginator = Paginator(status_list, 25)
