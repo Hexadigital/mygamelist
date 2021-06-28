@@ -15,7 +15,8 @@ def IndexView(request):
         status_list = UserGameStatus.objects.filter(user=request.user).order_by('-id')
     else:
         status_list = UserGameStatus.objects.order_by('-id')
-    latest_games = Game.objects.order_by('-id')[:8]
+    sexual_content = Tag.objects.get(name="Sexual Content")
+    latest_games = Game.objects.exclude(tags=sexual_content).order_by('-id')[:8]
     page = request.GET.get('page', 1)
 
     paginator = Paginator(status_list, 25)
