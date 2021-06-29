@@ -1,159 +1,119 @@
+{% extends "base.html" %}
 {% load static %}
-<head>
-	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	
-	<title>{{ game.name }} ({{ game.year }}) :: Remember Games</title>
-	
+{% load humanize %}
+
+{% block title %}{{ game.name }} ({{ game.year }}) :: Remember Games{% endblock %}
+
+{% block embedpreview %}
 	<meta name="twitter:card" content="summary" />
 	<meta name="twitter:title" content="{{ game.name }} ({{ game.year }}) :: Remember Games" />
 	<meta name="twitter:description" content="{{ game.description|truncatechars:200 }}" />
 	<meta name="twitter:image" content="{{ game.image.url }}" />
-	
-	<link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
-	<link href="{% static 'css/style.css' %}" rel="stylesheet">
-	
-	<style>
-		body {
-			background-image: url("{% static 'bgdark.png' %}");
-			background-repeat: repeat;
-			color: white;
-		}
-	</style>
-</head>
+{% endblock %}
 
-<body>
-	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-		<a class="navbar-brand" href="#">Remember Games</a>
-		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-		<span class="navbar-toggler-icon"></span>
-		</button>
-		<div class="collapse navbar-collapse" id="navbarSupportedContent">
-		<ul class="navbar-nav mr-auto">
-		<li class="nav-item">
-		<a class="nav-link" href="/">Home</a>
-		</li>
-		<li class="nav-item">
-		<a class="nav-link" href="{% url 'games:gamelist' %}">My Games</a>
-		</li>
-		<li class="nav-item">
-		<a class="nav-link" href="{% url 'games:browse' %}">Browse</a>
-		</li>
-		<li class="nav-item">
-		<a class="nav-link" href="/forum">Forums</a>
-		</li>
-		</ul>
-		{% if user.is_authenticated %}
-			<a href="{% url 'games:profile' user.id user.username|slugify %}">
-			{% if user.userprofile.avatar %}
-			<img width="40" height="40" class="d-inline-block align-top rounded-circle" src="{{ user.userprofile.avatar.url }}">
-			{% else %}
-			<img width="40" height="40" class="d-inline-block align-top rounded-circle" src="{% static 'default_avatar.png' %}">
-			{% endif %}
-			</a>
-		{% else %}<ul class="navbar-nav"><li class="nav-item"><a class="nav-link" href="{% url 'games:login' %}">Login</a></li></ul>
-		{% endif %}
-		</div>
-	</nav>
-	<div class="container">
-		<div class="row justify-content-md-center">
-			<div class="col-md-12" align="center">
-				<br>
-				<h4>{{ game.name }} ({{ game.year }})</h4>
-			</div>
-			<div class="col-md-4" align="center">
-				<img style="max-height:400px;max-width:100%;" src="{{ game.image.url }}"><br>
-				<br>
-			</div>
-			<div class="col-md-8 align-self-center">
-				{% if game.trailer_link != '' %}
-				<video style="max-width:100%; height:auto" controls><source src="{{ game.trailer_link }}" type="video/webm" />Your browser does not support WEBM.</video>
-				{% else %}
-				<img style="max-height:400px;max-width:100%;" src="{% static 'no_trailer.png' %}"><br>
-				{% endif %}
-			</div>
-			<div class="col-md-4" align="center">
-				<blockquote class="blockquote">
-					{% if not game_entry %}
-						<a class="btn btn-primary" role="button" href="{% url 'games:gamelist' 'edit' game.id %}">Add to List</a>
-					{% elif game_entry %}
-						<a class="btn btn-primary" role="button" href="{% url 'games:gamelist' 'edit' game.id %}">{{ game_entry.status }}</a>
-					{% endif %}
-				</blockquote>
-				<blockquote class="blockquote">
-					{% if game.main_link != '' %}
-					<a href="{{ game.main_link }}" target="_blank" rel="noopener noreferrer"><img src="{% static 'icons/website.png' %}"></a>
-					{% endif %}
-					{% if game.steam_link != '' %}
-					<a href="{{ game.steam_link }}" target="_blank" rel="noopener noreferrer"><img src="{% static 'icons/steam.png' %}"></a>
-					{% endif %}
-					{% if game.wikipedia_link != '' %}
-					<a href="{{ game.wikipedia_link }}" target="_blank" rel="noopener noreferrer"><img src="{% static 'icons/wikipedia.png' %}"></a>
-					{% endif %}
-					{% if game.howlongtobeat_link != '' %}
-					<a href="{{ game.howlongtobeat_link }}" target="_blank" rel="noopener noreferrer"><img src="{% static 'icons/hl2b.png' %}"></a>
-					{% endif %}
-					{% if game.gamefaqs_link != '' %}
-					<a href="{{ game.gamefaqs_link }}" target="_blank" rel="noopener noreferrer"><img src="{% static 'icons/gamefaqs.png' %}"></a>
-					{% endif %}
-					{% if game.mobygames_link != '' %}
-					<a href="{{ game.mobygames_link }}" target="_blank" rel="noopener noreferrer"><img src="{% static 'icons/mobygames.png' %}"></a>
-					{% endif %}
-					{% if game.winehq_link != '' %}
-					<a href="{{ game.winehq_link }}" target="_blank" rel="noopener noreferrer"><img src="{% static 'icons/winehq.png' %}"></a>
-					{% endif %}
-					{% if game.vndb_link != '' %}
-					<a href="{{ game.vndb_link }}" target="_blank" rel="noopener noreferrer"><img src="{% static 'icons/vndb.png' %}"></a>
-					{% endif %}
-					{% if game.pcgamingwiki_link != '' %}
-					<a href="{{ game.pcgamingwiki_link }}" target="_blank" rel="noopener noreferrer"><img src="{% static 'icons/pcgamingwiki.png' %}"></a>
-					{% endif %}
-				</blockquote>
-				<blockquote class="blockquote">
-					<span title="Rated by {{ users_rated }} user(s).">Score: {% if user_score %}{{ user_score|floatformat:"0" }}%{% else %}None{% endif %}</span>
-				</blockquote>
-				<blockquote class="blockquote">
-					<p class="mb-0">
-						Genres:<br>{% for genre in game.genres.all %}
-							<a href="{% url 'games:genre' genre.id genre.name|slugify %}">{{ genre.name }}</a>{% if not forloop.last %}, {% endif %}
-								{% endfor %}
-					</p>
-				</blockquote>
-				<blockquote class="blockquote">
-						<button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#gametags" aria-expanded="false" aria-controls="gametags">Show Tags</button><br>
-						<div class="collapse" id="gametags">{% for tag in game.tags.all|dictsort:"name" %}
-								<a href="{% url 'games:tag' tag.id tag.name|slugify %}">{{ tag.name }}</a>{% if not forloop.last %}, {% endif %}
-								{% endfor %}</div>
-						<small class="text-muted">May contain spoilers</small><br>
-				</blockquote>
-			</div>
-			<div class="col-md-8" align="center">
-				{% if game.screen1 %}<img style="max-height:500px;max-width:24%;object-fit: contain;" src="{{ game.screen1.url }}" onclick="lightbox.init(this,220);">{% endif %}
-				{% if game.screen2 %}<img style="max-height:500px;max-width:24%;object-fit: contain;" src="{{ game.screen2.url }}" onclick="lightbox.init(this,220);">{% endif %}
-				{% if game.screen3 %}<img style="max-height:500px;max-width:24%;object-fit: contain;" src="{{ game.screen3.url }}" onclick="lightbox.init(this,220);">{% endif %}
-				{% if game.screen4 %}<img style="max-height:500px;max-width:24%;object-fit: contain;" src="{{ game.screen4.url }}" onclick="lightbox.init(this,220);">{% endif %}
-				<br><br>
-				<h4>
-					<span class="badge badge-secondary">Planning<br>{{ user_counts.PLAN }}</span>
-					<span class="badge badge-primary">Playing<br>{{ user_counts.PLAY }}</span>
-					<span class="badge badge-success">Completed<br>{{ user_counts.CMPL }}</span>
-					<span class="badge badge-warning">On Hold<br>{{ user_counts.HOLD }}</span>
-					<span class="badge badge-danger">Dropped<br>{{ user_counts.DROP }}</span>
-				</h4>
-				<p>{{ game.description }}</p>
-			</div>
-		</div>
-	</div>
-	<div class="footer">
+{% block navitems %}
+	<li class="nav-item">
+	<a class="nav-link" href="/">Home</a>
+	</li>
+	<li class="nav-item">
+	<a class="nav-link" href="{% url 'games:gamelist' %}">My Games</a>
+	</li>
+	<li class="nav-item">
+	<a class="nav-link active" href="{% url 'games:browse' %}">Browse</a>
+	</li>
+	<li class="nav-item">
+	<a class="nav-link" href="/forum">Forums</a>
+	</li>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+	<div class="row justify-content-md-center">
 		<div class="col-md-12" align="center">
-			<a href="https://github.com/Frostflake/mygamelist">GitHub</a>
+			<br>
+			<h4>{{ game.name }} ({{ game.year }})</h4>
+		</div>
+		<div class="col-md-4" align="center">
+			<img style="max-height:400px;max-width:100%;" src="{{ game.image.url }}"><br>
+			<br>
+		</div>
+		<div class="col-md-8 align-self-center">
+			{% if game.trailer_link != '' %}
+			<video style="max-width:100%; height:auto" controls><source src="{{ game.trailer_link }}" type="video/webm" />Your browser does not support WEBM.</video>
+			{% else %}
+			<img style="max-height:400px;max-width:100%;" src="{% static 'no_trailer.png' %}"><br>
+			{% endif %}
+		</div>
+		<div class="col-md-4" align="center">
+			<blockquote class="blockquote">
+				{% if not game_entry %}
+					<a class="btn btn-primary" role="button" href="{% url 'games:gamelist' 'edit' game.id %}">Add to List</a>
+				{% elif game_entry %}
+					<a class="btn btn-primary" role="button" href="{% url 'games:gamelist' 'edit' game.id %}">{{ game_entry.status }}</a>
+				{% endif %}
+			</blockquote>
+			<blockquote class="blockquote">
+				{% if game.main_link != '' %}
+				<a href="{{ game.main_link }}" target="_blank" rel="noopener noreferrer"><img src="{% static 'icons/website.png' %}"></a>
+				{% endif %}
+				{% if game.steam_link != '' %}
+				<a href="{{ game.steam_link }}" target="_blank" rel="noopener noreferrer"><img src="{% static 'icons/steam.png' %}"></a>
+				{% endif %}
+				{% if game.wikipedia_link != '' %}
+				<a href="{{ game.wikipedia_link }}" target="_blank" rel="noopener noreferrer"><img src="{% static 'icons/wikipedia.png' %}"></a>
+				{% endif %}
+				{% if game.howlongtobeat_link != '' %}
+				<a href="{{ game.howlongtobeat_link }}" target="_blank" rel="noopener noreferrer"><img src="{% static 'icons/hl2b.png' %}"></a>
+				{% endif %}
+				{% if game.gamefaqs_link != '' %}
+				<a href="{{ game.gamefaqs_link }}" target="_blank" rel="noopener noreferrer"><img src="{% static 'icons/gamefaqs.png' %}"></a>
+				{% endif %}
+				{% if game.mobygames_link != '' %}
+				<a href="{{ game.mobygames_link }}" target="_blank" rel="noopener noreferrer"><img src="{% static 'icons/mobygames.png' %}"></a>
+				{% endif %}
+				{% if game.winehq_link != '' %}
+				<a href="{{ game.winehq_link }}" target="_blank" rel="noopener noreferrer"><img src="{% static 'icons/winehq.png' %}"></a>
+				{% endif %}
+				{% if game.vndb_link != '' %}
+				<a href="{{ game.vndb_link }}" target="_blank" rel="noopener noreferrer"><img src="{% static 'icons/vndb.png' %}"></a>
+				{% endif %}
+				{% if game.pcgamingwiki_link != '' %}
+				<a href="{{ game.pcgamingwiki_link }}" target="_blank" rel="noopener noreferrer"><img src="{% static 'icons/pcgamingwiki.png' %}"></a>
+				{% endif %}
+			</blockquote>
+			<blockquote class="blockquote">
+				<span title="Rated by {{ users_rated }} user(s).">Score: {% if user_score %}{{ user_score|floatformat:"0" }}%{% else %}None{% endif %}</span>
+			</blockquote>
+			<blockquote class="blockquote">
+				<p class="mb-0">
+					Genres:<br>{% for genre in game.genres.all %}
+						<a href="{% url 'games:genre' genre.id genre.name|slugify %}">{{ genre.name }}</a>{% if not forloop.last %}, {% endif %}
+							{% endfor %}
+				</p>
+			</blockquote>
+			<blockquote class="blockquote">
+					<button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#gametags" aria-expanded="false" aria-controls="gametags">Show Tags</button><br>
+					<div class="collapse" id="gametags">{% for tag in game.tags.all|dictsort:"name" %}
+							<a href="{% url 'games:tag' tag.id tag.name|slugify %}">{{ tag.name }}</a>{% if not forloop.last %}, {% endif %}
+							{% endfor %}</div>
+					<small class="text-muted">May contain spoilers</small><br>
+			</blockquote>
+		</div>
+		<div class="col-md-8" align="center">
+			{% if game.screen1 %}<img style="max-height:500px;max-width:24%;object-fit: contain;" src="{{ game.screen1.url }}" onclick="lightbox.init(this,220);">{% endif %}
+			{% if game.screen2 %}<img style="max-height:500px;max-width:24%;object-fit: contain;" src="{{ game.screen2.url }}" onclick="lightbox.init(this,220);">{% endif %}
+			{% if game.screen3 %}<img style="max-height:500px;max-width:24%;object-fit: contain;" src="{{ game.screen3.url }}" onclick="lightbox.init(this,220);">{% endif %}
+			{% if game.screen4 %}<img style="max-height:500px;max-width:24%;object-fit: contain;" src="{{ game.screen4.url }}" onclick="lightbox.init(this,220);">{% endif %}
+			<br><br>
+			<h4>
+				<span class="badge badge-secondary">Planning<br>{{ user_counts.PLAN }}</span>
+				<span class="badge badge-primary">Playing<br>{{ user_counts.PLAY }}</span>
+				<span class="badge badge-success">Completed<br>{{ user_counts.CMPL }}</span>
+				<span class="badge badge-warning">On Hold<br>{{ user_counts.HOLD }}</span>
+				<span class="badge badge-danger">Dropped<br>{{ user_counts.DROP }}</span>
+			</h4>
+			<p>{{ game.description }}</p>
 		</div>
 	</div>
-	<div id="lightbox" class="lightbox hidden"></div>
-	<div id="curtain" class="curtain hidden"></div>
-
-    <script src="{% static 'js/jquery.min.js' %}"></script>
-    <script src="{% static 'js/bootstrap.min.js' %}"></script>
-    <script src="{% static 'js/scripts.js' %}"></script>
-</body>
+</div>
+{% endblock %}

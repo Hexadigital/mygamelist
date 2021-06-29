@@ -9,7 +9,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Count, Q
 
 from .models import Game, Genre, Platform, Tag, User, UserGameListEntry, ManualUserGameListEntry, UserGameStatus
-from .models import UserGameStatus
+from .models import UserGameStatus, Notification
 from .forms import SignUpForm, ManualGameForm, GameEntryForm
 
 def IndexView(request):
@@ -318,6 +318,21 @@ def GameListView(request, edit_type=None, entry_id=None):
         return render(request, 'games/add_manual_game.html', {'form': form})
     else:
         raise Http404
+
+@login_required(login_url='/login/')
+def NotificationsView(request):
+    notification_list = Notification.objects.filter(user=request.user).order_by('-id')
+    final_notif_list = []
+    for notif in notification_list:
+        new_notif = {}
+        if notif.notif_type == 'MIGRATED':
+            game = Game.objects.get(id=notif.notif_object_id)
+            new_notif['created_at'] = notif.created_at
+            new_notif['user'] = notif.user
+            new_notif['notif_type'] = notif.notif_type
+            new_notif['game'] = game
+            final_notif_list.append(new_notif)
+    return render(request, 'games/notifications.html', {'notification_list': final_notif_list})
 
 class ForumView(generic.View):
     pass

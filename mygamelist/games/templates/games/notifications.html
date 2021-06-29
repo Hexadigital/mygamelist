@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Notifications :: Remember Games{% endblock %}
+
+{% block embedpreview %}
+	<meta name="twitter:card" content="summary" />
+	<meta name="twitter:title" content="Notifications :: Remember Games" />
+	<meta name="twitter:description" content="Remember Games is a website you can use to track games you've played." />
+	<meta name="twitter:image" content="" />
+{% endblock %}
+
+{% block navitems %}
+	<li class="nav-item">
+	<a class="nav-link" href="/">Home</a>
+	</li>
+	<li class="nav-item">
+	<a class="nav-link" href="{% url 'games:gamelist' %}">My Games</a>
+	</li>
+	<li class="nav-item">
+	<a class="nav-link" href="{% url 'games:browse' %}">Browse</a>
+	</li>
+	<li class="nav-item">
+	<a class="nav-link" href="/forum">Forums</a>
+	</li>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+	<br>
+	<div class="row">
+		<div class="col-2" align="center"></div>
+		<div class="col-8">
+			{% for notif in notification_list %}
+				<div class="text-white bg-dark mb-3 rounded" style="max-width: 100%">
+					<div class="row align-items-center">
+						{% if notif.notif_type == 'MIGRATED' %}
+						<div class="col-md-auto" style="width:80px;">
+							<img class="rounded" src="{{ notif.game.image.url }}" style="max-width: 80px; height: 130px; object-fit: cover;">
+						</div>
+						<div class="col">
+							<div class="card-header d-flex justify-content-between">
+								<div>Migration Notice</div>
+								<div>{{ notif.created_at|naturaltime }}</div>
+							</div>
+							<div class="card-body">
+								<p class="card-text">
+									<a class="gamelink" href="{% url 'games:game' notif.game.id notif.game.name|slugify %}">{{ notif.game.name }}</a> has been added to the site. Your list has been updated accordingly.
+								</p>
+							</div>
+						</div>
+						{% endif %}
+					</div>
+				</div>
+			{% endfor %}
+		</div>
+		<div class="col-2" align="center"></div>
+	</div>
+</div>
+{% endblock %}

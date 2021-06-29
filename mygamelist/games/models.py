@@ -136,3 +136,9 @@ class UserGameStatus(models.Model):
 
     def __str__(self):
         return self.user.username + " " + self.status + " " + self.game.name
+
+class Notification(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    notif_type = models.CharField(max_length=10)
+    notif_object_id = models.IntegerField()

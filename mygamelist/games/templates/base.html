@@ -1,0 +1,75 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	
+	<title>{% block title %}{% endblock %}</title>
+	
+	{% block embedpreview %}{% endblock %}
+	
+	<link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+	<link href="{% static 'css/style.css' %}" rel="stylesheet">
+	
+	<style>
+		body {
+			background-image: url("{% static 'bgdark.png' %}");
+			background-repeat: repeat;
+			color: white;
+		}
+		a.gamelink {
+			color: #CCBADC;
+			text-decoration: none;
+		}
+		table.profilelist {
+			text-align: center;
+		}
+	</style>
+</head>
+
+<body>
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+		<a class="navbar-brand" href="#">Remember Games</a>
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+		<span class="navbar-toggler-icon"></span>
+		</button>
+		<div class="collapse navbar-collapse" id="navbarSupportedContent">
+		<ul class="navbar-nav mr-auto">
+		{% block navitems %}{% endblock %}
+		</ul>
+		{% if user.is_authenticated %}
+			<a href="{% url 'games:notifications' %}">
+			{% if alert %}
+			<img width="30" height="30" src="{% static 'icons/new-notif.png' %}">
+			{% else %}
+			<img width="30" height="30" src="{% static 'icons/no-notif.png' %}">
+			{% endif %}
+			</a>&nbsp;&nbsp;&nbsp;&nbsp;
+			<a href="{% url 'games:profile' user.id user.username|slugify %}">
+			{% if user.userprofile.avatar %}
+			<img width="40" height="40" class="d-inline-block align-top rounded-circle" src="{{ user.userprofile.avatar.url }}">
+			{% else %}
+			<img width="40" height="40" class="d-inline-block align-top rounded-circle" src="{% static 'default_avatar.png' %}">
+			{% endif %}
+			</a>
+		{% else %}<ul class="navbar-nav"><li class="nav-item"><a class="nav-link" href="{% url 'games:login' %}">Login</a></li></ul>
+		{% endif %}
+		</div>
+	</nav>
+	{% block content %}{% endblock %}
+	<div class="footer">
+		<div class="col-12" align="center">
+			<a href="https://github.com/Frostflake/mygamelist">GitHub</a><br>
+			Coded with ♥ &middot; &copy; 2021 Remember Games
+		</div>
+	</div>
+	<div id="lightbox" class="lightbox hidden"></div>
+	<div id="curtain" class="curtain hidden"></div>
+
+	<script src="{% static 'js/jquery.min.js' %}"></script>
+	<script src="{% static 'js/bootstrap.min.js' %}"></script>
+	<script src="{% static 'js/scripts.js' %}"></script>
+</body>
+</html>

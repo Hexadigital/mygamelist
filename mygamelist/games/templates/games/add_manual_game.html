@@ -1,129 +1,85 @@
+{% extends "base.html" %}
 {% load static %}
-<head>
-	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	
-	<title>My Games :: Remember Games</title>
-	
+{% load humanize %}
+
+{% block title %}My Games :: Remember.Games{% endblock %}
+
+{% block embedpreview %}
 	<meta name="twitter:card" content="summary" />
 	<meta name="twitter:title" content="My Games :: Remember Games" />
 	<meta name="twitter:description" content="Remember Games is a website you can use to track games you've played." />
-	
-	<link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
-	<link href="{% static 'css/style.css' %}" rel="stylesheet">
-	
-	<style>
-		body {
-			background-image: url("{% static 'bgdark.png' %}");
-			background-repeat: repeat;
-			color: white;
-		}
-		a.gamelink {
-			color: #CCBADC;
-			text-decoration: none;
-		}
-		table {
-			text-align: center;
-		}
-	</style>
-</head>
+	<meta name="twitter:image" content="" />
+{% endblock %}
 
-<body>
-	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-		<a class="navbar-brand" href="#">Remember Games</a>
-		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-		<span class="navbar-toggler-icon"></span>
-		</button>
-		<div class="collapse navbar-collapse" id="navbarSupportedContent">
-		<ul class="navbar-nav mr-auto">
-		<li class="nav-item">
-		<a class="nav-link" href="/">Home</a>
-		</li>
-		<li class="nav-item">
-		<a class="nav-link active" href="{% url 'games:gamelist' %}">My Games</a>
-		</li>
-		<li class="nav-item">
-		<a class="nav-link" href="{% url 'games:browse' %}">Browse</a>
-		</li>
-		<li class="nav-item">
-		<a class="nav-link" href="/forum">Forums</a>
-		</li>
-		</ul>
-		{% if user.is_authenticated %}
-			<a href="{% url 'games:profile' user.id user.username|slugify %}">
-			{% if user.userprofile.avatar %}
-			<img width="40" height="40" class="d-inline-block align-top rounded-circle" src="{{ user.userprofile.avatar.url }}">
-			{% else %}
-			<img width="40" height="40" class="d-inline-block align-top rounded-circle" src="{% static 'default_avatar.png' %}">
-			{% endif %}
-			</a>
-		{% else %}<ul class="navbar-nav"><li class="nav-item"><a class="nav-link" href="{% url 'games:login' %}">Login</a></li></ul>
-		{% endif %}
-		</div>
-	</nav>
-	<div class="container">
-		<div class="row">
-			<form action="{% url 'games:gamelist' 'add-manual' %}" method="post">
-				{% csrf_token %}
-				{{ form.errors }}
-				<div class="fieldWrapper">
-					<label for="id_name">Game Name:</label>
-					<input type="text" name="name" maxlength="150" required="" value="{{ form.name.value|default_if_none:"" }}" id="id_name">
-				</div>
-				<div class="fieldWrapper">
-					<label for="id_platform">Platform:</label>
-					<select name="platform">
-						{% for choice in form.platform.field.choices %}
-							<option value="{{ choice.0 }}"{% if choice.0|slugify == form.platform.value|slugify %} selected=""{% endif %}>{{ choice.1 }}</option>
-						{% endfor %}
-					</select>
-				</div>
-				<div class="fieldWrapper">
-					<label for="id_status">Status:</label>
-					<select name="status" id="id_status">
-						<option value="PLAN"{% if form.status.value == 'PLAN' %} selected=""{% endif %}>Plan to Play</option>
-						<option value="PLAY"{% if form.status.value == 'PLAY' %} selected=""{% endif %}>Playing</option>
-						<option value="CMPL"{% if form.status.value == 'CMPL' %} selected=""{% endif %}>Completed</option>
-						<option value="DROP"{% if form.status.value == 'DROP' %} selected=""{% endif %}>Dropped</option>
-						<option value="HOLD"{% if form.status.value == 'HOLD' %} selected=""{% endif %}>Paused</option>
-					</select>
-				</div>
-				<div class="fieldWrapper">
-					<label for="id_score">Score:</label>
-					<input type="number" name="score" step="0.25" value="{{ form.score.value|default_if_none:"" }}" id="id_score">
-				</div>
-				<div class="fieldWrapper">
-					<label for="id_hours">Hours:</label>
-					<input type="number" name="hours" step="0.25" value="{{ form.hours.value|default_if_none:"" }}" id="id_hours">
-				</div>
-				<div class="fieldWrapper">
-					<label for="id_start_date">Start Date:</label>
-					<input type="text" name="start_date" id="id_start_date" value="{{ form.start_date.value|default_if_none:"" }}" placeholder="YYYY-MM-DD">
-				</div>
-				<div class="fieldWrapper">
-					<label for="id_stop_date">Stop Date:</label>
-					<input type="text" name="stop_date" id="id_stop_date" value="{{ form.stop_date.value|default_if_none:"" }}" placeholder="YYYY-MM-DD">
-				</div>
-				<div class="fieldWrapper">
-					<label for="id_times_replayed">Times Replayed:</label>
-					<input type="number" name="times_replayed" required="" value="{{ form.times_replayed.value }}" id="id_times_replayed">
-				</div>
-				<div class="fieldWrapper">
-					<label for="id_comments">Comments:</label>
-					<input type="text" name="comments" maxlength="500" value="{{ game_entry.comments }}" id="id_comments">
-				</div>
-				<input type="submit" value="Edit">
-			</form>
-		</div>
-	</div>
-	<div class="footer">
-		<div class="col-md-12" align="center">
-			<a href="https://github.com/Frostflake/mygamelist">GitHub</a>
-		</div>
-	</div>
+{% block navitems %}
+	<li class="nav-item">
+	<a class="nav-link" href="/">Home</a>
+	</li>
+	<li class="nav-item">
+	<a class="nav-link active" href="{% url 'games:gamelist' %}">My Games</a>
+	</li>
+	<li class="nav-item">
+	<a class="nav-link" href="{% url 'games:browse' %}">Browse</a>
+	</li>
+	<li class="nav-item">
+	<a class="nav-link" href="/forum">Forums</a>
+	</li>
+{% endblock %}
 
-	<script src="{% static 'js/jquery.min.js' %}"></script>
-	<script src="{% static 'js/bootstrap.min.js' %}"></script>
-	<script src="{% static 'js/scripts.js' %}"></script>
-</body>
+{% block content %}
+<div class="container">
+	<div class="row">
+		<form action="{% url 'games:gamelist' 'add-manual' %}" method="post">
+			{% csrf_token %}
+			{{ form.errors }}
+			<div class="fieldWrapper">
+				<label for="id_name">Game Name:</label>
+				<input type="text" name="name" maxlength="150" required="" value="{{ form.name.value|default_if_none:"" }}" id="id_name">
+			</div>
+			<div class="fieldWrapper">
+				<label for="id_platform">Platform:</label>
+				<select name="platform">
+					{% for choice in form.platform.field.choices %}
+						<option value="{{ choice.0 }}"{% if choice.0|slugify == form.platform.value|slugify %} selected=""{% endif %}>{{ choice.1 }}</option>
+					{% endfor %}
+				</select>
+			</div>
+			<div class="fieldWrapper">
+				<label for="id_status">Status:</label>
+				<select name="status" id="id_status">
+					<option value="PLAN"{% if form.status.value == 'PLAN' %} selected=""{% endif %}>Plan to Play</option>
+					<option value="PLAY"{% if form.status.value == 'PLAY' %} selected=""{% endif %}>Playing</option>
+					<option value="CMPL"{% if form.status.value == 'CMPL' %} selected=""{% endif %}>Completed</option>
+					<option value="DROP"{% if form.status.value == 'DROP' %} selected=""{% endif %}>Dropped</option>
+					<option value="HOLD"{% if form.status.value == 'HOLD' %} selected=""{% endif %}>Paused</option>
+				</select>
+			</div>
+			<div class="fieldWrapper">
+				<label for="id_score">Score:</label>
+				<input type="number" name="score" step="0.25" value="{{ form.score.value|default_if_none:"" }}" id="id_score">
+			</div>
+			<div class="fieldWrapper">
+				<label for="id_hours">Hours:</label>
+				<input type="number" name="hours" step="0.25" value="{{ form.hours.value|default_if_none:"" }}" id="id_hours">
+			</div>
+			<div class="fieldWrapper">
+				<label for="id_start_date">Start Date:</label>
+				<input type="text" name="start_date" id="id_start_date" value="{{ form.start_date.value|default_if_none:"" }}" placeholder="YYYY-MM-DD">
+			</div>
+			<div class="fieldWrapper">
+				<label for="id_stop_date">Stop Date:</label>
+				<input type="text" name="stop_date" id="id_stop_date" value="{{ form.stop_date.value|default_if_none:"" }}" placeholder="YYYY-MM-DD">
+			</div>
+			<div class="fieldWrapper">
+				<label for="id_times_replayed">Times Replayed:</label>
+				<input type="number" name="times_replayed" required="" value="{{ form.times_replayed.value }}" id="id_times_replayed">
+			</div>
+			<div class="fieldWrapper">
+				<label for="id_comments">Comments:</label>
+				<input type="text" name="comments" maxlength="500" value="{{ game_entry.comments }}" id="id_comments">
+			</div>
+			<input type="submit" value="Edit">
+		</form>
+	</div>
+</div>
+{% endblock %}

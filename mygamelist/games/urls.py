@@ -24,5 +24,6 @@ urlpatterns = [
     path('gamelist/', views.GameListView, name='gamelist'),
     path('gamelist/<str:edit_type>', views.GameListView, name='gamelist'),
     path('gamelist/<str:edit_type>/<int:entry_id>', views.GameListView, name='gamelist'),
-    path('browse/', views.BrowseView, name='browse')
+    path('browse/', views.BrowseView, name='browse'),
+	path('notifications/', views.NotificationsView, name='notifications')
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
