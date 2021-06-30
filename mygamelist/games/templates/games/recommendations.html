@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Recommendations :: Remember Games{% endblock %}
+
+{% block embedpreview %}
+	<meta name="twitter:card" content="summary" />
+	<meta name="twitter:title" content="Recommendations :: Remember Games" />
+	<meta name="twitter:description" content="Remember Games is a website you can use to track games you've played." />
+	<meta name="twitter:image" content="" />
+{% endblock %}
+
+{% block navitems %}
+	<li class="nav-item">
+	<a class="nav-link" href="/">Home</a>
+	</li>
+	<li class="nav-item">
+	<a class="nav-link" href="{% url 'games:gamelist' %}">My Games</a>
+	</li>
+	<li class="nav-item">
+	<a class="nav-link" href="{% url 'games:browse' %}">Browse</a>
+	</li>
+	<li class="nav-item">
+	<a class="nav-link" href="/forum">Forums</a>
+	</li>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+	<br>
+	<div class="row">
+		<div class="col-2" align="center"></div>
+		<div class="col-8">
+			<center>If this page is empty, please note that you must have at least five games (with pages) rated. Recommendations are refreshed periodically.<br>Predictions will become more accurate as the site is developed.</center><br><br>
+			{% for rec in rec_list %}
+				<div class="text-white bg-dark mb-3 rounded" style="max-width: 100%">
+					<div class="row align-items-center">
+						<div class="col-md-auto" style="width:80px;">
+							<img class="rounded" src="{{ rec.game.image.url }}" style="max-width: 80px; height: 130px; object-fit: cover;">
+						</div>
+						<div class="col">
+							<div class="card-header d-flex justify-content-between">
+								<div>Our AI thinks you would rate this game a {{ rec.rec_data }}%.</div>
+							</div>
+							<div class="card-body">
+								<p class="card-text">
+									<a class="gamelink" href="{% url 'games:game' rec.game.id rec.game.name|slugify %}">{{ rec.game.name }}</a>
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			{% endfor %}
+		</div>
+		<div class="col-2" align="center"></div>
+	</div>
+</div>
+{% endblock %}

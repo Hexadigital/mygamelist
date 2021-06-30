@@ -56,6 +56,7 @@ class Game(models.Model):
     genres = models.ManyToManyField(Genre, blank=True)
     tags = models.ManyToManyField(Tag, blank=True)
     description = models.TextField(blank=True, default='')
+    aliases = models.TextField(blank=True, default='')
     main_link = models.URLField(max_length=250, blank=True, default='', verbose_name="Main Website")
     wikipedia_link = models.URLField(max_length=250, blank=True, default='', verbose_name="Wikipedia")
     gamefaqs_link = models.URLField(max_length=250, blank=True, default='', verbose_name="GameFAQs Link")
@@ -142,3 +143,9 @@ class Notification(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     notif_type = models.CharField(max_length=10)
     notif_object_id = models.IntegerField()
+
+class Recommendation(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    slot = models.IntegerField()
+    game = models.ForeignKey(Game, on_delete=models.CASCADE)
+    rec_data = models.CharField(max_length=10)

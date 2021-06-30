@@ -9,7 +9,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Count, Q
 
 from .models import Game, Genre, Platform, Tag, User, UserGameListEntry, ManualUserGameListEntry, UserGameStatus
-from .models import UserGameStatus, Notification
+from .models import UserGameStatus, Notification, Recommendation
 from .forms import SignUpForm, ManualGameForm, GameEntryForm
 
 def IndexView(request):
@@ -143,7 +143,7 @@ def BrowseView(request):
     sexual_content = Tag.objects.get(name="Sexual Content")
     query = request.GET.get('search')
     if query:
-        game_list = Game.objects.filter(Q(name__icontains=query)).exclude(tags=sexual_content).order_by('-id')
+        game_list = Game.objects.filter(Q(name__icontains=query) | Q(aliases__icontains=query)).exclude(tags=sexual_content).order_by('-id')
     else:
         game_list = Game.objects.exclude(tags=sexual_content).order_by('-id')
     page = request.GET.get('page', 1)
@@ -333,6 +333,11 @@ def NotificationsView(request):
             new_notif['game'] = game
             final_notif_list.append(new_notif)
     return render(request, 'games/notifications.html', {'notification_list': final_notif_list})
+
+@login_required(login_url='/login/')
+def RecommendationsView(request, slot=1):
+    rec_list = Recommendation.objects.filter(user=request.user).order_by('slot')
+    return render(request, 'games/recommendations.html', {'rec_list': rec_list})
 
 class ForumView(generic.View):
     pass
