@@ -21,9 +21,6 @@
 	<li class="nav-item">
 	<a class="nav-link" href="{% url 'games:browse' %}">Browse</a>
 	</li>
-	<li class="nav-item">
-	<a class="nav-link" href="/forum">Forums</a>
-	</li>
 {% endblock %}
 
 {% block content %}
@@ -32,7 +29,7 @@
 	<div class="row">
 		<div class="col-2" align="center"></div>
 		<div class="col-8">
-			<center>If this page is empty, please note that you must have at least five games (with pages) rated. Recommendations are refreshed periodically.<br>Predictions will become more accurate as the site is developed.</center><br><br>
+			<center>If this page is empty, please note that you must have at least five games (with pages) rated. Recommendations are refreshed periodically.<br>Predictions will become more accurate as you add games to your list and as new site features are developed.</center><br><br>
 			{% for rec in rec_list %}
 				<div class="text-white bg-dark mb-3 rounded" style="max-width: 100%">
 					<div class="row align-items-center">

@@ -320,8 +320,11 @@ def GameListView(request, edit_type=None, entry_id=None):
         raise Http404
 
 @login_required(login_url='/login/')
-def NotificationsView(request):
+def NotificationsView(request, action=''):
     notification_list = Notification.objects.filter(user=request.user).order_by('-id')
+    if action == "clear":
+        notification_list.delete()
+        return redirect('/notifications/')
     final_notif_list = []
     for notif in notification_list:
         new_notif = {}
