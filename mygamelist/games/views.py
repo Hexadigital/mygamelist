@@ -9,7 +9,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Count, Q
 
 from .models import Game, Genre, Platform, Tag, User, UserGameListEntry, ManualUserGameListEntry, UserGameStatus
-from .models import UserGameStatus, Notification, Recommendation
+from .models import UserGameStatus, Notification, Recommendation, Collection, CollectionType
 from .forms import SignUpForm, ManualGameForm, GameEntryForm
 
 def IndexView(request):
@@ -119,6 +119,11 @@ def GameView(request, game_id, name=None):
         "IMPT": "Imported"
     }
     game = Game.objects.get(id=game_id)
+
+    user_col_type = CollectionType.objects.get(name='User')
+    regular_collections = Collection.objects.exclude(category=user_col_type).filter(games=game)
+    user_collections = Collection.objects.filter(category=user_col_type).filter(games=game)
+
     game_entries = UserGameListEntry.objects.filter(game=game)
     if request.user.is_authenticated:
         try:
@@ -135,9 +140,9 @@ def GameView(request, game_id, name=None):
             user_scores.append(entry.score * 10)
         user_counts[entry.status] += 1
     if len(user_scores) > 0:
-        return render(request, 'games/game_detail.html', {'game': game, 'user_score':sum(user_scores)/len(user_scores), 'users_rated':len(user_scores), 'user_counts':user_counts, 'game_entry': game_entry})
+        return render(request, 'games/game_detail.html', {'game': game, 'user_score':sum(user_scores)/len(user_scores), 'users_rated':len(user_scores), 'user_counts':user_counts, 'game_entry': game_entry, 'regular_collections':regular_collections, 'user_collections':user_collections})
     else:
-        return render(request, 'games/game_detail.html', {'game': game, 'user_score':None, 'users_rated':0, 'user_counts':user_counts, 'game_entry': game_entry})
+        return render(request, 'games/game_detail.html', {'game': game, 'user_score':None, 'users_rated':0, 'user_counts':user_counts, 'game_entry': game_entry, 'regular_collections':regular_collections, 'user_collections':user_collections})
 
 def BrowseView(request):
     sexual_content = Tag.objects.get(name="Sexual Content")
@@ -338,8 +343,12 @@ def NotificationsView(request, action=''):
     return render(request, 'games/notifications.html', {'notification_list': final_notif_list})
 
 @login_required(login_url='/login/')
-def RecommendationsView(request, slot=1):
-    rec_list = Recommendation.objects.filter(user=request.user).order_by('slot')
+def RecommendationsView(request, user_id=None):
+    if request.user.id == 1 and user_id is not None:
+        selected_user = User.objects.get(id=user_id)
+        rec_list = Recommendation.objects.filter(user=selected_user).order_by('slot')
+    else:
+        rec_list = Recommendation.objects.filter(user=request.user).order_by('slot')
     return render(request, 'games/recommendations.html', {'rec_list': rec_list})
 
 class ForumView(generic.View):

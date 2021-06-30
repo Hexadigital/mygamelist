@@ -110,6 +110,10 @@
 				<span class="badge badge-danger">Dropped<br>{{ user_counts.DROP }}</span>
 			</h4>
 			<p>{{ game.description }}</p>
+			In {{ regular_collections|length }} collection(s):<br>
+			{% for collection in regular_collections %}
+			{{ collection }}<br>
+			{% endfor %}
 		</div>
 	</div>
 </div>

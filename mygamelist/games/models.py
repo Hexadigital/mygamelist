@@ -149,3 +149,19 @@ class Recommendation(models.Model):
     slot = models.IntegerField()
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     rec_data = models.CharField(max_length=10)
+
+class CollectionType(models.Model):
+    name = models.CharField(max_length=150)
+    description = models.TextField(blank=True, default='')
+
+    def __str__(self):
+        return self.name
+
+class Collection(models.Model):
+    name = models.CharField(max_length=150)
+    category = models.ForeignKey(CollectionType, on_delete=models.CASCADE)
+    description = models.TextField(blank=True, default='')
+    games = models.ManyToManyField(Game, blank=True)
+
+    def __str__(self):
+        return self.category.name + " - " + self.name

@@ -27,5 +27,6 @@ urlpatterns = [
     path('browse/', views.BrowseView, name='browse'),
     path('notifications/', views.NotificationsView, name='notifications'),
     path('notifications/<str:action>/', views.NotificationsView, name='notifications'),
-    path('recommendations/', views.RecommendationsView, name='recommendations')
+    path('recommendations/', views.RecommendationsView, name='recommendations'),
+    path('recommendations/view/<int:user_id>', views.RecommendationsView, name='recommendations'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
