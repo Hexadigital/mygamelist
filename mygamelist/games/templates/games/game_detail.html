@@ -29,6 +29,7 @@
 		<div class="col-md-12" align="center">
 			<br>
 			<h4>{{ game.name }} ({{ game.year }})</h4>
+			{% if stubbed %}<div class="alert alert-warning" role="alert">This page is a stub! Any contributions are more than welcome.</div>{% endif %}
 		</div>
 		<div class="col-md-4" align="center">
 			<img style="max-height:400px;max-width:100%;" src="{{ game.image.url }}"><br>
@@ -44,7 +45,7 @@
 		<div class="col-md-4" align="center">
 			<blockquote class="blockquote">
 				{% if not game_entry %}
-					<a class="btn btn-primary" role="button" href="{% url 'games:gamelist' 'edit' game.id %}">Add to List</a>
+					<a class="btn btn-primary" role="button" href="{% url 'games:gamelist' 'edit' game.id %}">Add to List</a> <a role="button" href="{% url 'games:ignore' game.id %}" class="btn btn-{% if ignored %}dark">Unignore{% else %}secondary">Ignore{% endif %}</a>
 				{% elif game_entry %}
 					<a class="btn btn-primary" role="button" href="{% url 'games:gamelist' 'edit' game.id %}">{{ game_entry.status }}</a>
 				{% endif %}
@@ -79,7 +80,11 @@
 				{% endif %}
 			</blockquote>
 			<blockquote class="blockquote">
-				<span title="Rated by {{ users_rated }} user(s).">Score: {% if user_score %}{{ user_score|floatformat:"0" }}%{% else %}None{% endif %}</span>
+				{% if users_rated > 0 %}
+					<span title="Rated by {{ users_rated }} user(s).">Score: {% if user_score %}{{ user_score|floatformat:"0" }}%{% else %}None{% endif %}</span>
+				{% else %}
+					<span title="Using external data for scoring.">Score: {% if game.temp_pop_score %}{{ game.temp_pop_score|floatformat:"0" }}%{% else %}None{% endif %}</span>
+				{% endif %}
 			</blockquote>
 			<blockquote class="blockquote">
 				<p class="mb-0">
@@ -112,7 +117,7 @@
 			<p>{{ game.description }}</p>
 			In {{ regular_collections|length }} collection(s):<br>
 			{% for collection in regular_collections %}
-			{{ collection }}<br>
+			<a href="{% url 'games:collection' collection.id %}" class="gamelink">{{ collection }}</a><br>
 			{% endfor %}
 		</div>
 	</div>

@@ -66,6 +66,7 @@ class Game(models.Model):
     winehq_link = models.URLField(max_length=250, blank=True, default='', verbose_name="WineHQ Link")
     mobygames_link = models.URLField(max_length=250, blank=True, default='', verbose_name="MobyGames Link")
     vndb_link = models.URLField(max_length=250, blank=True, default='', verbose_name="VNDB Link")
+    temp_pop_score = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
 
     def __str__(self):
         return self.name + " (" + str(self.year) + ")"
@@ -73,6 +74,8 @@ class Game(models.Model):
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     avatar = models.ImageField(upload_to=random_avatar_filename, null=True)
+    banned_tags = models.ManyToManyField(Tag, blank=True)
+    ignored_games = models.ManyToManyField(Game, blank=True)
     games_added = models.IntegerField(default=0)
     edits_made = models.IntegerField(default=0)
 

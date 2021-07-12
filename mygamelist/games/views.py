@@ -33,7 +33,10 @@ def IndexView(request):
 
 def GamesTaggedWithView(request, tag_id, name=None):
     sexual_content = Tag.objects.get(name="Sexual Content")
-    tag = Tag.objects.get(id=tag_id)
+    try:
+        tag = Tag.objects.get(id=tag_id)
+    except Tag.DoesNotExist:
+        raise Http404
     game_list = Game.objects.filter(tags=tag).exclude(tags=sexual_content).order_by('-id')
     page = request.GET.get('page', 1)
 
@@ -46,8 +49,29 @@ def GamesTaggedWithView(request, tag_id, name=None):
         paginated_results = paginator.page(paginator.num_pages)
     return render(request, 'games/tag_detail.html', {'game_list': paginated_results, 'tag': tag})
 
+def GamesInCollectionView(request, col_id, name=None):
+    sexual_content = Tag.objects.get(name="Sexual Content")
+    try:
+        collection = Collection.objects.get(id=col_id)
+    except Collection.DoesNotExist:
+        raise Http404
+    game_list = collection.games.exclude(tags=sexual_content).order_by('-id')
+    page = request.GET.get('page', 1)
+
+    paginator = Paginator(game_list, 25)
+    try:
+        paginated_results = paginator.page(page)
+    except PageNotAnInteger:
+        paginated_results = paginator.page(1)
+    except EmptyPage:
+        paginated_results = paginator.page(paginator.num_pages)
+    return render(request, 'games/collection_list.html', {'game_list': paginated_results, 'collection': collection})
+
 def ProfileView(request, user_id, name=None, tab=None):
-    selected_user = User.objects.get(id=user_id)
+    try:
+        selected_user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        raise Http404
     # Activity
     if tab is None or tab == 'activity':
         status_list = UserGameStatus.objects.filter(user=user_id).order_by('-id')
@@ -93,7 +117,10 @@ def ProfileView(request, user_id, name=None, tab=None):
 
 def GenreView(request, genre_id, name=None):
     sexual_content = Tag.objects.get(name="Sexual Content")
-    genre = Genre.objects.get(id=genre_id)
+    try:
+        genre = Genre.objects.get(id=genre_id)
+    except Genre.DoesNotExist:
+        raise Http404
     game_list = Game.objects.filter(genres=genre).exclude(tags=sexual_content).order_by('-id')
     page = request.GET.get('page', 1)
 
@@ -109,6 +136,28 @@ def GenreView(request, genre_id, name=None):
 class PlatformView(generic.DetailView):
     model = Platform
 
+@login_required(login_url='/login/')
+def IgnoreGameView(request, game_id):
+    rec = None
+    try:
+        game = Game.objects.get(id=game_id)
+    except Game.DoesNotExist:
+        raise Http404
+    try:
+        rec = Recommendation.objects.filter(user=request.user, game=game)
+    except Recommendation.DoesNotExist:
+        pass
+    try:
+        if game in request.user.userprofile.ignored_games.all():
+            request.user.userprofile.ignored_games.remove(game)
+        else:
+            request.user.userprofile.ignored_games.add(game)
+            if rec is not None:
+                rec.delete()
+    except Exception as e:
+        print(e)
+    return HttpResponseRedirect('/game/' + str(game_id))
+
 def GameView(request, game_id, name=None):
     status_conversion = {
         "PLAY":"Playing",
@@ -118,21 +167,30 @@ def GameView(request, game_id, name=None):
         "PLAN":"Plan to Play",
         "IMPT": "Imported"
     }
-    game = Game.objects.get(id=game_id)
+    try:
+        game = Game.objects.get(id=game_id)
+    except Game.DoesNotExist:
+        raise Http404
 
     user_col_type = CollectionType.objects.get(name='User')
-    regular_collections = Collection.objects.exclude(category=user_col_type).filter(games=game)
-    user_collections = Collection.objects.filter(category=user_col_type).filter(games=game)
+    regular_collections = Collection.objects.exclude(category=user_col_type).filter(games=game).order_by('category', 'name')
+    user_collections = Collection.objects.filter(category=user_col_type).filter(games=game).order_by('category', 'name')
+
+    stubbed = False
+    if "STUB" in [x.name for x in game.tags.all()]:
+        stubbed = True
 
     game_entries = UserGameListEntry.objects.filter(game=game)
+    game_entry = None
+    ignored = False
     if request.user.is_authenticated:
         try:
+            if game in request.user.userprofile.ignored_games.all():
+                ignored = True
             game_entry = UserGameListEntry.objects.get(game=Game.objects.get(id=game_id),user=request.user)
             game_entry.status = status_conversion[game_entry.status]
         except UserGameListEntry.DoesNotExist:
             game_entry = None
-    else:
-        game_entry = None
     user_scores = []
     user_counts = {'PLAN':0, 'PLAY':0, 'CMPL':0, 'HOLD':0, 'DROP':0, 'IMPT':0}
     for entry in game_entries:
@@ -140,9 +198,9 @@ def GameView(request, game_id, name=None):
             user_scores.append(entry.score * 10)
         user_counts[entry.status] += 1
     if len(user_scores) > 0:
-        return render(request, 'games/game_detail.html', {'game': game, 'user_score':sum(user_scores)/len(user_scores), 'users_rated':len(user_scores), 'user_counts':user_counts, 'game_entry': game_entry, 'regular_collections':regular_collections, 'user_collections':user_collections})
+        return render(request, 'games/game_detail.html', {'game': game, 'user_score':sum(user_scores)/len(user_scores), 'users_rated':len(user_scores), 'user_counts':user_counts, 'game_entry': game_entry, 'regular_collections':regular_collections, 'user_collections':user_collections, 'stubbed':stubbed, 'ignored':ignored})
     else:
-        return render(request, 'games/game_detail.html', {'game': game, 'user_score':None, 'users_rated':0, 'user_counts':user_counts, 'game_entry': game_entry, 'regular_collections':regular_collections, 'user_collections':user_collections})
+        return render(request, 'games/game_detail.html', {'game': game, 'user_score':None, 'users_rated':0, 'user_counts':user_counts, 'game_entry': game_entry, 'regular_collections':regular_collections, 'user_collections':user_collections, 'stubbed':stubbed, 'ignored':ignored})
 
 def BrowseView(request):
     sexual_content = Tag.objects.get(name="Sexual Content")
@@ -247,10 +305,15 @@ def GameListView(request, edit_type=None, entry_id=None):
             form = ManualGameForm()
         return render(request, 'games/edit_manual_game.html', {'form': form, 'game_entry': game_entry})
     elif edit_type == 'edit':
+        rec = None
         try:
             game = Game.objects.get(id=entry_id)
         except Game.DoesNotExist:
             raise Http404
+        try:
+            rec = Recommendation.objects.filter(user=request.user, game=game)
+        except Recommendation.DoesNotExist:
+            pass
         new = False
         try:
             game_entry = UserGameListEntry.objects.get(game=game,user=request.user)
@@ -260,6 +323,8 @@ def GameListView(request, edit_type=None, entry_id=None):
             game_entry.game = game
             new = True
         if request.method == 'POST':
+            if game in request.user.userprofile.ignored_games.all():
+                request.user.userprofile.ignored_games.remove(game)
             # create a form instance and populate it with data from the request:
             form = GameEntryForm(request.POST)
             # check whether it's valid:
@@ -288,7 +353,9 @@ def GameListView(request, edit_type=None, entry_id=None):
                 game_entry.stop_date = form.cleaned_data['stop_date']
                 game_entry.times_replayed = max(min(form.cleaned_data['times_replayed'], 999), 0)
                 game_entry.save()
-                return HttpResponseRedirect('/gamelist/')
+                if rec is not None:
+                    rec.delete()
+                return HttpResponseRedirect('/game/' + str(game.id))
         else:
             form = ManualGameForm()
         return render(request, 'games/edit_game_entry.html', {'form': form, 'game_id': entry_id, 'game_entry': game_entry})
@@ -350,6 +417,14 @@ def RecommendationsView(request, user_id=None):
     else:
         rec_list = Recommendation.objects.filter(user=request.user).order_by('slot')
     return render(request, 'games/recommendations.html', {'rec_list': rec_list})
+
+@login_required(login_url='/login/')
+def RecommendationsRefreshView(request):
+    rec_list = Recommendation.objects.filter(user=request.user).order_by('slot')
+    rec_list.delete()
+    with open("/home/mygamelist/rec-queue/" + str(request.user.id), "w") as out_file:
+        out_file.write("refresh")
+    return redirect('/recommendations/')
 
 class ForumView(generic.View):
     pass
