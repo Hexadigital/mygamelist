@@ -186,6 +186,6 @@ class UserSettings(models.Model):
     rating_systems = [
         ("SMIL","3-Point Smiley"),
         ("STAR","5-Point Star"),
-        ("DECM","10-Point Decimal")
+        ("DCML","10-Point Decimal")
     ]
-    score_type = models.CharField(max_length=4, choices=rating_systems, default="DECM")
+    score_type = models.CharField(max_length=4, choices=rating_systems, default="DCML")

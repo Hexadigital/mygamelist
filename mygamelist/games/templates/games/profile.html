@@ -8,7 +8,7 @@
 	<meta name="twitter:card" content="summary" />
 	<meta name="twitter:title" content="{{ selected_user.username }}" />
 	<meta name="twitter:description" content="Remember Games is a website you can use to track games you've played." />
-	<meta name="twitter:image" content="{% if selected_user.userprofile.avatar %}{{ selected_user.userprofile.avatar.url }}{% else %}{% static 'default_avatar.png' %}{% endif %}" />
+	<meta name="twitter:image" content="{{ selected_user.userprofile.avatar.url }}" />
 {% endblock %}
 
 {% block navitems %}
@@ -33,11 +33,7 @@
 			</div>
 			<div class="profile-header-content">
 				<div class="profile-header-img">
-					{% if selected_user.userprofile.avatar %}
 					<img class="rounded-circle" src="{{ selected_user.userprofile.avatar.url }}">
-					{% else %}
-					<img class="rounded-circle" src="{% static 'default_avatar.png' %}">
-					{% endif %}
 				</div>
 				<ul class="profile-header-tab nav nav-tabs nav-tabs-v2">
 					<li class="nav-item">
@@ -154,6 +150,13 @@
 											{% endfor %}
 										</table>
 									{% endif %}
+								{% endfor %}
+							{% elif tab == 'social' %}
+							<div class="alert alert-primary" role="alert">Following {{ selected_user.userprofile.followed_users.count }} user{% if selected_user.userprofile.followed_users.count != 1 %}s{% endif %}:</div>
+								{% for fuser in selected_user.userprofile.followed_users.all %}
+									<a href="{% url 'games:profile' fuser.id fuser.username|slugify %}">
+									<img width="80" height="80" class="d-inline-block align-top rounded-circle" src="{{ fuser.userprofile.avatar.url }}">
+									</a>
 								{% endfor %}
 							{% endif %}
 						</div>
