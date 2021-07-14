@@ -38,7 +38,7 @@
 			<input type="text" value="{{ game_entry.game.name }}" readonly><br>
 			<br>
 			<label for="id_score">Score:</label><br>
-			{% if settings.score_type == 'smile' %}
+			{% if settings.score_type == 'SMIL' %}
 			<link href="{% static 'css/smile.css' %}" rel="stylesheet">
 			<input type="radio" name="score" value="7.5" class="happy" {% if game_entry.score >= 7.0 %}checked{% endif %}>
 			<input type="radio" name="score" value="5.0" class="neutral" {% if game_entry.score < 7.0 and game_entry.score >= 5.0 %}checked{% endif %}>
@@ -86,9 +86,9 @@
 	<div class="row">
 		<div class="col-12" align="center">
 			<button class="btn btn-primary" type="submit">Edit</button><br>
-			<br>
+			{% if settings.score_type != 'SMIL' and settings.score_type != 'STAR' %}<br>
 			Scoring Guide:<br>
-			10 = Masterpiece, 9 = Great, 8 = Very Good, 7 = Good, 6 = Fine, 5 = Average, 4 = Bad, 3 = Very Bad, 2 = Horrible, 1 = Appalling<br>
+			10 = Masterpiece, 9 = Great, 8 = Very Good, 7 = Good, 6 = Fine, 5 = Average, 4 = Bad, 3 = Very Bad, 2 = Horrible, 1 = Appalling<br>{% endif %}
 		</div>
 	</div></form>
 	<br><br>

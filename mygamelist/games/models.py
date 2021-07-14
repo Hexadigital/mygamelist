@@ -73,14 +73,6 @@ class Game(models.Model):
     def __str__(self):
         return self.name + " (" + str(self.year) + ")"
 
-class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    avatar = models.ImageField(upload_to=random_avatar_filename, null=True, blank=True)
-    banned_tags = models.ManyToManyField(Tag, blank=True)
-    ignored_games = models.ManyToManyField(Game, blank=True)
-    games_added = models.IntegerField(default=0)
-    edits_made = models.IntegerField(default=0)
-
 @receiver(post_save, sender=User)
 def create_userprofile_signal(sender, instance, created, **kwargs):
     if created:     
@@ -180,3 +172,20 @@ class Collection(models.Model):
 
     def __str__(self):
         return self.category.name + " - " + self.name
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    avatar = models.ImageField(upload_to=random_avatar_filename, default='avatars/default.png')
+    banned_tags = models.ManyToManyField(Tag, blank=True)
+    ignored_games = models.ManyToManyField(Game, blank=True)
+    ignored_collections = models.ManyToManyField(Collection, blank=True)
+    followed_users = models.ManyToManyField(User, blank=True, related_name='userprofile_followed_users')
+
+class UserSettings(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    rating_systems = [
+        ("SMIL","3-Point Smiley"),
+        ("STAR","5-Point Star"),
+        ("DECM","10-Point Decimal")
+    ]
+    score_type = models.CharField(max_length=4, choices=rating_systems, default="DECM")

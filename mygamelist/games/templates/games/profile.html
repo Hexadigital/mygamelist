@@ -28,7 +28,9 @@
 <div class="container">
 	<div class="profile">
 		<div class="profile-header">
-			<div class="profile-header-cover"></div>
+			<div class="profile-header-cover">
+				{% if user.is_authenticated and user.id != selected_user.id%}<a class="btn btn-primary" role="button" href="{% url 'games:follow' selected_user.id %}" style="position:absolute;right:10px;bottom:10px;">{% if followed %}Unfollow{% else %}Follow{% endif %}</a>{% endif %}
+			</div>
 			<div class="profile-header-content">
 				<div class="profile-header-img">
 					{% if selected_user.userprofile.avatar %}
@@ -130,7 +132,19 @@
 											<tr>
 												<td>{% if entry.game_id %}<a class="gamelink" href="{% url 'games:game' entry.game_id entry_name|slugify %}">{% endif %}{{ entry_name }}{% if entry.game_id %}</a>{% endif %}</td>
 												<td>{{ entry.platform.name }}</td>
-												<td>{{ entry.score }}</td>
+												<td>{% if profile_score_type == 'SMIL' %}
+														{% if entry.score >= 7.0 %}
+															<img src="{% static 'icons/happy.svg' %}" style="max-height:25px;">
+														{% elif entry.score < 7.0 and entry.score >= 5.0 %}
+															<img src="{% static 'icons/neutral.svg' %}" style="max-height:25px;">
+														{% elif entry.score < 5.0 %}
+															<img src="{% static 'icons/sad.svg' %}" style="max-height:25px;">
+														{% else %}
+															<img src="{% static 'icons/circle.svg' %}" style="max-height:25px;">
+														{% endif %}
+													{% else %}
+														{{ entry.score }}
+													{% endif %}</td>
 												<td>{{ entry.hours }}</td>
 												<td>
 													{% if entry.comments %}<span title="{{ entry.comments }}">&#x1F4AC;</span>{% endif %}

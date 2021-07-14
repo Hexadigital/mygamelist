@@ -9,12 +9,18 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Count, Q
 
 from .models import Game, Genre, Platform, Tag, User, UserGameListEntry, ManualUserGameListEntry, UserGameStatus
-from .models import UserGameStatus, Notification, Recommendation, Collection, CollectionType, UserProfile
+from .models import UserGameStatus, Notification, Recommendation, Collection, CollectionType, UserProfile, UserSettings
 from .forms import SignUpForm, ManualGameForm, GameEntryForm
 
 def IndexView(request):
     if request.user.is_authenticated:
-        status_list = UserGameStatus.objects.filter(user=request.user).order_by('-id')
+        try:
+            user_profile = UserProfile.objects.get(user=request.user)
+            followed_users = [x.id for x in user_profile.followed_users.all()]
+            followed_users.append(request.user.id)
+            status_list = UserGameStatus.objects.filter(user__in=followed_users).order_by('-id')
+        except UserProfile.DoesNotExist:
+            status_list = UserGameStatus.objects.filter(user=request.user).order_by('-id')
     else:
         status_list = UserGameStatus.objects.order_by('-id')
     sexual_content = Tag.objects.get(name="Sexual Content")
@@ -72,6 +78,15 @@ def ProfileView(request, user_id, name=None, tab=None):
         selected_user = User.objects.get(id=user_id)
     except User.DoesNotExist:
         raise Http404
+    followed = False
+    if request.user.is_authenticated:
+        try:
+            user_profile = UserProfile.objects.get(user=request.user)
+            followed_users = [x.id for x in user_profile.followed_users.all()]
+            if selected_user.id in followed_users:
+                followed = True
+        except UserProfile.DoesNotExist:
+            pass
     # Activity
     if tab is None or tab == 'activity':
         status_list = UserGameStatus.objects.filter(user=user_id).order_by('-id')
@@ -84,7 +99,7 @@ def ProfileView(request, user_id, name=None, tab=None):
             paginated_results = paginator.page(1)
         except EmptyPage:
             paginated_results = paginator.page(paginator.num_pages)
-        return render(request, 'games/profile.html', {'selected_user': selected_user, 'tab': tab, 'activities': paginated_results})
+        return render(request, 'games/profile.html', {'selected_user': selected_user, 'followed': followed, 'tab': tab, 'activities': paginated_results})
     elif tab == "list":
         status_conversion = {
             "PLAY":"Playing",
@@ -104,14 +119,21 @@ def ProfileView(request, user_id, name=None, tab=None):
         # Sort dicts
         for status in total_list.keys():
             total_list[status] = OrderedDict(sorted(total_list[status].items()))
+            
+        # Figure out how to display their ratings
+        try:
+            user_settings = UserSettings.objects.get(user=selected_user)
+            profile_score_type = user_settings.score_type
+        except UserSettings.DoesNotExist:
+            profile_score_type = None
 
-        return render(request, 'games/profile.html', {'selected_user': selected_user, 'tab': tab, 'total_list': total_list})
+        return render(request, 'games/profile.html', {'selected_user': selected_user, 'followed': followed, 'tab': tab, 'total_list': total_list, 'profile_score_type': profile_score_type})
     elif tab == "social":
-        return render(request, 'games/profile.html', {'selected_user': selected_user, 'tab': tab})
+        return render(request, 'games/profile.html', {'selected_user': selected_user, 'followed': followed, 'tab': tab})
     elif tab == "stats":
-        return render(request, 'games/profile.html', {'selected_user': selected_user, 'tab': tab})
+        return render(request, 'games/profile.html', {'selected_user': selected_user, 'followed': followed, 'tab': tab})
     elif tab == "contrib":
-        return render(request, 'games/profile.html', {'selected_user': selected_user, 'tab': tab})
+        return render(request, 'games/profile.html', {'selected_user': selected_user, 'followed': followed, 'tab': tab})
     else:
         raise Http404
 
@@ -157,6 +179,22 @@ def IgnoreGameView(request, game_id):
     except Exception as e:
         print(e)
     return HttpResponseRedirect('/game/' + str(game_id))
+
+@login_required(login_url='/login/')
+def FollowUserView(request, user_id):
+    rec = None
+    try:
+        req_user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        raise Http404
+    try:
+        if req_user in request.user.userprofile.followed_users.all():
+            request.user.userprofile.followed_users.remove(req_user)
+        else:
+            request.user.userprofile.followed_users.add(req_user)
+    except Exception as e:
+        print(e)
+    return HttpResponseRedirect('/user/' + str(req_user.id))
 
 def GameView(request, game_id, name=None):
     status_conversion = {
