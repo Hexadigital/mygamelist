@@ -158,6 +158,12 @@
 									<img width="80" height="80" class="d-inline-block align-top rounded-circle" src="{{ fuser.userprofile.avatar.url }}">
 									</a>
 								{% endfor %}
+							<br><br><div class="alert alert-primary" role="alert">Followed by {{ followed_by.count }} user{% if followed_by.count != 1 %}s{% endif %}:</div>
+								{% for fuser in followed_by %}
+									<a href="{% url 'games:profile' fuser.id fuser.username|slugify %}">
+									<img width="80" height="80" class="d-inline-block align-top rounded-circle" src="{{ fuser.userprofile.avatar.url }}">
+									</a>
+								{% endfor %}
 							{% endif %}
 						</div>
 					</div>

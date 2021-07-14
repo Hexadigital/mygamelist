@@ -129,7 +129,8 @@ def ProfileView(request, user_id, name=None, tab=None):
 
         return render(request, 'games/profile.html', {'selected_user': selected_user, 'followed': followed, 'tab': tab, 'total_list': total_list, 'profile_score_type': profile_score_type})
     elif tab == "social":
-        return render(request, 'games/profile.html', {'selected_user': selected_user, 'followed': followed, 'tab': tab})
+        followed_by = User.objects.filter(userprofile__followed_users=selected_user).all()
+        return render(request, 'games/profile.html', {'selected_user': selected_user, 'followed': followed, 'followed_by': followed_by, 'tab': tab})
     elif tab == "stats":
         return render(request, 'games/profile.html', {'selected_user': selected_user, 'followed': followed, 'tab': tab})
     elif tab == "contrib":
