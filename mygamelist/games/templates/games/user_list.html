@@ -47,7 +47,19 @@
 					</td>
 					<td>{% if entry.game_id %}<a class="gamelink" href="{% url 'games:game' entry.game_id entry_name|slugify %}">{% endif %}{{ entry_name }}{% if entry.game_id %}</a>{% endif %}</td>
 					<td>{% if entry.platform.shorthand %}{{ entry.platform.shorthand }}{% else %}{{ entry.platform.name }}{% endif %}</td>
-					<td>{{ entry.score }}</td>
+					<td>{% if settings.score_type == 'smile' %}
+							{% if entry.score >= 7.0 %}
+								<img src="{% static 'icons/happy.svg' %}" style="max-height:25px;">
+							{% elif entry.score < 7.0 and entry.score >= 5.0 %}
+								<img src="{% static 'icons/neutral.svg' %}" style="max-height:25px;">
+							{% elif entry.score < 5.0 %}
+								<img src="{% static 'icons/sad.svg' %}" style="max-height:25px;">
+							{% else %}
+								<img src="{% static 'icons/circle.svg' %}" style="max-height:25px;">
+							{% endif %}
+						{% else %}
+							{{ entry.score }}
+						{% endif %}</td>
 					<td>{{ entry.hours }}</td>
 					<td>
 						{% if entry.comments %}<span title="{{ entry.comments }}">&#x1F4AC;</span>{% endif %}

@@ -38,7 +38,7 @@
 			<input type="text" value="{{ game_entry.game.name }}" readonly><br>
 			<br>
 			<label for="id_score">Score:</label><br>
-			{% if settings.score_type == 'smile' or True %}
+			{% if settings.score_type == 'smile' %}
 			<link href="{% static 'css/smile.css' %}" rel="stylesheet">
 			<input type="radio" name="score" value="7.5" class="happy" {% if game_entry.score >= 7.0 %}checked{% endif %}>
 			<input type="radio" name="score" value="5.0" class="neutral" {% if game_entry.score < 7.0 and game_entry.score >= 5.0 %}checked{% endif %}>
