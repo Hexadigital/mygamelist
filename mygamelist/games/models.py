@@ -2,6 +2,8 @@ from django.db import models
 from decimal import Decimal
 from uuid import uuid4
 from django.contrib.auth.models import User
+from django.dispatch import receiver
+from django.db.models.signals import post_save
 
 def random_cover_filename(instance, filename):
     ext = filename.split('.')[-1]
@@ -73,11 +75,21 @@ class Game(models.Model):
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    avatar = models.ImageField(upload_to=random_avatar_filename, null=True)
+    avatar = models.ImageField(upload_to=random_avatar_filename, null=True, blank=True)
     banned_tags = models.ManyToManyField(Tag, blank=True)
     ignored_games = models.ManyToManyField(Game, blank=True)
     games_added = models.IntegerField(default=0)
     edits_made = models.IntegerField(default=0)
+
+@receiver(post_save, sender=User)
+def create_userprofile_signal(sender, instance, created, **kwargs):
+    if created:     
+        UserProfile.objects.create(user=instance)
+        sexual_content = Tag.objects.get(name="Sexual Content")
+        stub = Tag.objects.get(name="STUB")
+        instance.userprofile.banned_tags.add(sexual_content)
+        instance.userprofile.banned_tags.add(stub)
+        instance.userprofile.save()
 
 class UserGameListEntry(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

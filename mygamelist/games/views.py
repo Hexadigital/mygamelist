@@ -9,7 +9,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Count, Q
 
 from .models import Game, Genre, Platform, Tag, User, UserGameListEntry, ManualUserGameListEntry, UserGameStatus
-from .models import UserGameStatus, Notification, Recommendation, Collection, CollectionType
+from .models import UserGameStatus, Notification, Recommendation, Collection, CollectionType, UserProfile
 from .forms import SignUpForm, ManualGameForm, GameEntryForm
 
 def IndexView(request):

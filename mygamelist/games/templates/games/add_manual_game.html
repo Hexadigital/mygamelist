@@ -25,60 +25,74 @@
 
 {% block content %}
 <div class="container">
+<br>
+<div class="text-white bg-dark mb-3 rounded" style="max-width: 100%">
+<br>
+<form action="{% url 'games:gamelist' 'add-manual' %}" method="post">
 	<div class="row">
-		<form action="{% url 'games:gamelist' 'add-manual' %}" method="post">
-			{% csrf_token %}
-			{{ form.errors }}
-			<div class="fieldWrapper">
-				<label for="id_name">Game Name:</label>
-				<input type="text" name="name" maxlength="150" required="" value="{{ form.name.value|default_if_none:"" }}" id="id_name">
-			</div>
-			<div class="fieldWrapper">
-				<label for="id_platform">Platform:</label>
-				<select name="platform">
-					{% for choice in form.platform.field.choices %}
-						<option value="{{ choice.0 }}"{% if choice.0|slugify == form.platform.value|slugify %} selected=""{% endif %}>{{ choice.1 }}</option>
-					{% endfor %}
-				</select>
-			</div>
-			<div class="fieldWrapper">
-				<label for="id_status">Status:</label>
-				<select name="status" id="id_status">
-					<option value="PLAN"{% if form.status.value == 'PLAN' %} selected=""{% endif %}>Plan to Play</option>
-					<option value="PLAY"{% if form.status.value == 'PLAY' %} selected=""{% endif %}>Playing</option>
-					<option value="CMPL"{% if form.status.value == 'CMPL' %} selected=""{% endif %}>Completed</option>
-					<option value="DROP"{% if form.status.value == 'DROP' %} selected=""{% endif %}>Dropped</option>
-					<option value="HOLD"{% if form.status.value == 'HOLD' %} selected=""{% endif %}>Paused</option>
-				</select>
-			</div>
-			<div class="fieldWrapper">
-				<label for="id_score">Score:</label>
-				<input type="number" name="score" step="0.25" value="{{ form.score.value|default_if_none:"" }}" id="id_score">
-			</div>
-			<div class="fieldWrapper">
-				<label for="id_hours">Hours:</label>
-				<input type="number" name="hours" step="0.25" value="{{ form.hours.value|default_if_none:"" }}" id="id_hours">
-			</div>
-			<div class="fieldWrapper">
-				<label for="id_start_date">Start Date:</label>
-				<input type="text" name="start_date" id="id_start_date" value="{{ form.start_date.value|default_if_none:"" }}" placeholder="YYYY-MM-DD">
-			</div>
-			<div class="fieldWrapper">
-				<label for="id_stop_date">Stop Date:</label>
-				<input type="text" name="stop_date" id="id_stop_date" value="{{ form.stop_date.value|default_if_none:"" }}" placeholder="YYYY-MM-DD">
-			</div>
-			<div class="fieldWrapper">
-				<label for="id_times_replayed">Times Replayed:</label>
-				<input type="number" name="times_replayed" required="" value="{{ form.times_replayed.value }}" id="id_times_replayed">
-			</div>
-			<div class="fieldWrapper">
-				<label for="id_comments">Comments:</label>
-				<input type="text" name="comments" maxlength="500" value="{{ game_entry.comments }}" id="id_comments">
-			</div>
-			<input type="submit" value="Edit">
-		</form>
+		{% csrf_token %}
+		{{ form.errors }}
 		<br>
-		Scoring Guide: 10 = Masterpiece, 9 = Great, 8 = Very Good, 7 = Good, 6 = Fine, 5 = Average, 4 = Bad, 3 = Very Bad, 2 = Horrible, 1 = Appalling<br>
+		<div class="col-4" align="center">
+			<label for="id_name"><b>Game Name:</b></label><br>
+			<input type="text" value="{{ form.name.value|default_if_none:"" }}"><br>
+			<br>
+			<label for="id_score">Score:</label><br>
+			{% if settings.score_type == 'smile' %}
+			<link href="{% static 'css/smile.css' %}" rel="stylesheet">
+			<input type="radio" name="score" value="7.5" class="happy" {% if form.score.value >= 7.0 %}checked{% endif %}>
+			<input type="radio" name="score" value="5.0" class="neutral" {% if form.score.value < 7.0 and form.score.value >= 5.0 %}checked{% endif %}>
+			<input type="radio" name="score" value="2.5" class="sad" {% if form.score.value < 5.0 %}checked{% endif %}>
+			<input type="radio" name="score" value="" class="none" {% if not form.score.value %}checked{% endif %}><br>
+			{% else %}
+			<input type="number" name="score" step="0.01" value="{{ form.score.value|default_if_none:"" }}" id="id_score"><br>
+			{% endif %}
+			<br>
+			<label for="id_hours">Hours:</label><br>
+			<input type="number" name="hours" step="0.01" value="{{ form.hours.value|default_if_none:"" }}" id="id_hours"><br>
+		</div>
+		<div class="col-4" align="center">
+			<label for="id_platform"><b>Platform:</b></label><br>
+			<select name="platform">
+				{% for choice in form.platform.field.choices %}
+					<option value="{{ choice.0 }}"{% if choice.0|slugify == form.platform.value|slugify %} selected{% endif %}>{{ choice.1 }}</option>
+				{% endfor %}
+			</select><br>
+			<br>
+			<label for="id_start_date">Start Date:</label><br>
+			<input type="text" name="start_date" id="id_start_date" value="{{ form.start_date.value|default_if_none:"" }}" placeholder="YYYY-MM-DD"><br>
+			<br>
+			<label for="id_times_replayed">Times Replayed:</label><br>
+			<input type="number" name="times_replayed" required="" value="{{ form.times_replayed.value }}" id="id_times_replayed"><br>
+		</div>
+		<div class="col-4" align="center">
+			<label for="id_status"><b>Status:</b></label><br>
+			<select name="status" id="id_status">
+				<option value="PLAN"{% if form.status.value == 'PLAN' %} selected=""{% endif %}>Plan to Play</option>
+				<option value="PLAY"{% if form.status.value == 'PLAY' %} selected=""{% endif %}>Playing</option>
+				<option value="CMPL"{% if form.status.value == 'CMPL' %} selected=""{% endif %}>Completed</option>
+				<option value="DROP"{% if form.status.value == 'DROP' %} selected=""{% endif %}>Dropped</option>
+				<option value="HOLD"{% if form.status.value == 'HOLD' %} selected=""{% endif %}>Paused</option>
+			</select><br>
+			<br>
+			<label for="id_stop_date">Stop Date:</label><br>
+			<input type="text" name="stop_date" id="id_stop_date" value="{{ form.stop_date.value|default_if_none:"" }}" placeholder="YYYY-MM-DD"><br>
+			<br>
+			<label for="id_comments">Comments:</label><br>
+			<input type="text" name="comments" maxlength="500" value="{{ form.comments.value|default_if_none:"" }}" id="id_comments"><br>
+		</div>
 	</div>
+	<br>
+	<div class="row">
+		<div class="col-12" align="center">
+			<button class="btn btn-primary" type="submit">Edit</button><br>
+			<br>
+			Scoring Guide:<br>
+			10 = Masterpiece, 9 = Great, 8 = Very Good, 7 = Good, 6 = Fine, 5 = Average, 4 = Bad, 3 = Very Bad, 2 = Horrible, 1 = Appalling<br>
+		</div>
+	</div></form>
+	<br><br>
 </div>
+</div>
+<br><br>
 {% endblock %}
