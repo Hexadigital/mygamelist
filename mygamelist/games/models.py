@@ -125,6 +125,7 @@ class ManualUserGameListEntry(models.Model):
     start_date = models.DateField(blank=True, null=True)
     stop_date = models.DateField(blank=True, null=True)
     times_replayed = models.IntegerField(default=0)
+    never_migrate = models.BooleanField(default=False, null=True)
 
     def __str__(self):
         return self.user.username + " - " + self.name
@@ -141,6 +142,7 @@ class UserGameStatus(models.Model):
     ]
     status = models.CharField(max_length=4, choices=statuses)
     created_at = models.DateTimeField(auto_now_add=True)
+    liked_by = models.ManyToManyField(User, blank=True, related_name='usergamestatus_liked_by')
 
     def __str__(self):
         return self.user.username + " " + self.status + " " + self.game.name

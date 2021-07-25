@@ -1,4 +1,5 @@
 import datetime
+import json
 from collections import OrderedDict
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import render, redirect
@@ -193,6 +194,11 @@ def FollowUserView(request, user_id):
             request.user.userprofile.followed_users.remove(req_user)
         else:
             request.user.userprofile.followed_users.add(req_user)
+            new_notif = Notification()
+            new_notif.user = req_user
+            new_notif.notif_type = 'FOLLOWED'
+            new_notif.notif_object_id = request.user.id
+            new_notif.save()
     except Exception as e:
         print(e)
     return HttpResponseRedirect('/user/' + str(req_user.id))
@@ -278,7 +284,7 @@ def GameListView(request, edit_type=None, entry_id=None):
         for entry in game_list:
             total_list[status_conversion[entry.status]][entry.game.name] = {'id': entry.game.id, 'game_id': entry.game.id, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed, 'edit_type': 'edit', 'delete_type': 'delete'}
         for entry in manual_list:
-            total_list[status_conversion[entry.status]][entry.name] = {'id': entry.id, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed, 'edit_type': 'edit-manual', 'delete_type': 'delete-manual'}
+            total_list[status_conversion[entry.status]][entry.name] = {'id': entry.id, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed, 'edit_type': 'edit-manual', 'delete_type': 'delete-manual', 'never_migrate':entry.never_migrate}
         # Sort dicts
         for status in total_list.keys():
             total_list[status] = OrderedDict(sorted(total_list[status].items()))
@@ -446,6 +452,12 @@ def NotificationsView(request, action=''):
             new_notif['notif_type'] = notif.notif_type
             new_notif['game'] = game
             final_notif_list.append(new_notif)
+        elif notif.notif_type == 'FOLLOWED':
+            follower = User.objects.get(id=notif.notif_object_id)
+            new_notif['user'] = notif.user
+            new_notif['notif_type'] = notif.notif_type
+            new_notif['follower'] = follower
+            final_notif_list.append(new_notif)
     return render(request, 'games/notifications.html', {'notification_list': final_notif_list})
 
 @login_required(login_url='/login/')
@@ -464,6 +476,27 @@ def RecommendationsRefreshView(request):
     with open("/home/mygamelist/rec-queue/" + str(request.user.id), "w") as out_file:
         out_file.write("refresh")
     return redirect('/recommendations/')
+
+@login_required(login_url='/login/')
+def LikeStatusView(request, status_id=None):
+    try:
+        status = UserGameStatus.objects.get(id=status_id)
+    except UserGameStatus.DoesNotExist:
+        raise Http404
+    # Handle like action
+    js_response = {}
+    if request.user in status.liked_by.all():
+        js_response['liked'] = False
+        status.liked_by.remove(request.user)
+    else:
+        js_response['liked'] = True
+        status.liked_by.add(request.user)
+    # Return JSON for JavaScript requests
+    if request.is_ajax():
+        js_response['new_count'] = status.liked_by.count()
+        return HttpResponse(json.dumps(js_response), content_type='application/json')
+    else:
+        return redirect('/')
 
 class ForumView(generic.View):
     pass

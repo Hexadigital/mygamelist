@@ -34,4 +34,6 @@ urlpatterns = [
     path('recommendations/refresh/', views.RecommendationsRefreshView, name='recrefresh'),
     path('game/ignore/<int:game_id>/', views.IgnoreGameView, name='ignore'),
     path('user/follow/<int:user_id>/', views.FollowUserView, name='follow'),
+    path('status/like/', views.LikeStatusView, name='likestatus'),
+    path('status/like/<int:status_id>/', views.LikeStatusView, name='likestatus'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -64,6 +64,7 @@
 					<td>
 						{% if entry.comments %}<span title="{{ entry.comments }}">&#x1F4AC;</span>{% endif %}
 						{% if entry.times_replayed > 0 %}<span title="Replayed {{ entry.times_replayed }} time{% if entry.times_replayed > 1 %}s{% endif %}!">&#x1F501;</span>{% endif %}
+						{% if entry.never_migrate %}<span title="This has been flagged by a moderator as an entry that will never be automatically migrated.">&#x26A0;</span>{% endif %}
 					</td>
 				</tr>
 				{% endfor %}

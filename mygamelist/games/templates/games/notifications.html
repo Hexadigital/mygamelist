@@ -48,6 +48,21 @@
 								</p>
 							</div>
 						</div>
+						{% elif notif.notif_type == 'FOLLOWED' %}
+						<div class="col-md-auto" style="width:80px;">
+							<img class="rounded" src="{{ notif.follower.userprofile.avatar.url }}" style="max-width: 80px; height: 130px; object-fit: cover;">
+						</div>
+						<div class="col">
+							<div class="card-header d-flex justify-content-between">
+								<div>New Follower</div>
+								<div>{{ notif.created_at|naturaltime }}</div>
+							</div>
+							<div class="card-body">
+								<p class="card-text">
+									<a class="gamelink" href="{% url 'games:profile' notif.follower.id notif.follower.username|slugify %}">{{ notif.follower.username }}</a> is now following you.
+								</p>
+							</div>
+						</div>
 						{% endif %}
 					</div>
 				</div>

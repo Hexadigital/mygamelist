@@ -36,12 +36,12 @@
 							<img class="rounded" src="{{ activity.game.image.url }}" style="max-width: 80px; height: 130px; object-fit: cover;">
 						</div>
 						<div class="col">
-							<div class="card-header d-flex justify-content-between">
+							<div class="card-header d-flex justify-content-between container-fluid">
 								<a class="gamelink" href="{% url 'games:profile' activity.user.id activity.user.username|slugify %}"> <img class="rounded" src="{{ activity.user.userprofile.avatar.url }}" style="max-width: 40px; height: 40px; margin-right:10px;">{{ activity.user.username }}</a>
 								{{ activity.created_at|naturaltime }}
 							</div>
 							<div class="card-body">
-								<p class="card-text">
+								<div class="card-text">
 									{% if activity.status == "PLAN" %}
 										Plans to play 
 									{% elif activity.status == "PLAY" %}
@@ -54,7 +54,8 @@
 										Paused 
 									{% endif %}
 									<a class="gamelink" href="{% url 'games:game' activity.game.id activity.game.name|slugify %}">{{ activity.game.name }}</a>
-								</p>
+									<div class="float-right"><span name='status-count-{{ activity.id }}'>{{ activity.liked_by.count }}</span> <a onclick='like_status({{ activity.id }})'><img name='like-heart-{{ activity.id }}' height="20px" src='{% if user in activity.liked_by.all  %}{% static 'icons/heart-pink.svg' %}{% else %}{% static 'icons/heart.svg' %}{% endif %}'></a></div>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -65,11 +66,32 @@
 			<div class="text-white bg-dark mb-3 rounded" style="max-width: 100%">
 				<div class="card-header justify-content-between">Recently Added</div>
 				{% for game in latest_games %}
-					<a href="{% url 'games:game' game.id game.name|slugify %}"><img class="rounded mx-auto" style="object-fit:contain;max-height:150px;max-width:23%;margin-top:5px;margin-bottom:5px;" src="{{ game.image.url }}"></a>
+					<a href="{% url 'games:game' game.id game.name|slugify %}"><img class="rounded" style="object-fit:cover;height:150px;max-width:23%;margin-top:5px;margin-bottom:5px;" src="{{ game.image.url }}"></a>
 				{% endfor %}
 			</div>
 		</div>
 		<div class="col-1" align="center"></div>
 	</div>
 </div>
+<script>
+function like_status(status_id)
+{
+	$.ajax({
+		type: "GET",
+		url: "{% url 'games:likestatus' %}" + status_id + "/",
+		success: function(response) {
+			heart_image = document.getElementsByName('like-heart-' + status_id.toString());
+			status_count = document.getElementsByName('status-count-' + status_id.toString());
+			status_count[0].textContent = response.new_count.toString();
+			if (response.liked == true) {
+				heart_image[0].src = "{% static 'icons/heart-pink.svg' %}";
+			}
+			else if (response.liked == false) {
+				heart_image[0].src = "{% static 'icons/heart.svg' %}";
+			}
+	  }
+	});
+};
+
+</script>
 {% endblock %}
