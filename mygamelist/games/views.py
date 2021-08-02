@@ -11,7 +11,7 @@ from django.db.models import Count, Q
 
 from .models import Game, Genre, Platform, Tag, User, UserGameListEntry, ManualUserGameListEntry, UserGameStatus
 from .models import UserGameStatus, Notification, Recommendation, Collection, CollectionType, UserProfile, UserSettings
-from .forms import SignUpForm, ManualGameForm, GameEntryForm
+from .forms import SignUpForm, ManualGameForm, GameEntryForm, ChangeAvatarForm
 
 def IndexView(request):
     if request.user.is_authenticated:
@@ -105,14 +105,14 @@ def ProfileView(request, user_id, name=None, tab=None):
         status_conversion = {
             "PLAY":"Playing",
             "CMPL":"Completed",
-            "HOLD":"On Hold",
+            "HOLD":"Paused",
             "DROP":"Dropped",
             "PLAN":"Plan to Play",
             "IMPT": "Imported"
         }
         game_list = UserGameListEntry.objects.filter(user=user_id)
         manual_list = ManualUserGameListEntry.objects.filter(user=user_id)
-        total_list = {"Playing": {}, "Completed": {}, "On Hold": {}, "Dropped": {}, "Plan to Play": {}, "Imported": {}}
+        total_list = {"Playing": {}, "Completed": {}, "Paused": {}, "Dropped": {}, "Plan to Play": {}, "Imported": {}}
         for entry in game_list:
             total_list[status_conversion[entry.status]][entry.game.name] = {'game_id': entry.game.id, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed}
         for entry in manual_list:
@@ -207,7 +207,7 @@ def GameView(request, game_id, name=None):
     status_conversion = {
         "PLAY":"Playing",
         "CMPL":"Completed",
-        "HOLD":"On Hold",
+        "HOLD":"Paused",
         "DROP":"Dropped",
         "PLAN":"Plan to Play",
         "IMPT": "Imported"
@@ -270,7 +270,7 @@ def GameListView(request, edit_type=None, entry_id=None):
     status_conversion = {
         "PLAY":"Playing",
         "CMPL":"Completed",
-        "HOLD":"On Hold",
+        "HOLD":"Paused",
         "DROP":"Dropped",
         "PLAN":"Plan to Play",
         "IMPT": "Imported"
@@ -280,7 +280,7 @@ def GameListView(request, edit_type=None, entry_id=None):
     if edit_type is None:
         game_list = UserGameListEntry.objects.filter(user=user_id)
         manual_list = ManualUserGameListEntry.objects.filter(user=user_id)
-        total_list = {"Playing": {}, "Completed": {}, "On Hold": {}, "Dropped": {}, "Plan to Play": {}, "Imported": {}}
+        total_list = {"Playing": {}, "Completed": {}, "Paused": {}, "Dropped": {}, "Plan to Play": {}, "Imported": {}}
         for entry in game_list:
             total_list[status_conversion[entry.status]][entry.game.name] = {'id': entry.game.id, 'game_id': entry.game.id, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed, 'edit_type': 'edit', 'delete_type': 'delete'}
         for entry in manual_list:
@@ -497,6 +497,21 @@ def LikeStatusView(request, status_id=None):
         return HttpResponse(json.dumps(js_response), content_type='application/json')
     else:
         return redirect('/')
+
+@login_required(login_url='/login/')
+def SettingsView(request):
+    return render(request, 'games/settings.html', {})
+
+@login_required(login_url='/login/')
+def ChangeAvatarView(request):
+    form = ChangeAvatarForm()
+    user_profile = UserProfile.objects.get(user=request.user)
+    if request.method == 'POST':
+        form = ChangeAvatarForm(request.POST, request.FILES, instance=user_profile)
+        if form.is_valid():
+            form.save()
+            return redirect('/settings')
+    return render(request, 'games/avatar_change.html', {'form':form})
 
 class ForumView(generic.View):
     pass

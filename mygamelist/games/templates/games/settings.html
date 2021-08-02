@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}User Settings :: Remember Games{% endblock %}
+
+{% block content %}
+<br>
+<div class="container">
+	<div class="row align-items-center">
+		<div class="col" align="center">
+			<h3>You can...</h3>
+			<a class="gamelink" href="{% url 'games:changeavatar' %}">Change Your Avatar</a><br>
+			Edit Your Ignored Tags<br>
+		</div>
+	</div>
+</div>
+{% endblock %}

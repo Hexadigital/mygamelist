@@ -61,6 +61,13 @@
 							<div class="nav-field">Contributions</div>
 						</a>
 					</li>
+					{% if user.is_authenticated and user.id == selected_user.id %}
+					<li class="nav-item">
+						<a href="{% url 'games:settings' %}" class="nav-link">
+							<div class="nav-field">Settings</div>
+						</a>
+					</li>
+					{% endif %}
 				</ul>
 			</div>
 		</div>

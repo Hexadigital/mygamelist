@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Change Avatar :: Remember Games{% endblock %}
+
+{% block content %}
+<br>
+<div class="container">
+	<div class="row align-items-center">
+		<div class="col" align="center">
+			<h3>Change Avatar</h3>
+			{% if form.errors %}
+			{% for error in form.avatar.errors %}
+			{{ error|escape }}<br>
+			{% endfor %}
+			{% endif %}
+			<br>
+			<form method="post" enctype='multipart/form-data' action="{% url 'games:changeavatar' %}">
+				{% csrf_token %}
+				<input type="file" id="avatar" name="avatar"><br>
+				Avatar must be a JPG, GIF, or PNG - and under 512KB in size.<br>
+				A 250px x 250px avatar is recommended.<br>
+				<br>
+				<button class="btn btn-primary" type="submit">Submit</button><br>
+			</form>
+		</div>
+	</div>
+</div>
+{% endblock %}

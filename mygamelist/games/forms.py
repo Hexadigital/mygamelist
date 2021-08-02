@@ -1,8 +1,9 @@
+import magic
 from django import forms
 from django.contrib.admin.widgets import AdminDateWidget
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import ManualUserGameListEntry, UserGameListEntry, Platform
+from .models import ManualUserGameListEntry, UserGameListEntry, Platform, UserProfile
 
 class SignUpForm(UserCreationForm):
     email = forms.EmailField(max_length=254)
@@ -37,3 +38,20 @@ class GameEntryForm(forms.ModelForm):
             'start_date': forms.DateInput(format='%Y-%m-%d'),
             'stop_date': forms.DateInput(format='%Y-%m-%d')
         }
+
+class ChangeAvatarForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ['avatar']
+
+    def clean_avatar(self):
+        avatar = self.cleaned_data['avatar']
+
+        main, sub = magic.from_buffer(avatar.read(), mime=True).split('/')
+        if not (main == 'image' and sub in ['jpeg', 'gif', 'png']):
+            raise forms.ValidationError(u'Please use a JPEG, GIF or PNG image.')
+
+        if len(avatar) > (512 * 1024):
+            raise forms.ValidationError(u'Avatar file size may not exceed 512KB.')
+
+        return avatar

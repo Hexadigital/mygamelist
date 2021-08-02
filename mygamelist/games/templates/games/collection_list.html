@@ -11,18 +11,6 @@
 	<meta name="twitter:image" content="" />
 {% endblock %}
 
-{% block navitems %}
-	<li class="nav-item">
-	<a class="nav-link" href="/">Home</a>
-	</li>
-	<li class="nav-item">
-	<a class="nav-link" href="{% url 'games:gamelist' %}">My Games</a>
-	</li>
-	<li class="nav-item">
-	<a class="nav-link" href="{% url 'games:browse' %}">Browse</a>
-	</li>
-{% endblock %}
-
 {% block content %}
 <div class="container-fluid">
 	<center><h3>Games belonging to "{{ collection.category.name }} - {{ collection.name }}":</h3></center>
