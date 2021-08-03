@@ -11,12 +11,14 @@ from django.db.models import Count, Q
 
 from .models import Game, Genre, Platform, Tag, User, UserGameListEntry, ManualUserGameListEntry, UserGameStatus
 from .models import UserGameStatus, Notification, Recommendation, Collection, CollectionType, UserProfile, UserSettings
-from .forms import SignUpForm, ManualGameForm, GameEntryForm, ChangeAvatarForm
+from .forms import SignUpForm, ManualGameForm, GameEntryForm, ChangeAvatarForm, ChangeIgnoredTagsForm
 
 def IndexView(request):
+    banned_tags = [Tag.objects.get(name="Sexual Content").id]
     if request.user.is_authenticated:
         try:
             user_profile = UserProfile.objects.get(user=request.user)
+            banned_tags = [x.id for x in user_profile.banned_tags.all()]
             followed_users = [x.id for x in user_profile.followed_users.all()]
             followed_users.append(request.user.id)
             status_list = UserGameStatus.objects.filter(user__in=followed_users).order_by('-id')
@@ -24,9 +26,8 @@ def IndexView(request):
             status_list = UserGameStatus.objects.filter(user=request.user).order_by('-id')
     else:
         status_list = UserGameStatus.objects.order_by('-id')
-    sexual_content = Tag.objects.get(name="Sexual Content")
-    latest_games = Game.objects.exclude(tags=sexual_content).order_by('-id')[:8]
-    #popular_games = UserGameStatus.objects.exclude(game__tags=sexual_content).values("game", "game__image", "game__name").filter(created_at__lte=datetime.datetime.today(), created_at__gt=datetime.datetime.today()-datetime.timedelta(days=30)).annotate(count=Count('game')).order_by("-count")[:8]
+    latest_games = Game.objects.exclude(tags__in=banned_tags).order_by('-id')[:8]
+    #popular_games = UserGameStatus.objects.exclude(tags__in=banned_tags).values("game", "game__image", "game__name").filter(created_at__lte=datetime.datetime.today(), created_at__gt=datetime.datetime.today()-datetime.timedelta(days=30)).annotate(count=Count('game')).order_by("-count")[:8]
     page = request.GET.get('page', 1)
 
     paginator = Paginator(status_list, 25)
@@ -39,12 +40,15 @@ def IndexView(request):
     return render(request, 'games/index.html', {'activities': paginated_results, 'latest_games': latest_games})
 
 def GamesTaggedWithView(request, tag_id, name=None):
-    sexual_content = Tag.objects.get(name="Sexual Content")
+    banned_tags = [Tag.objects.get(name="Sexual Content").id]
+    if request.user.is_authenticated:
+        user_profile = UserProfile.objects.get(user=request.user)
+        banned_tags = [x.id for x in user_profile.banned_tags.all()]
     try:
         tag = Tag.objects.get(id=tag_id)
     except Tag.DoesNotExist:
         raise Http404
-    game_list = Game.objects.filter(tags=tag).exclude(tags=sexual_content).order_by('-id')
+    game_list = Game.objects.filter(tags=tag).exclude(tags__in=banned_tags).order_by('-id')
     page = request.GET.get('page', 1)
 
     paginator = Paginator(game_list, 25)
@@ -57,12 +61,15 @@ def GamesTaggedWithView(request, tag_id, name=None):
     return render(request, 'games/tag_detail.html', {'game_list': paginated_results, 'tag': tag})
 
 def GamesInCollectionView(request, col_id, name=None):
-    sexual_content = Tag.objects.get(name="Sexual Content")
+    banned_tags = [Tag.objects.get(name="Sexual Content").id]
+    if request.user.is_authenticated:
+        user_profile = UserProfile.objects.get(user=request.user)
+        banned_tags = [x.id for x in user_profile.banned_tags.all()]
     try:
         collection = Collection.objects.get(id=col_id)
     except Collection.DoesNotExist:
         raise Http404
-    game_list = collection.games.exclude(tags=sexual_content).order_by('-id')
+    game_list = collection.games.exclude(tags__in=banned_tags).order_by('-id')
     page = request.GET.get('page', 1)
 
     paginator = Paginator(game_list, 25)
@@ -140,12 +147,15 @@ def ProfileView(request, user_id, name=None, tab=None):
         raise Http404
 
 def GenreView(request, genre_id, name=None):
-    sexual_content = Tag.objects.get(name="Sexual Content")
+    banned_tags = [Tag.objects.get(name="Sexual Content").id]
+    if request.user.is_authenticated:
+        user_profile = UserProfile.objects.get(user=request.user)
+        banned_tags = [x.id for x in user_profile.banned_tags.all()]
     try:
         genre = Genre.objects.get(id=genre_id)
     except Genre.DoesNotExist:
         raise Http404
-    game_list = Game.objects.filter(genres=genre).exclude(tags=sexual_content).order_by('-id')
+    game_list = Game.objects.filter(genres=genre).exclude(tags__in=banned_tags).order_by('-id')
     page = request.GET.get('page', 1)
 
     paginator = Paginator(game_list, 25)
@@ -248,12 +258,15 @@ def GameView(request, game_id, name=None):
         return render(request, 'games/game_detail.html', {'game': game, 'user_score':None, 'users_rated':0, 'user_counts':user_counts, 'game_entry': game_entry, 'regular_collections':regular_collections, 'user_collections':user_collections, 'stubbed':stubbed, 'ignored':ignored})
 
 def BrowseView(request):
-    sexual_content = Tag.objects.get(name="Sexual Content")
+    banned_tags = [Tag.objects.get(name="Sexual Content").id]
+    if request.user.is_authenticated:
+        user_profile = UserProfile.objects.get(user=request.user)
+        banned_tags = [x.id for x in user_profile.banned_tags.all()]
     query = request.GET.get('search')
     if query:
-        game_list = Game.objects.filter(Q(name__icontains=query) | Q(aliases__icontains=query)).exclude(tags=sexual_content).order_by('-id')
+        game_list = Game.objects.filter(Q(name__icontains=query) | Q(aliases__icontains=query)).exclude(tags__in=banned_tags).order_by('-id')
     else:
-        game_list = Game.objects.exclude(tags=sexual_content).order_by('-id')
+        game_list = Game.objects.exclude(tags__in=banned_tags).order_by('-id')
     page = request.GET.get('page', 1)
 
     paginator = Paginator(game_list, 25)
@@ -512,6 +525,23 @@ def ChangeAvatarView(request):
             form.save()
             return redirect('/settings')
     return render(request, 'games/avatar_change.html', {'form':form})
+
+@login_required(login_url='/login/')
+def ChangeIgnoredTagsView(request):
+    user_profile = UserProfile.objects.get(user=request.user)
+    banned_tags = [x.id for x in user_profile.banned_tags.all()]
+    form = ChangeIgnoredTagsForm(instance=user_profile)
+    if request.method == 'POST':
+        form = ChangeIgnoredTagsForm(request.POST, instance=user_profile)
+        if form.is_valid():
+            form.save()
+            return redirect('/settings')
+    tags = {"Content":[],"Mechanics":[],"Protagonist":[],"Setting":[],"Subgenre":[],
+           "Graphics":[],"Meta":[],"Narrative":[],"Sports":[],"Technical":[]}
+    for tag in Tag.objects.all():
+        if tag.category in tags.keys():
+            tags[tag.category].append({'id':tag.id, 'name':tag.name})
+    return render(request, 'games/change_ignored_tags.html', {'tags':tags, 'banned_tags':banned_tags, 'form':form})
 
 class ForumView(generic.View):
     pass

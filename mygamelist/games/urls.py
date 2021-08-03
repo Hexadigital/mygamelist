@@ -38,4 +38,5 @@ urlpatterns = [
     path('status/like/<int:status_id>/', views.LikeStatusView, name='likestatus'),
     path('settings/', views.SettingsView, name='settings'),
     path('settings/avatar/', views.ChangeAvatarView, name='changeavatar'),
+    path('settings/ignoredtags/', views.ChangeIgnoredTagsView, name='changeignoredtags'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

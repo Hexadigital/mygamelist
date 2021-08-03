@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Change Ignored Tags :: Remember Games{% endblock %}
+
+{% block content %}
+<br>
+<div class="container">
+	<form method="post" action="{% url 'games:changeignoredtags' %}">
+	<div class="row align-items-center">
+		<div class="col" align="center">
+			<h3>Change Ignored Tags</h3>
+			Ignored tags will be hidden from searches and recommendations.<br>
+			By default, the Sexual Content and STUB tags are hidden.<br>
+			{% if form.errors %}
+			{% for error in form.avatar.errors %}
+			{{ error|escape }}<br>
+			{% endfor %}
+			{% endif %}
+			<br>
+			{% csrf_token %}
+			<br>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col">
+		<h4 align="center">Content</h4>
+			{% for tag in tags.Content %}
+			<input type="checkbox" name="banned_tags" value="{{ tag.id }}" {% if tag.id in banned_tags %}checked{% endif %}> {{ tag.name }}<br>
+			{% endfor %}
+		</div>
+		<div class="col">
+		<h4 align="center">Mechanics</h4>
+			{% for tag in tags.Mechanics %}
+			<input type="checkbox" name="banned_tags" value="{{ tag.id }}" {% if tag.id in banned_tags %}checked{% endif %}> {{ tag.name }}<br>
+			{% endfor %}
+		</div>
+		<div class="col">
+		<h4 align="center">Protagonist</h4>
+			{% for tag in tags.Protagonist %}
+			<input type="checkbox" name="banned_tags" value="{{ tag.id }}" {% if tag.id in banned_tags %}checked{% endif %}> {{ tag.name }}<br>
+			{% endfor %}
+		</div>
+		<div class="col">
+		<h4 align="center">Setting</h4>
+			{% for tag in tags.Setting %}
+			<input type="checkbox" name="banned_tags" value="{{ tag.id }}" {% if tag.id in banned_tags %}checked{% endif %}> {{ tag.name }}<br>
+			{% endfor %}
+		</div>
+		<div class="col">
+		<h4 align="center">Subgenre</h4>
+			{% for tag in tags.Subgenre %}
+			<input type="checkbox" name="banned_tags" value="{{ tag.id }}" {% if tag.id in banned_tags %}checked{% endif %}> {{ tag.name }}<br>
+			{% endfor %}
+		</div>
+	</div>
+		<br>
+	<div class="row">
+		<div class="col">
+		<h4 align="center">Graphics</h4>
+			{% for tag in tags.Graphics %}
+			<input type="checkbox" name="banned_tags" value="{{ tag.id }}" {% if tag.id in banned_tags %}checked{% endif %}> {{ tag.name }}<br>
+			{% endfor %}
+		</div>
+		<div class="col">
+		<h4 align="center">Meta</h4>
+			{% for tag in tags.Meta %}
+			<input type="checkbox" name="banned_tags" value="{{ tag.id }}" {% if tag.id in banned_tags %}checked{% endif %}> {{ tag.name }}<br>
+			{% endfor %}
+		</div>
+		<div class="col">
+		<h4 align="center">Narrative</h4>
+			{% for tag in tags.Narrative %}
+			<input type="checkbox" name="banned_tags" value="{{ tag.id }}" {% if tag.id in banned_tags %}checked{% endif %}> {{ tag.name }}<br>
+			{% endfor %}
+		</div>
+		<div class="col">
+		<h4 align="center">Sports</h4>
+			{% for tag in tags.Sports %}
+			<input type="checkbox" name="banned_tags" value="{{ tag.id }}" {% if tag.id in banned_tags %}checked{% endif %}> {{ tag.name }}<br>
+			{% endfor %}
+		</div>
+		<div class="col">
+		<h4 align="center">Technical</h4>
+			{% for tag in tags.Technical %}
+			<input type="checkbox" name="banned_tags" value="{{ tag.id }}" {% if tag.id in banned_tags %}checked{% endif %}> {{ tag.name }}<br>
+			{% endfor %}
+		</div>
+	</div>
+		<br>
+	<div class="row align-items-center">
+		<div class="col" align="center">
+			<button class="btn btn-primary" type="submit">Submit</button><br>
+		</div>
+	</div>
+	</form>
+</div>
+{% endblock %}
+

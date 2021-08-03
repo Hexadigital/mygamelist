@@ -3,7 +3,7 @@ from django import forms
 from django.contrib.admin.widgets import AdminDateWidget
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import ManualUserGameListEntry, UserGameListEntry, Platform, UserProfile
+from .models import ManualUserGameListEntry, UserGameListEntry, Platform, UserProfile, Tag
 
 class SignUpForm(UserCreationForm):
     email = forms.EmailField(max_length=254)
@@ -55,3 +55,12 @@ class ChangeAvatarForm(forms.ModelForm):
             raise forms.ValidationError(u'Avatar file size may not exceed 512KB.')
 
         return avatar
+
+class ChangeIgnoredTagsForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ['banned_tags']
+    banned_tags = forms.ModelMultipleChoiceField(
+            queryset=Tag.objects.all(),
+            widget=forms.CheckboxSelectMultiple
+        )
