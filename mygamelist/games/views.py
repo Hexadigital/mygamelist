@@ -1,5 +1,6 @@
 import datetime
 import json
+import random
 from collections import OrderedDict
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import render, redirect
@@ -80,6 +81,18 @@ def GamesInCollectionView(request, col_id, name=None):
     except EmptyPage:
         paginated_results = paginator.page(paginator.num_pages)
     return render(request, 'games/collection_list.html', {'game_list': paginated_results, 'collection': collection})
+
+@login_required(login_url='/login/')
+def GameListRandomView(request):
+    game_list = UserGameListEntry.objects.filter(user=request.user.id,status='PLAN')
+    manual_list = ManualUserGameListEntry.objects.filter(user=request.user.id,status='PLAN')
+    planning = []
+    for entry in game_list:
+        planning.append({'name':entry.game.name, 'platform':entry.platform, 'comments':entry.comments, 'id':entry.game.id})
+    for entry in manual_list:
+        planning.append({'name':entry.name, 'platform':entry.platform, 'comments':entry.comments, 'id':None})
+    
+    return render(request, 'games/random_from_list.html', random.choice(planning))
 
 def ProfileView(request, user_id, name=None, tab=None):
     try:
@@ -277,6 +290,40 @@ def BrowseView(request):
     except EmptyPage:
         paginated_results = paginator.page(paginator.num_pages)
     return render(request, 'games/browse.html', {'game_list': paginated_results})
+
+def BrowseCollectionView(request):
+    query = request.GET.get('search')
+    if query:
+        collection_list = Collection.objects.filter(Q(name__icontains=query)).order_by('-id')
+    else:
+        collection_list = Collection.objects.order_by('-id')
+    page = request.GET.get('page', 1)
+
+    paginator = Paginator(collection_list, 25)
+    try:
+        paginated_results = paginator.page(page)
+    except PageNotAnInteger:
+        paginated_results = paginator.page(1)
+    except EmptyPage:
+        paginated_results = paginator.page(paginator.num_pages)
+    return render(request, 'games/search_for_collection.html', {'collection_list': paginated_results})
+
+def BrowseUserView(request):
+    query = request.GET.get('search')
+    if query:
+        user_list = User.objects.filter(Q(name__icontains=query)).order_by('-id')
+    else:
+        user_list = User.objects.order_by('-id')
+    page = request.GET.get('page', 1)
+
+    paginator = Paginator(user_list, 25)
+    try:
+        paginated_results = paginator.page(page)
+    except PageNotAnInteger:
+        paginated_results = paginator.page(1)
+    except EmptyPage:
+        paginated_results = paginator.page(paginator.num_pages)
+    return render(request, 'games/search_for_user.html', {'user_list': paginated_results})
 
 @login_required(login_url='/login/')
 def GameListView(request, edit_type=None, entry_id=None):
