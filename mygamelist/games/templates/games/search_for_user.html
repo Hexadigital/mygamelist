@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Collections :: Remember.Games{% endblock %}
+
+{% block embedpreview %}
+	<meta name="twitter:card" content="summary" />
+	<meta name="twitter:title" content="Users :: Remember Games" />
+	<meta name="twitter:description" content="Remember Games is a website you can use to track games you've played." />
+	<meta name="twitter:image" content="" />
+{% endblock %}
+
+{% block navitems %}
+	<li class="nav-item">
+	<a class="nav-link" href="/">Home</a>
+	</li>
+	<li class="nav-item">
+	<a class="nav-link" href="{% url 'games:gamelist' %}">My Games</a>
+	</li>
+	<li class="nav-item">
+	<a class="nav-link active" href="{% url 'games:browse' %}">Browse</a>
+	</li>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-md-12" align="center">
+			<br>
+			<form method="GET" >
+				<input type="text" name="search" value="{{ request.GET.search }}" placeholder="Collection Name">
+				<button type="btn" class="btn btn-primary" type="submit">Search</button>
+			</form>
+			Search For: <a href="{% url 'games:browse' %}" class="gamelink">Games</a> | <a href="{% url 'games:browsecollection' %}" class="gamelink">Collections</a> | Users<br>
+			<br>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col" align="center">
+	{% for user_entry in user_list %}
+		<a href="{% url 'games:profile' user_entry.id user_entry.username|slugify %}"><img class="rounded" src="{{ user_entry.userprofile.avatar.url }}" style="max-width: 40px; height: 40px;"> {{ user_entry.username }}</a><br>
+	{% endfor %}
+		</div>
+	</div>
+	<div class="col-md-12" align="center">
+	{% if user_list.has_previous %}
+	<a href="?page={{ user_list.previous_page_number }}">&laquo;</a>
+	{% else %}
+	&laquo;
+	{% endif %}
+	{{ user_list.number }}
+	{% if user_list.has_next %}
+	<a href="?page={{ user_list.next_page_number }}">&raquo;</a>
+	{% else %}
+	&raquo;
+	{% endif %}
+	</div>
+</div>
+{% endblock %}
