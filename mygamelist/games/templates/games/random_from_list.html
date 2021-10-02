@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}My Games :: Remember Games{% endblock %}
+
+{% block embedpreview %}
+	<meta name="twitter:card" content="summary" />
+	<meta name="twitter:title" content="My Games :: Remember Games" />
+	<meta name="twitter:description" content="Remember Games is a website you can use to track games you've played." />
+	<meta name="twitter:image" content="" />
+{% endblock %}
+
+{% block navitems %}
+	<li class="nav-item">
+	<a class="nav-link" href="/">Home</a>
+	</li>
+	<li class="nav-item">
+	<a class="nav-link active" href="{% url 'games:gamelist' %}">My Games</a>
+	</li>
+	<li class="nav-item">
+	<a class="nav-link" href="{% url 'games:browse' %}">Browse</a>
+	</li>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+	<br>
+	<center>
+		<h1>The die is cast.</h1>
+		<h3>{% if id %}<a class="gamelink" href="{% url 'games:game' id name|slugify %}">{% endif %}{{ name }}{% if id %}</a>{% endif %}</h3>
+		<i>{{ platform }}</i><br>
+		<br>
+		{% if comments %}{{ comments }}{% endif %}
+	</center>
+</div>
+{% endblock %}

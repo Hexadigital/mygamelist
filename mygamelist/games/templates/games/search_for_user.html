@@ -2,11 +2,11 @@
 {% load static %}
 {% load humanize %}
 
-{% block title %}Browse :: Remember.Games{% endblock %}
+{% block title %}Collections :: Remember.Games{% endblock %}
 
 {% block embedpreview %}
 	<meta name="twitter:card" content="summary" />
-	<meta name="twitter:title" content="Browse :: Remember Games" />
+	<meta name="twitter:title" content="Users :: Remember Games" />
 	<meta name="twitter:description" content="Remember Games is a website you can use to track games you've played." />
 	<meta name="twitter:image" content="" />
 {% endblock %}
@@ -29,31 +29,29 @@
 		<div class="col-md-12" align="center">
 			<br>
 			<form method="GET" >
-				<input type="text" name="search" value="{{ request.GET.search }}" placeholder="Game Name">
+				<input type="text" name="search" value="{{ request.GET.search }}" placeholder="Collection Name">
 				<button type="btn" class="btn btn-primary" type="submit">Search</button>
 			</form>
-			Search For: Games | <a href="{% url 'games:browsecollection' %}" class="gamelink">Collections</a> | <a href="{% url 'games:browseusers' %}" class="gamelink">Users</a><br>
+			Search For: <a href="{% url 'games:browse' %}" class="gamelink">Games</a> | <a href="{% url 'games:browsecollection' %}" class="gamelink">Collections</a> | Users<br>
 			<br>
 		</div>
 	</div>
 	<div class="row">
-	{% for game in game_list %}
-		{% if game.image %}
-		<div class="col d-flex align-items-md-center justify-content-md-center">
-		<a href="{% url 'games:game' game.id game.name|slugify %}"><img class="rounded mx-auto d-block" style="object-fit:contain;max-height:250px;max-width:167px;" src="{{ game.image.url }}"></a>
-		</div>
-		{% endif %}
+		<div class="col" align="center">
+	{% for user_entry in user_list %}
+		<a href="{% url 'games:profile' user_entry.id user_entry.username|slugify %}"><img class="rounded" src="{{ user_entry.userprofile.avatar.url }}" style="max-width: 40px; height: 40px;"> {{ user_entry.username }}</a><br>
 	{% endfor %}
+		</div>
 	</div>
 	<div class="col-md-12" align="center">
-	{% if game_list.has_previous %}
-	<a href="?page={{ game_list.previous_page_number }}">&laquo;</a>
+	{% if user_list.has_previous %}
+	<a href="?page={{ user_list.previous_page_number }}">&laquo;</a>
 	{% else %}
 	&laquo;
 	{% endif %}
-	{{ game_list.number }}
-	{% if game_list.has_next %}
-	<a href="?page={{ game_list.next_page_number }}">&raquo;</a>
+	{{ user_list.number }}
+	{% if user_list.has_next %}
+	<a href="?page={{ user_list.next_page_number }}">&raquo;</a>
 	{% else %}
 	&raquo;
 	{% endif %}
