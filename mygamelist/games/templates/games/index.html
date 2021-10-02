@@ -27,8 +27,12 @@
 <div class="container-fluid">
 	<br>
 	<div class="row">
+		{% if mobile %}
+		<div class="col-12">
+		{% else %}
 		<div class="col-1" align="center"></div>
 		<div class="col-7">
+		{% endif %}
 			{% for activity in activities %}
 				<div class="text-white bg-dark mb-3 rounded" style="max-width: 100%">
 					<div class="row align-items-center">
@@ -61,8 +65,10 @@
 					</div>
 				</div>
 			{% endfor %}
+		{% if not mobile %}
 		</div>
 		<div class="col-3" align="center">
+		{% endif %}
 			<div class="text-white bg-dark mb-3 rounded" style="max-width: 100%">
 				<div class="card-header justify-content-between">Recently Added</div>
 				{% for game in latest_games %}
@@ -70,7 +76,9 @@
 				{% endfor %}
 			</div>
 		</div>
+		{% if not mobile %}
 		<div class="col-1" align="center"></div>
+		{% endif %}
 	</div>
 </div>
 <script>
