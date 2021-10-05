@@ -191,3 +191,12 @@ class UserSettings(models.Model):
         ("DCML","10-Point Decimal")
     ]
     score_type = models.CharField(max_length=4, choices=rating_systems, default="DCML")
+
+class TagAdditionRequest(models.Model):
+    game = models.ForeignKey(Game, on_delete=models.CASCADE)
+    tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
+    requested_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    comments = models.CharField(max_length=1000, blank=True, default='')
+
+    def __str__(self):
+        return self.game.name + " -> " + self.tag.name

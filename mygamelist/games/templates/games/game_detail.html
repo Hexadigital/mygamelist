@@ -97,7 +97,8 @@
 					<button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#gametags" aria-expanded="false" aria-controls="gametags">Show Tags</button><br>
 					<div class="collapse" id="gametags">{% for tag in game.tags.all|dictsort:"name" %}
 							<a href="{% url 'games:tag' tag.id tag.name|slugify %}">{{ tag.name }}</a>{% if not forloop.last %}, {% endif %}
-							{% endfor %}</div>
+							{% endfor %}<br>
+						<a class="btn btn-outline-primary btn-sm" role="button" href="{% url 'games:tagreq' game.id %}">Add a Tag?</a></div>
 					<small class="text-muted">May contain spoilers</small><br>
 			</blockquote>
 		</div>

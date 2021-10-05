@@ -11,8 +11,8 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Count, Q
 
 from .models import Game, Genre, Platform, Tag, User, UserGameListEntry, ManualUserGameListEntry, UserGameStatus
-from .models import UserGameStatus, Notification, Recommendation, Collection, CollectionType, UserProfile, UserSettings
-from .forms import SignUpForm, ManualGameForm, GameEntryForm, ChangeAvatarForm, ChangeIgnoredTagsForm
+from .models import UserGameStatus, Notification, Recommendation, Collection, CollectionType, UserProfile, UserSettings, TagAdditionRequest
+from .forms import SignUpForm, ManualGameForm, GameEntryForm, ChangeAvatarForm, ChangeIgnoredTagsForm, TagAdditionRequestForm
 
 def IndexView(request):
     banned_tags = [Tag.objects.get(name="Sexual Content").id]
@@ -589,6 +589,25 @@ def ChangeIgnoredTagsView(request):
         if tag.category in tags.keys():
             tags[tag.category].append({'id':tag.id, 'name':tag.name})
     return render(request, 'games/change_ignored_tags.html', {'tags':tags, 'banned_tags':banned_tags, 'form':form})
+
+@login_required(login_url='/login/')
+def TagAdditionRequestView(request, game_id):
+    try:
+        game = Game.objects.get(id=game_id)
+    except Game.DoesNotExist:
+        raise Http404
+    form = TagAdditionRequestForm()
+    if request.method == 'POST':
+        form = TagAdditionRequestForm(request.POST)
+        if form.is_valid():
+            tagreq = TagAdditionRequest()
+            tagreq.game = game
+            tagreq.requested_by = request.user
+            tagreq.tag = form.cleaned_data['tag']
+            tagreq.comments = form.cleaned_data['comments']
+            tagreq.save()
+            return redirect('/game/' + str(game_id))
+    return render(request, 'games/submit_tag.html', {'game':game, 'form':form})
 
 class ForumView(generic.View):
     pass
