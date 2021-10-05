@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Submit Tag :: Remember.Games{% endblock %}
+
+{% block embedpreview %}
+	<meta name="twitter:card" content="summary" />
+	<meta name="twitter:title" content="My Games :: Remember Games" />
+	<meta name="twitter:description" content="Remember Games is a website you can use to track games you've played." />
+	<meta name="twitter:image" content="" />
+{% endblock %}
+
+{% block content %}
+<div class="container">
+<br>
+<div class="text-white bg-dark mb-3 rounded" style="max-width: 100%">
+<br>
+<form action="{% url 'games:tagreq' game.id %}" method="post">
+	<div class="row">
+		{% csrf_token %}
+		{{ form.errors }}
+		<br>
+		<div class="col-12" align="center">
+			<label for="id_name"><b>Game Name:</b></label><br>
+			{{ game.name }}<br>
+			<br>
+			<label for="id_tag"><b>Tag:</b></label><br>
+			<select name="tag">
+				{% for choice in form.tag.field.choices %}
+					<option value="{{ choice.0 }}">{{ choice.1 }}</option>
+				{% endfor %}
+			</select><br>
+			<br>
+			<label for="id_comments">Reason for Adding Tag:</label><br>
+			<textarea name="comments" maxlength="1000" rows="4" cols="50" id="id_comments"></textarea><br>
+		</div>
+	</div>
+	<br>
+	<div class="row">
+		<div class="col-12" align="center">
+			It is better to be missing a tag than to have an incorrect tag.<br>
+			If at all possible, please provide evidence (screenshot, video, wiki article, another database) that the tag belongs.<br>
+			<br>
+			<button class="btn btn-primary" type="submit">Submit</button><br>
+		</div>
+	</div></form>
+	<br><br>
+</div>
+</div>
+<br><br>
+{% endblock %}

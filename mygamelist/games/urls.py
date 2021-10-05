@@ -36,6 +36,7 @@ urlpatterns = [
     path('recommendations/view/<int:user_id>', views.RecommendationsView, name='recommendations'),
     path('recommendations/refresh/', views.RecommendationsRefreshView, name='recrefresh'),
     path('game/ignore/<int:game_id>/', views.IgnoreGameView, name='ignore'),
+    path('game/addtag/<int:game_id>/', views.TagAdditionRequestView, name='tagreq'),
     path('user/follow/<int:user_id>/', views.FollowUserView, name='follow'),
     path('status/like/', views.LikeStatusView, name='likestatus'),
     path('status/like/<int:status_id>/', views.LikeStatusView, name='likestatus'),
