@@ -580,6 +580,7 @@ def ChangeIgnoredTagsView(request):
     form = ChangeIgnoredTagsForm(instance=user_profile)
     if request.method == 'POST':
         form = ChangeIgnoredTagsForm(request.POST, instance=user_profile)
+        print(form.is_valid())
         if form.is_valid():
             form.save()
             return redirect('/settings')

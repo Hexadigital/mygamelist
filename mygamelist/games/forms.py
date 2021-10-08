@@ -62,7 +62,8 @@ class ChangeIgnoredTagsForm(forms.ModelForm):
         fields = ['banned_tags']
     banned_tags = forms.ModelMultipleChoiceField(
             queryset=Tag.objects.all(),
-            widget=forms.CheckboxSelectMultiple
+            widget=forms.CheckboxSelectMultiple,
+            required=False
         )
 
 class TagAdditionRequestForm(forms.ModelForm):

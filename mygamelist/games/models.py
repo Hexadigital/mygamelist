@@ -78,9 +78,7 @@ def create_userprofile_signal(sender, instance, created, **kwargs):
     if created:     
         UserProfile.objects.create(user=instance)
         sexual_content = Tag.objects.get(name="Sexual Content")
-        stub = Tag.objects.get(name="STUB")
         instance.userprofile.banned_tags.add(sexual_content)
-        instance.userprofile.banned_tags.add(stub)
         instance.userprofile.save()
 
 class UserGameListEntry(models.Model):
