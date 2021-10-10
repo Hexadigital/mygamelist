@@ -245,7 +245,7 @@ def GameView(request, game_id, name=None):
     user_collections = Collection.objects.filter(category=user_col_type).filter(games=game).order_by('category', 'name')
 
     stubbed = False
-    if "STUB" in [x.name for x in game.tags.all()]:
+    if len(game.tags.all()) < 5:
         stubbed = True
 
     game_entries = UserGameListEntry.objects.filter(game=game)
