@@ -84,7 +84,7 @@ def create_userprofile_signal(sender, instance, created, **kwargs):
 class UserGameListEntry(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
-    platform = models.ForeignKey(Platform, on_delete=models.CASCADE)
+    platform = models.ForeignKey(Platform, blank=True, null=True, on_delete=models.CASCADE)
     statuses = [
         ("PLAN", "Plan to Play"),
         ("PLAY", "Playing"),
@@ -107,7 +107,7 @@ class UserGameListEntry(models.Model):
 class ManualUserGameListEntry(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=150)
-    platform = models.ForeignKey(Platform, on_delete=models.CASCADE)
+    platform = models.ForeignKey(Platform, blank=True, null=True, on_delete=models.CASCADE)
     statuses = [
         ("PLAY", "Playing"),
         ("CMPL", "Completed"),
