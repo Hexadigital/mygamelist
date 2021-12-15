@@ -112,7 +112,7 @@
 														{% elif activity.status == "HOLD" %}
 															Paused 
 														{% endif %}
-														<a class="gamelink" href="{% url 'games:game' activity.game.id activity.game.name|slugify %}">{{ activity.game.name }}</a>
+														<a class="gamelink" href="{% url 'games:game' activity.game.id activity %}">{{ activity.game.name }}</a>
 													</p>
 												</div>
 											</div>

@@ -36,7 +36,7 @@
 				<div class="text-white bg-dark mb-3 rounded" style="max-width: 100%">
 					<div class="row align-items-center">
 						<div class="col-md-auto" style="width:80px;">
-							<a class="gamelink" href="{% url 'games:game' rec.game.id rec.game.name|slugify %}"><img class="rounded" src="{{ rec.game.image.url }}" style="max-width: 80px; height: 130px; object-fit: cover;"></a>
+							<a class="gamelink" href="{% url 'games:game' rec.game.id %}"><img class="rounded" src="{{ rec.game.image.url }}" style="max-width: 80px; height: 130px; object-fit: cover;"></a>
 						</div>
 						<div class="col">
 							<div class="card-header d-flex justify-content-between">
@@ -44,7 +44,7 @@
 							</div>
 							<div class="card-body">
 								<p class="card-text">
-									<a class="gamelink" href="{% url 'games:game' rec.game.id rec.game.name|slugify %}">{{ rec.game.name }}</a>
+									<a class="gamelink" href="{% url 'games:game' rec.game.id %}">{{ rec.game.name }}</a>
 								</p>
 							</div>
 						</div>
