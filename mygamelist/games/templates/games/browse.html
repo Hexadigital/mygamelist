@@ -47,13 +47,13 @@
 	</div>
 	<div class="col-md-12" align="center">
 	{% if game_list.has_previous %}
-	<a href="?page={{ game_list.previous_page_number }}">&laquo;</a>
+	<a href="?page={{ game_list.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">&laquo;</a>
 	{% else %}
 	&laquo;
 	{% endif %}
 	{{ game_list.number }}
 	{% if game_list.has_next %}
-	<a href="?page={{ game_list.next_page_number }}">&raquo;</a>
+	<a href="?page={{ game_list.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">&raquo;</a>
 	{% else %}
 	&raquo;
 	{% endif %}
