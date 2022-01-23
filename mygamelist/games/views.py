@@ -575,7 +575,7 @@ def ChangeAvatarView(request):
 
 @login_required(login_url='/login/')
 def ChangeIgnoredTagsView(request):
-    user_profile = CustomList.objects.get(user=request.user)
+    user_profile = UserProfile.objects.get(user=request.user)
     banned_tags = [x.id for x in user_profile.banned_tags.all()]
     form = ChangeIgnoredTagsForm(instance=user_profile)
     if request.method == 'POST':
