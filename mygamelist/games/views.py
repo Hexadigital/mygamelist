@@ -11,7 +11,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Count, Q
 
 from .models import Game, Genre, Platform, Tag, User, UserGameListEntry, ManualUserGameListEntry, UserGameStatus
-from .models import UserGameStatus, Notification, Recommendation, Collection, CollectionType, UserProfile, UserSettings, TagAdditionRequest
+from .models import UserGameStatus, Notification, Recommendation, Collection, CollectionType, UserProfile, UserSettings, TagAdditionRequest, CustomList
 from .forms import SignUpForm, ManualGameForm, GameEntryForm, ChangeAvatarForm, ChangeIgnoredTagsForm, TagAdditionRequestForm
 
 def IndexView(request):
@@ -575,7 +575,7 @@ def ChangeAvatarView(request):
 
 @login_required(login_url='/login/')
 def ChangeIgnoredTagsView(request):
-    user_profile = UserProfile.objects.get(user=request.user)
+    user_profile = CustomList.objects.get(user=request.user)
     banned_tags = [x.id for x in user_profile.banned_tags.all()]
     form = ChangeIgnoredTagsForm(instance=user_profile)
     if request.method == 'POST':
@@ -590,6 +590,13 @@ def ChangeIgnoredTagsView(request):
         if tag.category in tags.keys():
             tags[tag.category].append({'id':tag.id, 'name':tag.name})
     return render(request, 'games/change_ignored_tags.html', {'tags':tags, 'banned_tags':banned_tags, 'form':form})
+
+@login_required(login_url='/login/')
+def ChangeCustomListsView(request):
+    lists = CustomList.objects.filter(user=request.user.id).order_by('name')
+    if request.method == 'POST':
+        pass
+    return render(request, 'games/change_custom_lists.html', {'lists':lists})
 
 @login_required(login_url='/login/')
 def TagAdditionRequestView(request, game_id):

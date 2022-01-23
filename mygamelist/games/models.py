@@ -198,3 +198,9 @@ class TagAdditionRequest(models.Model):
 
     def __str__(self):
         return self.game.name + " -> " + self.tag.name
+
+class CustomList(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=50)
+    linked_entries = models.ManyToManyField(UserGameListEntry, blank=True)
+    manual_entires = models.ManyToManyField(ManualUserGameListEntry, blank=True)
