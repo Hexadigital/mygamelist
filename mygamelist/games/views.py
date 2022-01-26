@@ -415,10 +415,6 @@ def GameListView(request, edit_type=None, entry_id=None):
             game = Game.objects.get(id=entry_id)
         except Game.DoesNotExist:
             raise Http404
-        try:
-            rec = Recommendation.objects.filter(user=request.user, game=game)
-        except Recommendation.DoesNotExist:
-            pass
         new = False
         try:
             game_entry = UserGameListEntry.objects.get(game=game,user=request.user)
@@ -427,9 +423,15 @@ def GameListView(request, edit_type=None, entry_id=None):
             game_entry.user = request.user
             game_entry.game = game
             new = True
+        custom_lists = CustomList.objects.filter(user=request.user).order_by('name')
+        lists_used = [c.id for c in CustomList.objects.filter(user=request.user, games=game)]
         if request.method == 'POST':
             if game in request.user.userprofile.ignored_games.all():
                 request.user.userprofile.ignored_games.remove(game)
+            try:
+                rec = Recommendation.objects.filter(user=request.user, game=game)
+            except Recommendation.DoesNotExist:
+                pass
             # create a form instance and populate it with data from the request:
             form = GameEntryForm(request.POST)
             # check whether it's valid:
@@ -460,10 +462,20 @@ def GameListView(request, edit_type=None, entry_id=None):
                 game_entry.save()
                 if rec is not None:
                     rec.delete()
+                # Update custom lists
+                posted_custom_lists = set([int(x) for x in request.POST.getlist('custom_lists')])
+                lists_to_add = list(posted_custom_lists - set(lists_used))
+                lists_to_remove = list(set(lists_used) - posted_custom_lists)
+                # Delete anything that has been unchecked
+                for clist in CustomList.objects.filter(user=request.user, id__in=lists_to_remove):
+                    clist.games.remove(game)
+                # Add anything that has been checked
+                for clist in CustomList.objects.filter(user=request.user, id__in=lists_to_add):
+                    clist.games.add(game)
                 return HttpResponseRedirect('/game/' + str(game.id))
         else:
             form = ManualGameForm()
-        return render(request, 'games/edit_game_entry.html', {'form': form, 'game_id': entry_id, 'game_entry': game_entry})
+        return render(request, 'games/edit_game_entry.html', {'form': form, 'game_id': entry_id, 'game_entry': game_entry, 'custom_lists': custom_lists, 'lists_used': lists_used})
     elif edit_type == 'add-manual':
         if request.method == 'POST':
             # create a form instance and populate it with data from the request:

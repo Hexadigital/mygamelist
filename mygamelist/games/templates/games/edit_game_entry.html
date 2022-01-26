@@ -24,16 +24,16 @@
 {% endblock %}
 
 {% block content %}
-<div class="container">
+<div class="container-fluid" align="center">
 <br>
-<div class="text-white bg-dark mb-3 rounded" style="max-width: 100%">
+<div class="text-white bg-dark mb-3 rounded" style="max-width: 75%">
 <br>
 <form action="{% url 'games:gamelist' 'edit' game_id %}" method="post">
 	<div class="row">
 		{% csrf_token %}
 		{{ form.errors }}
 		<br>
-		<div class="col-4" align="center">
+		<div class="col-sm-3" align="center">
 			<label for="id_name"><b>Game Name:</b></label><br>
 			<input type="text" value="{{ game_entry.game.name }}" readonly><br>
 			<br>
@@ -51,7 +51,7 @@
 			<label for="id_hours">Hours:</label><br>
 			<input type="number" name="hours" step="0.01" value="{{ game_entry.hours }}" id="id_hours"><br>
 		</div>
-		<div class="col-4" align="center">
+		<div class="col-sm-3" align="center">
 			<label for="id_platform"><b>Platform:</b></label><br>
 			<select name="platform">
 				{% for choice in form.platform.field.choices %}
@@ -65,7 +65,7 @@
 			<label for="id_times_replayed">Times Replayed:</label><br>
 			<input type="number" name="times_replayed" required="" value="{{ game_entry.times_replayed }}" id="id_times_replayed"><br>
 		</div>
-		<div class="col-4" align="center">
+		<div class="col-sm-3" align="center">
 			<label for="id_status"><b>Status:</b></label><br>
 			<select name="status" id="id_status">
 				<option value="PLAN"{% if game_entry.status == 'PLAN' %} selected=""{% endif %}>Plan to Play</option>
@@ -80,6 +80,12 @@
 			<br>
 			<label for="id_comments">Comments:</label><br>
 			<input type="text" name="comments" maxlength="500" value="{{ game_entry.comments }}" id="id_comments"><br>
+		</div>
+		<div class="col-sm-3" align="left">
+			<label for="id_custom_lists">Custom Lists:</label><br>
+			{% for clist in custom_lists %}
+			<input type="checkbox" name="custom_lists" value="{{ clist.id }}" {% if clist.id in lists_used %}checked{% endif %}> {{ clist.name }}<br>
+			{% endfor %}
 		</div>
 	</div>
 	<br>
