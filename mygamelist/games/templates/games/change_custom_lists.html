@@ -11,11 +11,12 @@
 		<div class="col" align="center">
 			<h3>Edit Your Custom Lists</h3>
 			{% for list in lists %}
-			{{ list.name }}<br>
+			{{ list.name }} ({{ list.games.count }}) 
+			<a href="{% url 'games:deletecustomlist' list.id %}">&#x1F5D1;</a><br>
 			{% endfor %}
 			<br>
-			<button class="btn btn-primary">Create New List</button>
-			<button class="btn btn-primary">Return to Settings</button><br>
+			<a role='button' class="btn btn-secondary" href="{% url 'games:settings' %}">Back</a>
+			<a role='button' class="btn btn-primary" href="{% url 'games:addcustomlist' %}">Create New List</a><br>
 		</div>
 	</div>
 </div>

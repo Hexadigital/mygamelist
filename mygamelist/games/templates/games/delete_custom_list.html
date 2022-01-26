@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Delete Custom List :: Remember.Games{% endblock %}
+
+{% block embedpreview %}
+	<meta name="twitter:card" content="summary" />
+	<meta name="twitter:title" content="Delete Custom List :: Remember Games" />
+	<meta name="twitter:description" content="Remember Games is a website you can use to track games you've played." />
+	<meta name="twitter:image" content="" />
+{% endblock %}
+
+{% block content %}
+<div class="container">
+	<br><br><br>
+	<div class="col-md-12" align="center">
+		<form action="{% url 'games:deletecustomlist' list_id %}" method="post">
+			{% csrf_token %}
+			<div class="fieldWrapper">
+				Are you sure you want to delete <b>{{ name }}</b>?
+			</div><br>
+			<button class="btn btn-danger" type="submit">Delete</button>
+		</form><br>
+		<a href="{% url 'games:changecustomlists' %}" class="btn btn-secondary">Cancel</a>
+	</div>
+</div>
+{% endblock %}

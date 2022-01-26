@@ -12,7 +12,7 @@ from django.db.models import Count, Q
 
 from .models import Game, Genre, Platform, Tag, User, UserGameListEntry, ManualUserGameListEntry, UserGameStatus
 from .models import UserGameStatus, Notification, Recommendation, Collection, CollectionType, UserProfile, UserSettings, TagAdditionRequest, CustomList
-from .forms import SignUpForm, ManualGameForm, GameEntryForm, ChangeAvatarForm, ChangeIgnoredTagsForm, TagAdditionRequestForm
+from .forms import SignUpForm, ManualGameForm, GameEntryForm, ChangeAvatarForm, ChangeIgnoredTagsForm, TagAdditionRequestForm, AddCustomListForm
 
 def IndexView(request):
     banned_tags = [Tag.objects.get(name="Sexual Content").id]
@@ -597,6 +597,31 @@ def ChangeCustomListsView(request):
     if request.method == 'POST':
         pass
     return render(request, 'games/change_custom_lists.html', {'lists':lists})
+
+@login_required(login_url='/login/')
+def AddCustomListView(request):
+    form = AddCustomListForm()
+    if request.method == 'POST':
+        form = AddCustomListForm(request.POST)
+        if form.is_valid():
+            tagreq = CustomList()
+            tagreq.user = request.user
+            tagreq.name = form.cleaned_data['name']
+            tagreq.privacy_level = form.cleaned_data['privacy_level']
+            tagreq.save()
+            return redirect('/settings/customlists/')
+    return render(request, 'games/add_custom_list.html', {'form':form})
+
+@login_required(login_url='/login/')
+def DeleteCustomListView(request, list_id):
+    try:
+        clist = CustomList.objects.get(id=list_id, user=request.user)
+    except CustomList.DoesNotExist:
+        raise Http404
+    if request.method == 'POST':
+        clist.delete()
+        return HttpResponseRedirect('/settings/customlists/')
+    return render(request, 'games/delete_custom_list.html', {'list_id':list_id, 'name':clist.name})
 
 @login_required(login_url='/login/')
 def TagAdditionRequestView(request, game_id):
