@@ -36,10 +36,10 @@ class Tag(models.Model):
     category = models.CharField(max_length=50)
     description = models.CharField(max_length=250, blank=True)
     class Meta:
-        ordering = ['category', 'name']
+        ordering = ['name']
 
     def __str__(self):
-        return self.category + " - " + self.name
+        return self.name
 
 class Genre(models.Model):
     name = models.CharField(max_length=50)
@@ -198,3 +198,13 @@ class TagAdditionRequest(models.Model):
 
     def __str__(self):
         return self.game.name + " -> " + self.tag.name
+
+class CustomList(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=50)
+    privacy_levels = [
+        ("PUBL", "Public"),
+        ("PRIV", "Private")
+    ]
+    privacy_level = models.CharField(max_length=4, choices=privacy_levels)
+    games = models.ManyToManyField(Game, blank=True)
