@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Error :: Remember.Games{% endblock %}
+
+{% block embedpreview %}
+	<meta name="twitter:card" content="summary" />
+	<meta name="twitter:title" content="Error :: Remember Games" />
+	<meta name="twitter:description" content="Remember Games is a website you can use to track games you've played." />
+	<meta name="twitter:image" content="" />
+{% endblock %}
+
+{% block content %}
+<div class="container">
+	<br><br><br>
+	<div class="col-md-12" align="center">
+		<h1>{{ error }}</h1><br><br>
+		<a onclick="history.back()" class="btn btn-primary">Return</a>
+	</div>
+</div>
+{% endblock %}

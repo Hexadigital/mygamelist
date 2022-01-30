@@ -14,6 +14,7 @@ urlpatterns = [
     path('tag/<int:tag_id>/<str:name>/', views.GamesTaggedWithView, name='tag'),
     path('collection/<int:col_id>/', views.GamesInCollectionView, name='collection'),
     path('collection/<int:col_id>/<str:name>/', views.GamesInCollectionView, name='collection'),
+    path('customlist/<int:list_id>/', views.GamesInCustomListView, name='customlist'),
     path('platform/<int:pk>/', views.PlatformView.as_view(), name='platform'),
     path('platform/<int:pk>/<str:name>/', views.PlatformView.as_view(), name='platform'),
     path('game/<int:game_id>/', views.GameView, name='game'),

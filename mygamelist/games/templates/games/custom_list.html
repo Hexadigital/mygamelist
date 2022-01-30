@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}{{ customlist.name }} :: Remember Games{% endblock %}
+
+{% block embedpreview %}
+	<meta name="twitter:card" content="summary" />
+	<meta name="twitter:title" content="{{ customlist.name }} :: Remember Games" />
+	<meta name="twitter:description" content="Remember Games is a website you can use to track games you've played." />
+	<meta name="twitter:image" content="" />
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+	<center><h3>Games in <a class="gamelink" href="{% url 'games:profile' customlist.user.id customlist.user.username|slugify %}">{{ customlist.user.username }}</a>'s "{{ customlist.name }}" List:</h3></center>
+	<div class="row">
+		{% for game in game_list %}
+			{% if game.image %}
+			<div class="col d-flex align-items-md-center justify-content-md-center">
+			<a href="{% url 'games:game' game.id %}"><img class="rounded mx-auto d-block" style="object-fit:contain;max-height:250px;max-width:167px;" src="{{ game.image.url }}"></a>
+			</div>
+			{% endif %}
+		{% endfor %}
+	</div>
+	<div class="col-md-12" align="center">
+		{% if game_list.has_previous %}
+		<a href="?page={{ game_list.previous_page_number }}">&laquo;</a>
+		{% else %}
+		&laquo;
+		{% endif %}
+		{{ game_list.number }}
+		{% if game_list.has_next %}
+		<a href="?page={{ game_list.next_page_number }}">&raquo;</a>
+		{% else %}
+		&raquo;
+		{% endif %}
+	</div>
+</div>
+{% endblock %}
