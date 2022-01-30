@@ -82,6 +82,34 @@ def GamesInCollectionView(request, col_id, name=None):
         paginated_results = paginator.page(paginator.num_pages)
     return render(request, 'games/collection_list.html', {'game_list': paginated_results, 'collection': collection})
 
+def GamesInCustomListView(request, list_id):
+    banned_tags = [Tag.objects.get(name="Sexual Content").id]
+    if request.user.is_authenticated:
+        user_profile = UserProfile.objects.get(user=request.user)
+        banned_tags = [x.id for x in user_profile.banned_tags.all()]
+    try:
+        customlist = CustomList.objects.get(id=list_id)
+    except CustomList.DoesNotExist:
+        raise Http404
+    # Prevent other users from viewing private lists
+    if customlist.privacy_level == 'PRIV':
+        if request.user.is_authenticated:
+            if request.user.id != customlist.user.id:
+                return render(request, 'games/error_message.html', {'error':'This list is private!'})
+        else:
+            return render(request, 'games/error_message.html', {'error':'This list is private!'})
+    game_list = customlist.games.exclude(tags__in=banned_tags).order_by('name')
+    page = request.GET.get('page', 1)
+
+    paginator = Paginator(game_list, 25)
+    try:
+        paginated_results = paginator.page(page)
+    except PageNotAnInteger:
+        paginated_results = paginator.page(1)
+    except EmptyPage:
+        paginated_results = paginator.page(paginator.num_pages)
+    return render(request, 'games/custom_list.html', {'game_list': paginated_results, 'customlist': customlist})
+
 @login_required(login_url='/login/')
 def GameListRandomView(request):
     game_list = UserGameListEntry.objects.filter(user=request.user.id,status='PLAN')
