@@ -15,7 +15,9 @@
 <div class="container">
 	<br><br><br>
 	<div class="col-md-12" align="center">
-		<h1>{{ error }}</h1><br><br>
+		<h1>{{ error }}</h1><br>
+		{% if suberror %}{{ suberror }}<br>{% endif %}
+		<br>
 		<a onclick="history.back()" class="btn btn-primary">Return</a>
 	</div>
 </div>
