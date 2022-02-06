@@ -268,6 +268,15 @@ def GameView(request, game_id, name=None):
     except Game.DoesNotExist:
         raise Http404
 
+    banned_tags = [Tag.objects.get(name="Sexual Content").id]
+    if request.user.is_authenticated:
+        user_profile = UserProfile.objects.get(user=request.user)
+        banned_tags = [x.id for x in user_profile.banned_tags.all()]
+
+    for tag_id in [x.id for x in game.tags.all()]:
+        if tag_id in banned_tags:
+            return render(request, 'games/error_message.html', {'error':'This game has one or more of your ignored tags!', 'suberror':'You can edit your ignored tags via your settings.'})
+
     user_col_type = CollectionType.objects.get(name='User')
     regular_collections = Collection.objects.exclude(category=user_col_type).filter(games=game).order_by('category', 'name')
     user_collections = Collection.objects.filter(category=user_col_type).filter(games=game).order_by('category', 'name')
