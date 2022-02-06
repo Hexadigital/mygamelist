@@ -12,7 +12,7 @@ from django.db.models import Count, Q
 
 from .models import Game, Genre, Platform, Tag, User, UserGameListEntry, ManualUserGameListEntry, UserGameStatus
 from .models import UserGameStatus, Notification, Recommendation, Collection, CollectionType, UserProfile, UserSettings, TagAdditionRequest, CustomList
-from .forms import SignUpForm, ManualGameForm, GameEntryForm, ChangeAvatarForm, ChangeIgnoredTagsForm, TagAdditionRequestForm, AddCustomListForm
+from .forms import SignUpForm, ManualGameForm, GameEntryForm, ChangeAvatarForm, ChangeIgnoredTagsForm, TagAdditionRequestForm, CustomListForm
 
 def IndexView(request):
     banned_tags = [Tag.objects.get(name="Sexual Content").id]
@@ -640,9 +640,9 @@ def ChangeCustomListsView(request):
 
 @login_required(login_url='/login/')
 def AddCustomListView(request):
-    form = AddCustomListForm()
+    form = CustomListForm()
     if request.method == 'POST':
-        form = AddCustomListForm(request.POST)
+        form = CustomListForm(request.POST)
         if form.is_valid():
             tagreq = CustomList()
             tagreq.user = request.user
@@ -651,6 +651,22 @@ def AddCustomListView(request):
             tagreq.save()
             return redirect('/settings/customlists/')
     return render(request, 'games/add_custom_list.html', {'form':form})
+
+@login_required(login_url='/login/')
+def EditCustomListView(request, list_id):
+    try:
+        clist = CustomList.objects.get(id=list_id, user=request.user)
+    except CustomList.DoesNotExist:
+        raise Http404
+    form = CustomListForm(instance=clist)
+    if request.method == 'POST':
+        form = CustomListForm(request.POST)
+        if form.is_valid():
+            clist.name = form.cleaned_data['name']
+            clist.privacy_level = form.cleaned_data['privacy_level']
+            clist.save()
+            return redirect('/settings/customlists/')
+    return render(request, 'games/edit_custom_list.html', {'form':form, 'clist_id':clist.id})
 
 @login_required(login_url='/login/')
 def DeleteCustomListView(request, list_id):

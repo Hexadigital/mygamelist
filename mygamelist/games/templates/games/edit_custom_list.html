@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Edit Custom List :: Remember.Games{% endblock %}
+
+{% block embedpreview %}
+	<meta name="twitter:card" content="summary" />
+	<meta name="twitter:title" content="Edit Custom List :: Remember Games" />
+	<meta name="twitter:description" content="Remember Games is a website you can use to track games you've played." />
+	<meta name="twitter:image" content="" />
+{% endblock %}
+
+{% block content %}
+<div class="container">
+<br>
+<div class="text-white bg-dark mb-3 rounded" style="max-width: 100%">
+<br>
+<form action="{% url 'games:editcustomlist' clist_id %}" method="post">
+	<div class="row">
+		{% csrf_token %}
+		{{ form.errors }}
+		<br>
+		<div class="col-12" align="center">
+			<label for="id_name"><b>List Name:</b></label><br>
+			<input type="text" name="name" maxlength="150" required="" value="{{ form.name.value|default_if_none:"" }}" id="id_name"><br>
+			<br>
+			<label for="id_privacy_level"><b>Privacy Setting:</b></label><br>
+			<select name="privacy_level">
+				<option value="PUBL"{% if form.privacy_level.value == 'PUBL' %} selected=""{% endif %}>Public</option>
+				<option value="PRIV"{% if form.privacy_level.value == 'PRIV' %} selected=""{% endif %}>Private</option>
+			</select><br>
+		</div>
+	</div>
+	<br>
+	<div class="row">
+		<div class="col-12" align="center">
+			Public means that everyone can see your custom list, Private means that only you can see it.<br>
+			<br>
+			<a role='button' class="btn btn-secondary" href="{% url 'games:changecustomlists' %}">Cancel</a>
+			<button class="btn btn-primary" type="submit">Submit</button>
+			<br>
+		</div>
+	</div></form>
+	<br><br>
+</div>
+</div>
+<br><br>
+{% endblock %}
