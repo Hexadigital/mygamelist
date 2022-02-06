@@ -71,7 +71,7 @@ class TagAdditionRequestForm(forms.ModelForm):
 		model = TagAdditionRequest
 		fields = ['tag', 'comments']
 
-class AddCustomListForm(forms.ModelForm):
+class CustomListForm(forms.ModelForm):
 	class Meta:
 		model = CustomList
 		fields = ['name', 'privacy_level']

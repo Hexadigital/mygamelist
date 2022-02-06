@@ -12,6 +12,7 @@
 			<h3>Edit Your Custom Lists</h3>
 			{% for list in lists %}
 			<a class="gamelink" href="{% url 'games:customlist' list.id %}">{{ list.name }}</a> ({{ list.games.count }}) 
+			<a href="{% url 'games:editcustomlist' list.id %}">&#x2699;</a>
 			<a href="{% url 'games:deletecustomlist' list.id %}">&#x1F5D1;</a><br>
 			{% endfor %}
 			<br>
