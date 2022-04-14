@@ -302,6 +302,8 @@ def GameView(request, game_id, name=None):
         if entry.score is not None:
             user_scores.append(entry.score * 10)
         user_counts[entry.status] += 1
+    if 'watch?v=' in game.trailer_link:
+        game.trailer_link = game.trailer_link.split("watch?v=")[1]
     if len(user_scores) > 0:
         return render(request, 'games/game_detail.html', {'game': game, 'user_score':sum(user_scores)/len(user_scores), 'users_rated':len(user_scores), 'user_counts':user_counts, 'game_entry': game_entry, 'regular_collections':regular_collections, 'user_collections':user_collections, 'stubbed':stubbed, 'ignored':ignored})
     else:
