@@ -10,6 +10,16 @@ def random_cover_filename(instance, filename):
     filename = '{}.{}'.format(uuid4().hex, ext)
     return 'covers/' + filename
 
+def random_banner_filename(instance, filename):
+    ext = filename.split('.')[-1]
+    filename = '{}.{}'.format(uuid4().hex, ext)
+    return 'banners/' + filename
+
+def random_background_filename(instance, filename):
+    ext = filename.split('.')[-1]
+    filename = '{}.{}'.format(uuid4().hex, ext)
+    return 'backgrounds/' + filename
+
 def random_screen_filename(instance, filename):
     ext = filename.split('.')[-1]
     filename = '{}.{}'.format(uuid4().hex, ext)
@@ -51,6 +61,7 @@ class Game(models.Model):
     year = models.IntegerField()
     trailer_link = models.URLField(max_length=250, blank=True, default='')
     image = models.ImageField(upload_to=random_cover_filename, null=True)
+    background = models.ImageField(upload_to=random_background_filename, null=True, blank=True)
     screen1 = models.ImageField(upload_to=random_screen_filename, null=True, blank=True)
     screen2 = models.ImageField(upload_to=random_screen_filename, null=True, blank=True)
     screen3 = models.ImageField(upload_to=random_screen_filename, null=True, blank=True)
