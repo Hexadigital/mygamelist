@@ -22,11 +22,11 @@ def IndexView(request):
             banned_tags = [x.id for x in user_profile.banned_tags.all()]
             followed_users = [x.id for x in user_profile.followed_users.all()]
             followed_users.append(request.user.id)
-            status_list = UserGameStatus.objects.filter(user__in=followed_users).order_by('-id')
+            status_list = UserGameStatus.objects.filter(user__in=followed_users).prefetch_related('game').prefetch_related('liked_by').prefetch_related('user__userprofile').order_by('-id')
         except UserProfile.DoesNotExist:
-            status_list = UserGameStatus.objects.filter(user=request.user).order_by('-id')
+            status_list = UserGameStatus.objects.filter(user=request.user).prefetch_related('game').prefetch_related('liked_by').prefetch_related('user__userprofile').order_by('-id')
     else:
-        status_list = UserGameStatus.objects.order_by('-id')
+        status_list = UserGameStatus.objects.prefetch_related('game').prefetch_related('liked_by').prefetch_related('user__userprofile').order_by('-id')
     latest_games = Game.objects.exclude(tags__in=banned_tags).order_by('-id')[:8]
     #popular_games = UserGameStatus.objects.exclude(tags__in=banned_tags).values("game", "game__image", "game__name").filter(created_at__lte=datetime.datetime.today(), created_at__gt=datetime.datetime.today()-datetime.timedelta(days=30)).annotate(count=Count('game')).order_by("-count")[:8]
     page = request.GET.get('page', 1)
@@ -124,7 +124,7 @@ def GameListRandomView(request):
 
 def ProfileView(request, user_id, name=None, tab=None):
     try:
-        selected_user = User.objects.get(id=user_id)
+        selected_user = User.objects.prefetch_related('userprofile__followed_users__userprofile').get(id=user_id)
     except User.DoesNotExist:
         raise Http404
     followed = False
@@ -138,7 +138,7 @@ def ProfileView(request, user_id, name=None, tab=None):
             pass
     # Activity
     if tab is None or tab == 'activity':
-        status_list = UserGameStatus.objects.filter(user=user_id).order_by('-id')
+        status_list = UserGameStatus.objects.filter(user=user_id).prefetch_related('game').prefetch_related('user__userprofile').order_by('-id')
         page = request.GET.get('page', 1)
 
         paginator = Paginator(status_list, 25)
@@ -158,8 +158,8 @@ def ProfileView(request, user_id, name=None, tab=None):
             "PLAN":"Plan to Play",
             "IMPT": "Imported"
         }
-        game_list = UserGameListEntry.objects.filter(user=user_id)
-        manual_list = ManualUserGameListEntry.objects.filter(user=user_id)
+        game_list = UserGameListEntry.objects.prefetch_related('platform').prefetch_related('game').filter(user=user_id)
+        manual_list = ManualUserGameListEntry.objects.prefetch_related('platform').filter(user=user_id)
         total_list = {"Playing": {}, "Completed": {}, "Paused": {}, "Dropped": {}, "Plan to Play": {}, "Imported": {}}
         for entry in game_list:
             total_list[status_conversion[entry.status]][entry.game.name] = {'game_id': entry.game.id, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed}
@@ -178,7 +178,7 @@ def ProfileView(request, user_id, name=None, tab=None):
 
         return render(request, 'games/profile.html', {'selected_user': selected_user, 'followed': followed, 'tab': tab, 'total_list': total_list, 'profile_score_type': profile_score_type})
     elif tab == "social":
-        followed_by = User.objects.filter(userprofile__followed_users=selected_user).all()
+        followed_by = User.objects.prefetch_related('userprofile').filter(userprofile__followed_users=selected_user).all()
         return render(request, 'games/profile.html', {'selected_user': selected_user, 'followed': followed, 'followed_by': followed_by, 'tab': tab})
     elif tab == "stats":
         return render(request, 'games/profile.html', {'selected_user': selected_user, 'followed': followed, 'tab': tab})
@@ -264,7 +264,7 @@ def GameView(request, game_id, name=None):
         "IMPT": "Imported"
     }
     try:
-        game = Game.objects.get(id=game_id)
+        game = Game.objects.prefetch_related('genres').prefetch_related('tags').get(id=game_id)
     except Game.DoesNotExist:
         raise Http404
 
@@ -273,16 +273,17 @@ def GameView(request, game_id, name=None):
         user_profile = UserProfile.objects.get(user=request.user)
         banned_tags = [x.id for x in user_profile.banned_tags.all()]
 
-    for tag_id in [x.id for x in game.tags.all()]:
+    game_tags = game.tags.all()
+    for tag_id in [x.id for x in game_tags]:
         if tag_id in banned_tags:
             return render(request, 'games/error_message.html', {'error':'This game has one or more of your ignored tags!', 'suberror':'You can edit your ignored tags via your settings.'})
 
     user_col_type = CollectionType.objects.get(name='User')
-    regular_collections = Collection.objects.exclude(category=user_col_type).filter(games=game).order_by('category', 'name')
-    user_collections = Collection.objects.filter(category=user_col_type).filter(games=game).order_by('category', 'name')
+    regular_collections = Collection.objects.prefetch_related('category').exclude(category=user_col_type).filter(games=game).order_by('category', 'name')
+    user_collections = Collection.objects.prefetch_related('category').filter(category=user_col_type).filter(games=game).order_by('category', 'name')
 
     stubbed = False
-    if len(game.tags.all()) < 5:
+    if len(game_tags) < 5:
         stubbed = True
 
     game_entries = UserGameListEntry.objects.filter(game=game)
@@ -333,9 +334,9 @@ def BrowseView(request):
 def BrowseCollectionView(request):
     query = request.GET.get('search')
     if query:
-        collection_list = Collection.objects.filter(Q(name__icontains=query)).order_by('-id')
+        collection_list = Collection.objects.filter(Q(name__icontains=query)).prefetch_related('games').prefetch_related('category').order_by('-id')
     else:
-        collection_list = Collection.objects.order_by('-id')
+        collection_list = Collection.objects.prefetch_related('games').prefetch_related('category').order_by('-id')
     page = request.GET.get('page', 1)
 
     paginator = Paginator(collection_list, 25)
@@ -350,9 +351,9 @@ def BrowseCollectionView(request):
 def BrowseUserView(request):
     query = request.GET.get('search')
     if query:
-        user_list = User.objects.filter(Q(name__icontains=query)).order_by('-id')
+        user_list = User.objects.filter(Q(name__icontains=query)).prefetch_related('userprofile').order_by('-id')
     else:
-        user_list = User.objects.order_by('-id')
+        user_list = User.objects.prefetch_related('userprofile').order_by('-id')
     page = request.GET.get('page', 1)
 
     paginator = Paginator(user_list, 25)
@@ -377,8 +378,8 @@ def GameListView(request, edit_type=None, entry_id=None):
     user_id = request.user.id
     # Viewing list
     if edit_type is None:
-        game_list = UserGameListEntry.objects.filter(user=user_id)
-        manual_list = ManualUserGameListEntry.objects.filter(user=user_id)
+        game_list = UserGameListEntry.objects.filter(user=user_id).prefetch_related('platform').prefetch_related('game')
+        manual_list = ManualUserGameListEntry.objects.filter(user=user_id).prefetch_related('platform')
         total_list = {"Playing": {}, "Completed": {}, "Paused": {}, "Dropped": {}, "Plan to Play": {}, "Imported": {}}
         for entry in game_list:
             total_list[status_conversion[entry.status]][entry.game.name] = {'id': entry.game.id, 'game_id': entry.game.id, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed, 'edit_type': 'edit', 'delete_type': 'delete'}
