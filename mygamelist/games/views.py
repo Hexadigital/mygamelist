@@ -333,9 +333,9 @@ def BrowseView(request):
 def BrowseCollectionView(request):
     query = request.GET.get('search')
     if query:
-        collection_list = Collection.objects.filter(Q(name__icontains=query)).order_by('-id')
+        collection_list = Collection.objects.filter(Q(name__icontains=query)).prefetch_related('games').prefetch_related('category').order_by('-id')
     else:
-        collection_list = Collection.objects.order_by('-id')
+        collection_list = Collection.objects.prefetch_related('games').prefetch_related('category').order_by('-id')
     page = request.GET.get('page', 1)
 
     paginator = Paginator(collection_list, 25)
@@ -350,9 +350,9 @@ def BrowseCollectionView(request):
 def BrowseUserView(request):
     query = request.GET.get('search')
     if query:
-        user_list = User.objects.filter(Q(name__icontains=query)).order_by('-id')
+        user_list = User.objects.filter(Q(name__icontains=query)).prefetch_related('userprofile').order_by('-id')
     else:
-        user_list = User.objects.order_by('-id')
+        user_list = User.objects.prefetch_related('userprofile').order_by('-id')
     page = request.GET.get('page', 1)
 
     paginator = Paginator(user_list, 25)
