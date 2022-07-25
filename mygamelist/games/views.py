@@ -377,8 +377,8 @@ def GameListView(request, edit_type=None, entry_id=None):
     user_id = request.user.id
     # Viewing list
     if edit_type is None:
-        game_list = UserGameListEntry.objects.filter(user=user_id)
-        manual_list = ManualUserGameListEntry.objects.filter(user=user_id)
+        game_list = UserGameListEntry.objects.filter(user=user_id).prefetch_related('platform').prefetch_related('game')
+        manual_list = ManualUserGameListEntry.objects.filter(user=user_id).prefetch_related('platform')
         total_list = {"Playing": {}, "Completed": {}, "Paused": {}, "Dropped": {}, "Plan to Play": {}, "Imported": {}}
         for entry in game_list:
             total_list[status_conversion[entry.status]][entry.game.name] = {'id': entry.game.id, 'game_id': entry.game.id, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed, 'edit_type': 'edit', 'delete_type': 'delete'}
