@@ -97,7 +97,7 @@
 											<div class="col">
 												<div class="card-header d-flex justify-content-between">
 													<a class="gamelink" href="{% url 'games:profile' activity.user.id activity.user.username|slugify %}"> <img class="rounded" src="{{ activity.user.userprofile.avatar.url }}" style="max-width: 40px; height: 40px; margin-right:10px;">{{ activity.user.username }}</a>
-													{{ activity.created_at|naturaltime }}
+													<div>{{ activity.created_at|naturaltime }}{% if activity.user.id == user.id %} <a href="{% url 'games:deletestatus' activity.id %}">&#x1F5D1;</a>{% endif %}</div>
 												</div>
 												<div class="card-body">
 													<p class="card-text">
