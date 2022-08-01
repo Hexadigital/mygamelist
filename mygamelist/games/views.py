@@ -692,6 +692,17 @@ def DeleteCustomListView(request, list_id):
     return render(request, 'games/delete_custom_list.html', {'list_id':list_id, 'name':clist.name})
 
 @login_required(login_url='/login/')
+def DeleteStatusView(request, status_id):
+    try:
+        activitystatus = UserGameStatus.objects.prefetch_related('game').get(id=status_id, user=request.user)
+    except UserGameStatus.DoesNotExist:
+        raise Http404
+    if request.method == 'POST':
+        activitystatus.delete()
+        return HttpResponseRedirect('/')
+    return render(request, 'games/delete_status.html', {'status_id':status_id, 'name':activitystatus.game.name})
+
+@login_required(login_url='/login/')
 def TagAdditionRequestView(request, game_id):
     try:
         game = Game.objects.get(id=game_id)
