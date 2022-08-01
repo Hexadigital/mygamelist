@@ -26,6 +26,7 @@ urlpatterns = [
     path('register/', views.register, name='register'),
     path('gamelist/', views.GameListView, name='gamelist'),
     path('gamelist/random', views.GameListRandomView, name='gamelistrandom'),
+    path('gamelist/export', views.GameListExportView, name='gamelistexport'),
     path('gamelist/<str:edit_type>', views.GameListView, name='gamelist'),
     path('gamelist/<str:edit_type>/<int:entry_id>', views.GameListView, name='gamelist'),
     path('browse/', views.BrowseView, name='browse'),

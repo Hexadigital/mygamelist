@@ -552,6 +552,26 @@ def GameListView(request, edit_type=None, entry_id=None):
         raise Http404
 
 @login_required(login_url='/login/')
+def GameListExportView(request):
+    status_conversion = {
+        "PLAY":"Playing",
+        "CMPL":"Completed",
+        "HOLD":"Paused",
+        "DROP":"Dropped",
+        "PLAN":"Plan to Play",
+        "IMPT": "Imported"
+    }
+    user_id = request.user.id
+    game_list = UserGameListEntry.objects.filter(user=user_id).prefetch_related('platform').prefetch_related('game')
+    manual_list = ManualUserGameListEntry.objects.filter(user=user_id).prefetch_related('platform')
+    total_list = []
+    for entry in game_list:
+        total_list.append({'name': entry.game.name, 'status':status_conversion[entry.status], 'platform': (None if entry.platform is None else entry.platform.name), 'score': (None if entry.score is None else str(entry.score)), 'hours': (None if entry.hours is None else str(entry.hours)), 'comments': entry.comments, 'start_date': (None if entry.start_date is None else str(entry.start_date)), 'stop_date': (None if entry.stop_date is None else str(entry.stop_date)), 'times_replayed': entry.times_replayed})
+    for entry in manual_list:
+        total_list.append({'name': entry.name, 'status':status_conversion[entry.status], 'platform': (None if entry.platform is None else entry.platform.name), 'score': (None if entry.score is None else str(entry.score)), 'hours': (None if entry.hours is None else str(entry.hours)), 'comments': entry.comments, 'start_date': (None if entry.start_date is None else str(entry.start_date)), 'stop_date': (None if entry.stop_date is None else str(entry.stop_date)), 'times_replayed': entry.times_replayed})
+    return HttpResponse(json.dumps(total_list), content_type='application/json')
+
+@login_required(login_url='/login/')
 def NotificationsView(request, action=''):
     notification_list = Notification.objects.filter(user=request.user).order_by('-id')
     if action == "clear":

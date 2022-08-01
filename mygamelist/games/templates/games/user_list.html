@@ -26,7 +26,7 @@
 {% block content %}
 <div class="container">
 	<br>
-	<center><a href="{% url 'games:gamelist' 'add-manual' %}" class="gamelink">Add Game Manually</a> | <a href="{% url 'games:gamelistrandom' %}" class="gamelink">Random Plan to Play</a> | <a href="{% url 'games:recommendations' %}" class="gamelink">Recommendations</a></center><br>
+	<center><a href="{% url 'games:gamelist' 'add-manual' %}" class="gamelink">Add Game Manually</a> | <a href="{% url 'games:gamelistexport' %}" class="gamelink">Export List</a> | <a href="{% url 'games:gamelistrandom' %}" class="gamelink">Random Plan to Play</a> | <a href="{% url 'games:recommendations' %}" class="gamelink">Recommendations</a></center><br>
 	<div class="row">
 		{% for status, game_list in total_list.items %}
 			<table class="table table-hover table-striped table-dark" style="text-align: center;">
