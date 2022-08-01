@@ -120,7 +120,10 @@ def GameListRandomView(request):
     for entry in manual_list:
         planning.append({'name':entry.name, 'platform':entry.platform, 'comments':entry.comments, 'id':None})
     
-    return render(request, 'games/random_from_list.html', random.choice(planning))
+    if len(planning) > 0:
+        return render(request, 'games/random_from_list.html', random.choice(planning))
+    else:
+        return render(request, 'games/random_from_list.html', {'name':None})
 
 def ProfileView(request, user_id, name=None, tab=None):
     try:

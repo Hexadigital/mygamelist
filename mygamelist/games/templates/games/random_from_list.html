@@ -28,10 +28,14 @@
 	<br>
 	<center>
 		<h1>The die is cast.</h1>
+		{% if name %}
 		<h3>{% if id %}<a class="gamelink" href="{% url 'games:game' id name|slugify %}">{% endif %}{{ name }}{% if id %}</a>{% endif %}</h3>
 		<i>{{ platform }}</i><br>
 		<br>
 		{% if comments %}{{ comments }}{% endif %}
+		{% else %}
+		<h3>You do not have anything in your plan to play!</h3>
+		{% endif %}
 	</center>
 </div>
 {% endblock %}
