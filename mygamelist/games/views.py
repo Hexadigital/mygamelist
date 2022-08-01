@@ -180,6 +180,9 @@ def ProfileView(request, user_id, name=None, tab=None):
             profile_score_type = None
 
         return render(request, 'games/profile.html', {'selected_user': selected_user, 'followed': followed, 'tab': tab, 'total_list': total_list, 'profile_score_type': profile_score_type})
+    elif tab == "clist":
+        lists = CustomList.objects.filter(user=selected_user, privacy_level='PUBL').order_by('name')
+        return render(request, 'games/profile.html', {'selected_user': selected_user, 'followed': followed, 'tab': tab, 'clists': lists})
     elif tab == "social":
         followed_by = User.objects.prefetch_related('userprofile').filter(userprofile__followed_users=selected_user).all()
         return render(request, 'games/profile.html', {'selected_user': selected_user, 'followed': followed, 'followed_by': followed_by, 'tab': tab})

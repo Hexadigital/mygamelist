@@ -47,6 +47,11 @@
 						</a>
 					</li>
 					<li class="nav-item">
+						<a href="{% url 'games:profile' selected_user.id selected_user.username|slugify 'clist' %}" class="nav-link{% if tab == 'clist' %} active{% endif %}">
+							<div class="nav-field">Custom Lists</div>
+						</a>
+					</li>
+					<li class="nav-item">
 						<a href="{% url 'games:profile' selected_user.id selected_user.username|slugify 'social' %}" class="nav-link{% if tab == 'social' %} active{% endif %}">
 							<div class="nav-field">Social</div>
 						</a>
@@ -158,6 +163,12 @@
 										</table>
 									{% endif %}
 								{% endfor %}
+							{% elif tab == 'clist' %}
+							<center>
+							{% for list in clists %}
+							<a class="gamelink" href="{% url 'games:customlist' list.id %}">{{ list.name }}</a> ({{ list.games.count }})<br>
+							{% endfor %}
+							</center>
 							{% elif tab == 'social' %}
 							<div class="alert alert-primary" role="alert">Following {{ selected_user.userprofile.followed_users.count }} user{% if selected_user.userprofile.followed_users.count != 1 %}s{% endif %}:</div>
 								{% for fuser in selected_user.userprofile.followed_users.all %}
