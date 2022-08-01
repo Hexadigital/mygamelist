@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Delete Status :: Remember.Games{% endblock %}
+
+{% block embedpreview %}
+	<meta name="twitter:card" content="summary" />
+	<meta name="twitter:title" content="Delete Status :: Remember Games" />
+	<meta name="twitter:description" content="Remember Games is a website you can use to track games you've played." />
+	<meta name="twitter:image" content="" />
+{% endblock %}
+
+{% block navitems %}
+	<li class="nav-item">
+	<a class="nav-link" href="/">Home</a>
+	</li>
+	<li class="nav-item">
+	<a class="nav-link active" href="{% url 'games:gamelist' %}">My Games</a>
+	</li>
+	<li class="nav-item">
+	<a class="nav-link" href="{% url 'games:browse' %}">Browse</a>
+	</li>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+	<br><br><br>
+	<div class="col-md-12" align="center">
+		<form action="{% url 'games:deletestatus' status_id %}" method="post">
+			{% csrf_token %}
+			<div class="fieldWrapper">
+				Are you sure you want to delete your status for <b>{{ name }}</b>?
+			</div><br>
+			<button class="btn btn-danger" type="submit">Delete</button>
+		</form>
+		<form action="{% url 'games:index' %}" method="get"><button class="btn btn-primary" type="submit">Cancel</button></form>
+	</div>
+</div>
+{% endblock %}

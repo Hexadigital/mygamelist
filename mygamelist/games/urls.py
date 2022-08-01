@@ -41,6 +41,7 @@ urlpatterns = [
     path('user/follow/<int:user_id>/', views.FollowUserView, name='follow'),
     path('status/like/', views.LikeStatusView, name='likestatus'),
     path('status/like/<int:status_id>/', views.LikeStatusView, name='likestatus'),
+    path('status/delete/<int:status_id>/', views.DeleteStatusView, name='deletestatus'),
     path('settings/', views.SettingsView, name='settings'),
     path('settings/avatar/', views.ChangeAvatarView, name='changeavatar'),
     path('settings/ignoredtags/', views.ChangeIgnoredTagsView, name='changeignoredtags'),
