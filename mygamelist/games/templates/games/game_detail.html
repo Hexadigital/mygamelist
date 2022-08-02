@@ -118,6 +118,7 @@ body {
 					</a>
 				</li>
 			</ul>
+			<br>
 			{% if not tab %}
 				<center>
 				{% if '.webm' in game.trailer_link %}
@@ -125,10 +126,10 @@ body {
 				{% elif game.trailer_link != '' %}
 				 <iframe width="100%" height="400" src="https://www.youtube.com/embed/{{ game.trailer_link }}"></iframe> 
 				{% endif %}
-				{% if game.screen1 %}<img style="max-height:500px;max-width:24%;object-fit: contain;" src="{{ game.screen1.url }}" onclick="lightbox.init(this,220);">{% endif %}
-				{% if game.screen2 %}<img style="max-height:500px;max-width:24%;object-fit: contain;" src="{{ game.screen2.url }}" onclick="lightbox.init(this,220);">{% endif %}
-				{% if game.screen3 %}<img style="max-height:500px;max-width:24%;object-fit: contain;" src="{{ game.screen3.url }}" onclick="lightbox.init(this,220);">{% endif %}
-				{% if game.screen4 %}<img style="max-height:500px;max-width:24%;object-fit: contain;" src="{{ game.screen4.url }}" onclick="lightbox.init(this,220);">{% endif %}
+				{% if game.screen1 %}<a href="{{ game.screen1.url }}" target="_blank"><img data-fancybox="gallery" style="max-height:500px;max-width:24%;object-fit: contain;" src="{{ game.screen1.url }}"></a>{% endif %}
+				{% if game.screen2 %}<a href="{{ game.screen2.url }}" target="_blank"><img data-fancybox="gallery" style="max-height:500px;max-width:24%;object-fit: contain;" src="{{ game.screen2.url }}"></a>{% endif %}
+				{% if game.screen3 %}<a href="{{ game.screen3.url }}" target="_blank"><img data-fancybox="gallery" style="max-height:500px;max-width:24%;object-fit: contain;" src="{{ game.screen3.url }}"></a>{% endif %}
+				{% if game.screen4 %}<a href="{{ game.screen4.url }}" target="_blank"><img data-fancybox="gallery" style="max-height:500px;max-width:24%;object-fit: contain;" src="{{ game.screen4.url }}"></a>{% endif %}
 				<br><br>
 				<h4>
 					<span class="badge badge-secondary">Planning<br>{{ user_counts.PLAN }}</span>
