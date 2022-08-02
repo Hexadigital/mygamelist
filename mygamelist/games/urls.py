@@ -19,6 +19,7 @@ urlpatterns = [
     path('platform/<int:pk>/<str:name>/', views.PlatformView.as_view(), name='platform'),
     path('game/<int:game_id>/', views.GameView, name='game'),
     path('game/<int:game_id>/<str:name>/', views.GameView, name='game'),
+    path('game/<int:game_id>/<str:name>/<str:tab>/', views.GameView, name='game'),
     path('user/<int:user_id>/', views.ProfileView, name='profile'),
     path('user/<int:user_id>/<str:name>/', views.ProfileView, name='profile'),
     path('user/<int:user_id>/<str:name>/<str:tab>/', views.ProfileView, name='profile'),

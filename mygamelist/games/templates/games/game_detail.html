@@ -35,6 +35,7 @@ body {
 {% endblock %}
 
 {% block content %}
+{% firstof game.name|slugify '_' as gameslug %}
 <div class="container firstrow">
 	<div class="row justify-content-md-center">
 		<div class="col-md-12" align="center">
@@ -45,17 +46,6 @@ body {
 		<div class="col-md-4" align="center">
 			<img style="max-height:400px;max-width:100%;" src="{{ game.image.url }}"><br>
 			<br>
-		</div>
-		<div class="col-md-8 align-self-center">
-			{% if '.webm' in game.trailer_link %}
-			<video style="max-width:100%; max-height:400px" controls><source src="{{ game.trailer_link }}" type="video/webm" />Your browser does not support WEBM.</video>
-			{% elif game.trailer_link != '' %}
-			 <iframe width="100%" height="400" src="https://www.youtube.com/embed/{{ game.trailer_link }}"></iframe> 
-			{% else %}
-			<img style="max-height:400px;max-width:100%;" src="{% static 'no_trailer.png' %}"><br>
-			{% endif %}
-		</div>
-		<div class="col-md-4" align="center">
 			<blockquote class="blockquote">
 				{% if not game_entry %}
 					<a class="btn btn-primary" role="button" href="{% url 'games:gamelist' 'edit' game.id %}">Add to List</a> <a role="button" href="{% url 'games:ignore' game.id %}" class="btn btn-{% if ignored %}dark">Unignore{% else %}secondary">Ignore{% endif %}</a>
@@ -115,24 +105,129 @@ body {
 					<small class="text-muted">May contain spoilers</small><br>
 			</blockquote>
 		</div>
-		<div class="col-md-8" align="center">
-			{% if game.screen1 %}<img style="max-height:500px;max-width:24%;object-fit: contain;" src="{{ game.screen1.url }}" onclick="lightbox.init(this,220);">{% endif %}
-			{% if game.screen2 %}<img style="max-height:500px;max-width:24%;object-fit: contain;" src="{{ game.screen2.url }}" onclick="lightbox.init(this,220);">{% endif %}
-			{% if game.screen3 %}<img style="max-height:500px;max-width:24%;object-fit: contain;" src="{{ game.screen3.url }}" onclick="lightbox.init(this,220);">{% endif %}
-			{% if game.screen4 %}<img style="max-height:500px;max-width:24%;object-fit: contain;" src="{{ game.screen4.url }}" onclick="lightbox.init(this,220);">{% endif %}
-			<br><br>
-			<h4>
-				<span class="badge badge-secondary">Planning<br>{{ user_counts.PLAN }}</span>
-				<span class="badge badge-primary">Playing<br>{{ user_counts.PLAY }}</span>
-				<span class="badge badge-success">Completed<br>{{ user_counts.CMPL }}</span>
-				<span class="badge badge-warning">On Hold<br>{{ user_counts.HOLD }}</span>
-				<span class="badge badge-danger">Dropped<br>{{ user_counts.DROP }}</span>
-			</h4>
-			<p>{{ game.description }}</p>
-			In {{ regular_collections|length }} collection(s):<br>
-			{% for collection in regular_collections %}
-			<a href="{% url 'games:collection' collection.id %}" class="gamelink">{{ collection }}</a><br>
-			{% endfor %}
+		<div class="col-md-8 align-center">
+			<ul class="profile-header-tab nav nav-tabs nav-tabs-v2">
+				<li class="nav-item">
+					<a href="{% url 'games:game' game.id gameslug %}" class="nav-link{% if not tab %} active{% endif %}">
+						<div class="nav-field">Overview</div>
+					</a>
+				</li>
+				<li class="nav-item">
+					<a href="{% url 'games:game' game.id gameslug 'social' %}" class="nav-link{% if tab == 'social' %} active{% endif %}">
+						<div class="nav-field">Social</div>
+					</a>
+				</li>
+			</ul>
+			{% if not tab %}
+				<center>
+				{% if '.webm' in game.trailer_link %}
+				<video style="max-width:100%; max-height:400px" controls><source src="{{ game.trailer_link }}" type="video/webm" />Your browser does not support WEBM.</video>
+				{% elif game.trailer_link != '' %}
+				 <iframe width="100%" height="400" src="https://www.youtube.com/embed/{{ game.trailer_link }}"></iframe> 
+				{% endif %}
+				{% if game.screen1 %}<img style="max-height:500px;max-width:24%;object-fit: contain;" src="{{ game.screen1.url }}" onclick="lightbox.init(this,220);">{% endif %}
+				{% if game.screen2 %}<img style="max-height:500px;max-width:24%;object-fit: contain;" src="{{ game.screen2.url }}" onclick="lightbox.init(this,220);">{% endif %}
+				{% if game.screen3 %}<img style="max-height:500px;max-width:24%;object-fit: contain;" src="{{ game.screen3.url }}" onclick="lightbox.init(this,220);">{% endif %}
+				{% if game.screen4 %}<img style="max-height:500px;max-width:24%;object-fit: contain;" src="{{ game.screen4.url }}" onclick="lightbox.init(this,220);">{% endif %}
+				<br><br>
+				<h4>
+					<span class="badge badge-secondary">Planning<br>{{ user_counts.PLAN }}</span>
+					<span class="badge badge-primary">Playing<br>{{ user_counts.PLAY }}</span>
+					<span class="badge badge-success">Completed<br>{{ user_counts.CMPL }}</span>
+					<span class="badge badge-warning">On Hold<br>{{ user_counts.HOLD }}</span>
+					<span class="badge badge-danger">Dropped<br>{{ user_counts.DROP }}</span>
+				</h4>
+				<p>{{ game.description }}</p>
+				In {{ regular_collections|length }} collection(s):<br>
+				{% for collection in regular_collections %}
+				<a href="{% url 'games:collection' collection.id %}" class="gamelink">{{ collection }}</a><br>
+				{% endfor %}
+				</center>
+			{% elif tab == 'social' %}
+			<div class="container">
+				<div class="row justify-content-md-center">
+					<div class="col-md-6 align-center">
+						<center><h4>Recent Activity</h4></center>
+						{% for activity in recent_statuses %}
+						<div class="text-white bg-dark mb-3 rounded" style="max-width: 100%">
+							<div class="row align-items-center">
+								<div class="col">
+									<div class="card-header d-flex justify-content-between container-fluid">
+										<a class="gamelink" href="{% url 'games:profile' activity.user.id activity.user.username|slugify %}"> <img class="rounded" src="{{ activity.user.userprofile.avatar.url }}" style="max-width: 40px; height: 40px; margin-right:10px;">{{ activity.user.username }}</a>
+									</div>
+									<div class="card-body">
+										<div class="card-text">
+											<center>
+											{% if activity.status == "PLAN" %}
+												Planned to play 
+											{% elif activity.status == "PLAY" %}
+												Started playing 
+											{% elif activity.status == "CMPL" %}
+												Completed
+											{% elif activity.status == "DROP" %}
+												Dropped 
+											{% elif activity.status == "HOLD" %}
+												Paused 
+											{% endif %} {{ activity.created_at|naturaltime }}
+											</center>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						{% endfor %}
+					</div>
+					<div class="col-md-6 align-center">
+						<center><h4>Following</h4></center>
+						{% for entry in following_entries %}
+						<div class="text-white bg-dark mb-3 rounded" style="max-width: 100%">
+							<div class="row align-items-center">
+								<div class="col">
+									<div class="card-header d-flex justify-content-between container-fluid">
+										<a class="gamelink" href="{% url 'games:profile' entry.user.id entry.user.username|slugify %}"> <img class="rounded" src="{{ entry.user.userprofile.avatar.url }}" style="max-width: 40px; height: 40px; margin-right:10px;">{{ entry.user.username }}</a>
+									</div>
+									<div class="card-body">
+										<div class="card-text d-flex justify-content-between">
+											<div>
+											{% if entry.status == "PLAN" %}
+												Planning 
+											{% elif entry.status == "PLAY" %}
+												Playing 
+											{% elif entry.status == "CMPL" %}
+												Completed 
+											{% elif entry.status == "DROP" %}
+												Dropped 
+											{% elif entry.status == "HOLD" %}
+												Paused 
+											{% endif %}
+											</div>
+											<div>
+												{% if entry.user.usersettings.score_type == 'SMIL' %}
+													{% if entry.score >= 7.0 %}
+														<img src="{% static 'icons/happy.svg' %}" style="max-height:25px;">
+													{% elif entry.score < 7.0 and entry.score >= 5.0 %}
+														<img src="{% static 'icons/neutral.svg' %}" style="max-height:25px;">
+													{% elif entry.score < 5.0 %}
+														<img src="{% static 'icons/sad.svg' %}" style="max-height:25px;">
+													{% else %}
+														<img src="{% static 'icons/circle.svg' %}" style="max-height:25px;">
+													{% endif %}
+												{% else %}
+													{% if entry.score != None %}
+														{{ entry.score }}
+													{% endif %}
+												{% endif %}
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						{% endfor %}
+					</div>
+				</div>
+			</div>
+			{% endif %}
 		</div>
 	</div>
 </div>

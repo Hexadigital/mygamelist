@@ -260,7 +260,7 @@ def FollowUserView(request, user_id):
         print(e)
     return HttpResponseRedirect('/user/' + str(req_user.id))
 
-def GameView(request, game_id, name=None):
+def GameView(request, game_id, name=None, tab=None):
     status_conversion = {
         "PLAY":"Playing",
         "CMPL":"Completed",
@@ -284,15 +284,7 @@ def GameView(request, game_id, name=None):
         if tag_id in banned_tags:
             return render(request, 'games/error_message.html', {'error':'This game has one or more of your ignored tags!', 'suberror':'You can edit your ignored tags via your settings.'})
 
-    user_col_type = CollectionType.objects.get(name='User')
-    regular_collections = Collection.objects.prefetch_related('category').exclude(category=user_col_type).filter(games=game).order_by('category', 'name')
-    user_collections = Collection.objects.prefetch_related('category').filter(category=user_col_type).filter(games=game).order_by('category', 'name')
-
-    stubbed = False
-    if len(game_tags) < 5:
-        stubbed = True
-
-    game_entries = UserGameListEntry.objects.filter(game=game)
+    # Fetch user-specific information for left sidebar
     game_entry = None
     ignored = False
     if request.user.is_authenticated:
@@ -303,18 +295,52 @@ def GameView(request, game_id, name=None):
             game_entry.status = status_conversion[game_entry.status]
         except UserGameListEntry.DoesNotExist:
             game_entry = None
+
+    # Fetch general information for left sidebar
+    game_entries = UserGameListEntry.objects.filter(game=game)
     user_scores = []
     user_counts = {'PLAN':0, 'PLAY':0, 'CMPL':0, 'HOLD':0, 'DROP':0, 'IMPT':0}
     for entry in game_entries:
         if entry.score is not None:
             user_scores.append(entry.score * 10)
         user_counts[entry.status] += 1
-    if 'watch?v=' in game.trailer_link:
-        game.trailer_link = game.trailer_link.split("watch?v=")[1]
     if len(user_scores) > 0:
-        return render(request, 'games/game_detail.html', {'game': game, 'user_score':sum(user_scores)/len(user_scores), 'users_rated':len(user_scores), 'user_counts':user_counts, 'game_entry': game_entry, 'regular_collections':regular_collections, 'user_collections':user_collections, 'stubbed':stubbed, 'ignored':ignored})
+        user_score = sum(user_scores)/len(user_scores)
+        users_rated = len(user_scores)
     else:
-        return render(request, 'games/game_detail.html', {'game': game, 'user_score':None, 'users_rated':0, 'user_counts':user_counts, 'game_entry': game_entry, 'regular_collections':regular_collections, 'user_collections':user_collections, 'stubbed':stubbed, 'ignored':ignored})
+        user_score = None
+        users_rated = 0
+
+
+    # Determine whether or not this page still needs tags
+    stubbed = False
+    if len(game_tags) < 5:
+        stubbed = True
+
+    # Overview tab
+    if tab is None:
+        user_col_type = CollectionType.objects.get(name='User')
+        regular_collections = Collection.objects.prefetch_related('category').exclude(category=user_col_type).filter(games=game).order_by('category', 'name')
+        user_collections = Collection.objects.prefetch_related('category').filter(category=user_col_type).filter(games=game).order_by('category', 'name')
+
+        if 'watch?v=' in game.trailer_link:
+            game.trailer_link = game.trailer_link.split("watch?v=")[1]
+        return render(request, 'games/game_detail.html', {'game': game, 'user_score':user_score, 'users_rated':users_rated, 'user_counts':user_counts, 'game_entry': game_entry, 'regular_collections':regular_collections, 'user_collections':user_collections, 'stubbed':stubbed, 'ignored':ignored, 'tab':tab})
+    # Social tab
+    elif tab == 'social':
+        # Find recent activity
+        recent_statuses = UserGameStatus.objects.filter(game=game).prefetch_related('liked_by').prefetch_related('user__userprofile').order_by('-id')[:8]
+        # Find list entries from followed users
+        if request.user.is_authenticated:
+            followed_users = [x.id for x in user_profile.followed_users.all()]
+            followed_users.append(request.user.id)
+            following_entries = UserGameListEntry.objects.filter(user__in=followed_users).prefetch_related('user__userprofile').prefetch_related('user__usersettings').filter(game=game).order_by('user__username')
+        else:
+            following_entries = []
+        return render(request, 'games/game_detail.html', {'game': game, 'user_score':user_score, 'users_rated':users_rated, 'user_counts':user_counts, 'game_entry': game_entry, 'recent_statuses': recent_statuses, 'following_entries': following_entries, 'stubbed':stubbed, 'ignored':ignored, 'tab':tab})
+    # Tab does not exist
+    else:
+        raise Http404
 
 def BrowseView(request):
     banned_tags = [Tag.objects.get(name="Sexual Content").id]
