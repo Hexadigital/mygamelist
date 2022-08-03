@@ -9,6 +9,7 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Count, Q
+from django.utils.http import is_safe_url
 
 from .models import Game, Genre, Platform, Tag, User, UserGameListEntry, ManualUserGameListEntry, UserGameStatus
 from .models import UserGameStatus, Notification, Recommendation, Collection, CollectionType, UserProfile, UserSettings, TagAdditionRequest, CustomList
@@ -408,6 +409,12 @@ def GameListView(request, edit_type=None, entry_id=None):
         "IMPT": "Imported"
     }
     user_id = request.user.id
+    if 'next' in request.GET.keys():
+        next_url = request.GET['next']
+    elif 'next' in request.POST.keys():
+        next_url = request.POST['next']
+    else:
+        next_url = None
     # Viewing list
     if edit_type is None:
         game_list = UserGameListEntry.objects.filter(user=user_id).prefetch_related('platform').prefetch_related('game')
@@ -506,9 +513,7 @@ def GameListView(request, edit_type=None, entry_id=None):
                 pass
             # create a form instance and populate it with data from the request:
             form = GameEntryForm(request.POST)
-            # check whether it's valid:
-            print(form.is_valid())
-            print(form.errors)
+            # check whether it's valid
             if form.is_valid():
                 # Update entry
                 if (game_entry.status != form.cleaned_data['status']) or new:
@@ -544,10 +549,13 @@ def GameListView(request, edit_type=None, entry_id=None):
                 # Add anything that has been checked
                 for clist in CustomList.objects.filter(user=request.user, id__in=lists_to_add):
                     clist.games.add(game)
-                return HttpResponseRedirect('/game/' + str(game.id))
+                if next_url is not None and next_url.startswith('/') and is_safe_url(next_url, None):
+                    return HttpResponseRedirect(next_url)
+                else:
+                    return HttpResponseRedirect('/game/' + str(game.id))
         else:
             form = ManualGameForm()
-        return render(request, 'games/edit_game_entry.html', {'form': form, 'game_id': entry_id, 'game_entry': game_entry, 'custom_lists': custom_lists, 'lists_used': lists_used})
+        return render(request, 'games/edit_game_entry.html', {'form': form, 'game_id': entry_id, 'game_entry': game_entry, 'custom_lists': custom_lists, 'lists_used': lists_used, 'next': next_url})
     elif edit_type == 'add-manual':
         if request.method == 'POST':
             # create a form instance and populate it with data from the request:
