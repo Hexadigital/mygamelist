@@ -29,7 +29,7 @@ def IndexView(request):
     else:
         status_list = UserGameStatus.objects.prefetch_related('game').prefetch_related('liked_by').prefetch_related('user__userprofile').order_by('-id')
     latest_games = Game.objects.exclude(tags__in=banned_tags).order_by('-id')[:8]
-    #popular_games = UserGameStatus.objects.exclude(tags__in=banned_tags).values("game", "game__image", "game__name").filter(created_at__lte=datetime.datetime.today(), created_at__gt=datetime.datetime.today()-datetime.timedelta(days=30)).annotate(count=Count('game')).order_by("-count")[:8]
+    popular_games = UserGameStatus.objects.prefetch_related('game').exclude(game__tags__in=banned_tags).values("game", "game__image", "game__name").filter(created_at__lte=datetime.datetime.today(), created_at__gt=datetime.datetime.today()-datetime.timedelta(days=7)).annotate(count=Count('game')).order_by("-count")[:8]
     page = request.GET.get('page', 1)
 
     paginator = Paginator(status_list, 25)
@@ -39,7 +39,7 @@ def IndexView(request):
         paginated_results = paginator.page(1)
     except EmptyPage:
         paginated_results = paginator.page(paginator.num_pages)
-    return render(request, 'games/index.html', {'activities': paginated_results, 'latest_games': latest_games})
+    return render(request, 'games/index.html', {'activities': paginated_results, 'latest_games': latest_games, 'popular_games': popular_games})
 
 def GamesTaggedWithView(request, tag_id, name=None):
     banned_tags = [Tag.objects.get(name="Sexual Content").id]

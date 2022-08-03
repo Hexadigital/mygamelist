@@ -77,6 +77,13 @@
 					<a href="{% url 'games:game' game.id gameslug %}"><img class="rounded" style="object-fit:cover;height:150px;width:23%;margin-top:5px;margin-bottom:5px;" src="{{ game.image.url }}"></a>
 				{% endfor %}
 			</div>
+			<div class="text-white bg-dark mb-3 rounded" style="max-width: 100%">
+				<div class="card-header justify-content-between">Recent Activity</div>
+				{% for status in popular_games %}
+					{% firstof status.game__name|slugify '_' as gameslug %}
+					<a href="{% url 'games:game' status.game gameslug %}"><img class="rounded" style="object-fit:cover;height:150px;width:23%;margin-top:5px;margin-bottom:5px;" src="/media/{{ status.game__image }}" title="{{ status.count }} recent activities"></a>
+				{% endfor %}
+			</div>
 		</div>
 		{% if not mobile %}
 		<div class="col-1" align="center"></div>
