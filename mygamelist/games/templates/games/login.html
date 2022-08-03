@@ -47,7 +47,7 @@
 					</tr>
 				</table>
 				<button class="btn btn-primary" type="submit">Login</button>
-				<input type="hidden" name="next" value="{% url 'games:index' %}">
+				<input type="hidden" name="next" value="{{ next }}">
 			</form>
 			Not registered? <a href="{% url 'games:register' %}">Create an account</a>
 			{% endif %}
