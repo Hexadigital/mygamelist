@@ -15,7 +15,7 @@ from .models import Game, Genre, Platform, Tag, User, UserGameListEntry, ManualU
 from .models import UserGameStatus, Notification, Recommendation, Collection, CollectionType, UserProfile, UserSettings, TagAdditionRequest, CustomList
 from .forms import SignUpForm, ManualGameForm, GameEntryForm, ChangeAvatarForm, ChangeIgnoredTagsForm, TagAdditionRequestForm, CustomListForm
 
-def IndexView(request):
+def IndexView(request, global_view=False):
     banned_tags = [Tag.objects.get(name="Sexual Content").id]
     if request.user.is_authenticated:
         try:
@@ -23,7 +23,10 @@ def IndexView(request):
             banned_tags = [x.id for x in user_profile.banned_tags.all()]
             followed_users = [x.id for x in user_profile.followed_users.all()]
             followed_users.append(request.user.id)
-            status_list = UserGameStatus.objects.filter(user__in=followed_users).prefetch_related('game').prefetch_related('liked_by').prefetch_related('user__userprofile').order_by('-id')
+            if global_view:
+                status_list = UserGameStatus.objects.prefetch_related('game').prefetch_related('liked_by').prefetch_related('user__userprofile').order_by('-id')
+            else:
+                status_list = UserGameStatus.objects.filter(user__in=followed_users).prefetch_related('game').prefetch_related('liked_by').prefetch_related('user__userprofile').order_by('-id')
         except UserProfile.DoesNotExist:
             status_list = UserGameStatus.objects.filter(user=request.user).prefetch_related('game').prefetch_related('liked_by').prefetch_related('user__userprofile').order_by('-id')
     else:
@@ -39,7 +42,10 @@ def IndexView(request):
         paginated_results = paginator.page(1)
     except EmptyPage:
         paginated_results = paginator.page(paginator.num_pages)
-    return render(request, 'games/index.html', {'activities': paginated_results, 'latest_games': latest_games, 'popular_games': popular_games})
+    return render(request, 'games/index.html', {'activities': paginated_results, 'latest_games': latest_games, 'popular_games': popular_games, 'global_view': global_view})
+
+def GlobalIndexView(request):
+	return IndexView(request, global_view=True)
 
 def GamesTaggedWithView(request, tag_id, name=None):
     banned_tags = [Tag.objects.get(name="Sexual Content").id]

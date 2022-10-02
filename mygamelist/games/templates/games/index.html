@@ -33,6 +33,13 @@
 		<div class="col-1" align="center"></div>
 		<div class="col-7">
 		{% endif %}
+			{% if user.is_authenticated %}
+				{% if global_view %}
+				<div class="row justify-content-end"><a class="gamelink" href="{% url 'games:index' %}">Show Following</a><br></div>
+				{% else %}
+				<div class="row justify-content-end"><a class="gamelink" href="{% url 'games:gindex' %}">Show Global</a><br></div>
+				{% endif %}
+			{% endif %}
 			{% for activity in activities %}
 				<div class="text-white bg-dark mb-3 rounded" style="max-width: 100%">
 					<div class="row align-items-center">
