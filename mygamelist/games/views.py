@@ -291,6 +291,9 @@ def GameView(request, game_id, name=None, tab=None):
         if tag_id in banned_tags:
             return render(request, 'games/error_message.html', {'error':'This game has one or more of your ignored tags!', 'suberror':'You can edit your ignored tags via your settings.'})
 
+    # Fetch pending tag submissions
+    pending_tags = TagAdditionRequest.objects.filter(game=game).prefetch_related('tag')
+
     # Fetch user-specific information for left sidebar
     game_entry = None
     ignored = False
@@ -332,7 +335,7 @@ def GameView(request, game_id, name=None, tab=None):
 
         if 'watch?v=' in game.trailer_link:
             game.trailer_link = game.trailer_link.split("watch?v=")[1]
-        return render(request, 'games/game_detail.html', {'game': game, 'user_score':user_score, 'users_rated':users_rated, 'user_counts':user_counts, 'game_entry': game_entry, 'regular_collections':regular_collections, 'user_collections':user_collections, 'stubbed':stubbed, 'ignored':ignored, 'tab':tab})
+        return render(request, 'games/game_detail.html', {'game': game, 'pending_tags':pending_tags, 'user_score':user_score, 'users_rated':users_rated, 'user_counts':user_counts, 'game_entry': game_entry, 'regular_collections':regular_collections, 'user_collections':user_collections, 'stubbed':stubbed, 'ignored':ignored, 'tab':tab})
     # Social tab
     elif tab == 'social':
         # Find recent activity
@@ -344,7 +347,7 @@ def GameView(request, game_id, name=None, tab=None):
             following_entries = UserGameListEntry.objects.filter(user__in=followed_users).prefetch_related('user__userprofile').prefetch_related('user__usersettings').filter(game=game).order_by('user__username')
         else:
             following_entries = []
-        return render(request, 'games/game_detail.html', {'game': game, 'user_score':user_score, 'users_rated':users_rated, 'user_counts':user_counts, 'game_entry': game_entry, 'recent_statuses': recent_statuses, 'following_entries': following_entries, 'stubbed':stubbed, 'ignored':ignored, 'tab':tab})
+        return render(request, 'games/game_detail.html', {'game': game, 'pending_tags':pending_tags, 'user_score':user_score, 'users_rated':users_rated, 'user_counts':user_counts, 'game_entry': game_entry, 'recent_statuses': recent_statuses, 'following_entries': following_entries, 'stubbed':stubbed, 'ignored':ignored, 'tab':tab})
     # Tab does not exist
     else:
         raise Http404
