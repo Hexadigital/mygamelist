@@ -101,8 +101,28 @@ body {
 					<div class="collapse" id="gametags">{% for tag in game.tags.all|dictsort:"name" %}
 							<a href="{% url 'games:tag' tag.id tag.name|slugify %}">{{ tag.name }}</a>{% if not forloop.last %}, {% endif %}
 							{% endfor %}<br>
+						{% if pending_tags %}
+						Pending Approval:<br>
+						{% for tag_request in pending_tags|dictsort:"tag.name" %}
+							<a href="{% url 'games:tag' tag_request.tag.id tag_request.tag.name|slugify %}">{{ tag_request.tag.name }}</a>{% if not forloop.last %}, {% endif %}
+						{% endfor %}<br>
+						{% endif %}
 						<a class="btn btn-outline-primary btn-sm" role="button" href="{% url 'games:tagreq' game.id %}">Add a Tag?</a></div>
 					<small class="text-muted">May contain spoilers</small><br>
+					<!-- Can I refactor this so I don't have to loop twice? -->
+					<noscript>
+					JavaScript disabled, displaying all tags:<br>
+					<div id="gametags-noscript">{% for tag in game.tags.all|dictsort:"name" %}
+						<a href="{% url 'games:tag' tag.id tag.name|slugify %}">{{ tag.name }}</a>{% if not forloop.last %}, {% endif %}
+						{% endfor %}<br>
+					{% if pending_tags %}
+					Pending Approval:<br>
+					{% for tag_request in pending_tags|dictsort:"tag.name" %}
+						<a href="{% url 'games:tag' tag_request.tag.id tag_request.tag.name|slugify %}">{{ tag_request.tag.name }}</a>{% if not forloop.last %}, {% endif %}
+					{% endfor %}
+					{% endif %}<br>
+					<a class="btn btn-outline-primary btn-sm" role="button" href="{% url 'games:tagreq' game.id %}">Add a Tag?</a></div>
+					</noscript>
 			</blockquote>
 		</div>
 		<div class="col-md-8 align-center">
