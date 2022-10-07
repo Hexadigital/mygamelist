@@ -224,6 +224,49 @@ def GenreView(request, genre_id, name=None):
 class PlatformView(generic.DetailView):
     model = Platform
 
+def BetterView(request, better_type=None):
+    banned_tags = [Tag.objects.get(name="Sexual Content").id]
+    if request.user.is_authenticated:
+        user_profile = UserProfile.objects.get(user=request.user)
+        banned_tags = [x.id for x in user_profile.banned_tags.all()]
+    query = request.GET.get('search')
+    if better_type is None:
+        return render(request, 'games/better.html')
+    elif better_type == 'description':
+        game_list = Game.objects.filter(description__exact='').exclude(tags__in=banned_tags).order_by('-id')
+        page_title = 'Games Missing Descriptions'
+        page_description = 'A list of games that still need a description.'
+        page_header = 'Games Needing Descriptions:'
+    elif better_type == 'screens':
+        screenshot_filter = Q(screen1__isnull=False) & Q(screen2__isnull=False) & Q(screen3__isnull=False) & Q(screen4__isnull=False)
+        game_list = Game.objects.exclude(screenshot_filter).exclude(tags__in=banned_tags).order_by('-id')
+        page_title = 'Games Missing Screenshots'
+        page_description = 'A list of games that have less than four screenshots.'
+        page_header = 'Games Needing Screenshots:'
+    elif better_type == 'no-screens':
+        screenshot_filter = Q(screen1__isnull=True) & Q(screen2__isnull=True) & Q(screen3__isnull=True) & Q(screen4__isnull=True)
+        game_list = Game.objects.filter(screenshot_filter).exclude(tags__in=banned_tags).order_by('-id')
+        page_title = 'Games Without Any Screenshots'
+        page_description = 'A list of games that have no screenshots.'
+        page_header = 'Games Without Screenshots:'
+    elif better_type == 'video':
+        game_list = Game.objects.filter(trailer_link__exact='').exclude(tags__in=banned_tags).order_by('-id')
+        page_title = 'Games Missing Video'
+        page_description = 'A list of games that still need a video.'
+        page_header = 'Games Needing Video:'
+    else:
+        raise Http404
+
+    page = request.GET.get('page', 1)
+    paginator = Paginator(game_list, 25)
+    try:
+        paginated_results = paginator.page(page)
+    except PageNotAnInteger:
+        paginated_results = paginator.page(1)
+    except EmptyPage:
+        paginated_results = paginator.page(paginator.num_pages)
+    return render(request, 'games/browse_nosearch.html', {'game_list': paginated_results, 'page_title': page_title, 'page_description': page_description, 'page_header': page_header})
+
 @login_required(login_url='/login/')
 def IgnoreGameView(request, game_id):
     rec = None
