@@ -31,6 +31,7 @@ def IndexView(request, global_view=False):
             status_list = UserGameStatus.objects.filter(user=request.user).prefetch_related('game').prefetch_related('liked_by').prefetch_related('user__userprofile').order_by('-id')
     else:
         status_list = UserGameStatus.objects.prefetch_related('game').prefetch_related('liked_by').prefetch_related('user__userprofile').order_by('-id')
+    status_list = status_list.exclude(game__tags__in=banned_tags)
     latest_games = Game.objects.exclude(tags__in=banned_tags).order_by('-id')[:8]
     popular_games = UserGameStatus.objects.prefetch_related('game').exclude(game__tags__in=banned_tags).values("game", "game__image", "game__name").filter(created_at__lte=datetime.datetime.today(), created_at__gt=datetime.datetime.today()-datetime.timedelta(days=7)).annotate(count=Count('game')).order_by("-count")[:8]
     page = request.GET.get('page', 1)
@@ -148,7 +149,12 @@ def ProfileView(request, user_id, name=None, tab=None):
             pass
     # Activity
     if tab is None or tab == 'activity':
+        banned_tags = [Tag.objects.get(name="Sexual Content").id]
+        if request.user.is_authenticated:
+            user_profile = UserProfile.objects.get(user=request.user)
+            banned_tags = [x.id for x in user_profile.banned_tags.all()]
         status_list = UserGameStatus.objects.filter(user=user_id).prefetch_related('game').prefetch_related('user__userprofile').order_by('-id')
+        status_list = status_list.exclude(game__tags__in=banned_tags)
         page = request.GET.get('page', 1)
 
         paginator = Paginator(status_list, 25)
