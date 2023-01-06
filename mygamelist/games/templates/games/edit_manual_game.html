@@ -25,13 +25,12 @@
 
 {% block content %}
 <div class="container">
-<br>
+<br>{{ form.errors }}
 <div class="text-white bg-dark mb-3 rounded" style="max-width: 100%">
 <br>
 <form action="{% url 'games:gamelist' 'edit-manual' game_entry.id %}" method="post">
 	<div class="row">
 		{% csrf_token %}
-		{{ form.errors }}
 		<br>
 		<div class="col-4" align="center">
 			<label for="id_name"><b>Game Name:</b></label><br>
@@ -54,8 +53,9 @@
 		<div class="col-4" align="center">
 			<label for="id_platform"><b>Platform:</b></label><br>
 			<select name="platform">
-				{% for choice in form.platform.field.choices %}
-					<option value="{{ choice.0 }}"{% if choice.0 == game_entry.platform.id %} selected{% endif %}>{{ choice.1 }}</option>
+				<option value="">---------</option>
+				{% for platform in dropdown_platforms %}
+					<option value="{{ platform.id }}"{% if platform.id == game_entry.platform.id %} selected{% endif %}>{{ platform.category }} - {{ platform.name }}</option>
 				{% endfor %}
 			</select><br>
 			<br>

@@ -34,6 +34,7 @@ class Platform(models.Model):
     name = models.CharField(max_length=50)
     category = models.CharField(max_length=50)
     shorthand = models.CharField(max_length=50, blank=True, default='')
+    default = models.BooleanField(default=False, null=False)
 
     class Meta:
         ordering = ['category', 'name']
@@ -86,10 +87,12 @@ class Game(models.Model):
 
 @receiver(post_save, sender=User)
 def create_userprofile_signal(sender, instance, created, **kwargs):
-    if created:     
+    if created:
         UserProfile.objects.create(user=instance)
         sexual_content = Tag.objects.get(name="Sexual Content")
         instance.userprofile.banned_tags.add(sexual_content)
+        common_platforms = Platform.objects.filter(default=True)
+        instance.userprofile.enabled_platforms.set(common_platforms)
         instance.userprofile.save()
 
 class UserGameListEntry(models.Model):
@@ -190,6 +193,7 @@ class UserProfile(models.Model):
     banned_tags = models.ManyToManyField(Tag, blank=True)
     ignored_games = models.ManyToManyField(Game, blank=True)
     ignored_collections = models.ManyToManyField(Collection, blank=True)
+    enabled_platforms = models.ManyToManyField(Platform, blank=True)
     followed_users = models.ManyToManyField(User, blank=True, related_name='userprofile_followed_users')
 
 class UserSettings(models.Model):

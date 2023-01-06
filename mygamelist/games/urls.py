@@ -54,4 +54,5 @@ urlpatterns = [
     path('settings/customlists/add', views.AddCustomListView, name='addcustomlist'),
     path('settings/customlists/delete/<int:list_id>/', views.DeleteCustomListView, name='deletecustomlist'),
     path('settings/customlists/edit/<int:list_id>/', views.EditCustomListView, name='editcustomlist'),
+    path('settings/platforms/', views.HidePlatformsView, name='hideplatforms'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

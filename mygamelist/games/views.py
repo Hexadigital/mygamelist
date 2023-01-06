@@ -13,7 +13,7 @@ from django.utils.http import is_safe_url
 
 from .models import Game, Genre, Platform, Tag, User, UserGameListEntry, ManualUserGameListEntry, UserGameStatus
 from .models import UserGameStatus, Notification, Recommendation, Collection, CollectionType, UserProfile, UserSettings, TagAdditionRequest, CustomList
-from .forms import SignUpForm, ManualGameForm, GameEntryForm, ChangeAvatarForm, ChangeIgnoredTagsForm, TagAdditionRequestForm, CustomListForm
+from .forms import SignUpForm, ManualGameForm, GameEntryForm, ChangeAvatarForm, ChangeIgnoredTagsForm, TagAdditionRequestForm, CustomListForm, HidePlatformsForm
 
 def IndexView(request, global_view=False):
     banned_tags = [Tag.objects.get(name="Sexual Content").id]
@@ -545,7 +545,10 @@ def GameListView(request, edit_type=None, entry_id=None):
                 return HttpResponseRedirect('/gamelist/')
         else:
             form = ManualGameForm()
-        return render(request, 'games/edit_manual_game.html', {'form': form, 'game_entry': game_entry})
+        dropdown_platforms = [x for x in request.user.userprofile.enabled_platforms.all()]
+        if game_entry.platform not in dropdown_platforms and game_entry.platform is not None:
+            dropdown_platforms = [game_entry.platform] + dropdown_platforms
+        return render(request, 'games/edit_manual_game.html', {'form': form, 'game_entry': game_entry, 'dropdown_platforms': dropdown_platforms})
     elif edit_type == 'edit':
         rec = None
         try:
@@ -562,6 +565,9 @@ def GameListView(request, edit_type=None, entry_id=None):
             new = True
         custom_lists = CustomList.objects.filter(user=request.user).order_by('name')
         lists_used = [c.id for c in CustomList.objects.filter(user=request.user, games=game)]
+        dropdown_platforms = [x for x in request.user.userprofile.enabled_platforms.all()]
+        if game_entry.platform not in dropdown_platforms and game_entry.platform is not None:
+            dropdown_platforms = [game_entry.platform] + dropdown_platforms
         if request.method == 'POST':
             if game in request.user.userprofile.ignored_games.all():
                 request.user.userprofile.ignored_games.remove(game)
@@ -613,7 +619,7 @@ def GameListView(request, edit_type=None, entry_id=None):
                     return HttpResponseRedirect('/game/' + str(game.id))
         else:
             form = ManualGameForm()
-        return render(request, 'games/edit_game_entry.html', {'form': form, 'game_id': entry_id, 'game_entry': game_entry, 'custom_lists': custom_lists, 'lists_used': lists_used, 'next': next_url})
+        return render(request, 'games/edit_game_entry.html', {'form': form, 'game_id': entry_id, 'game_entry': game_entry, 'custom_lists': custom_lists, 'lists_used': lists_used, 'next': next_url, 'dropdown_platforms': dropdown_platforms})
     elif edit_type == 'add-manual':
         if request.method == 'POST':
             # create a form instance and populate it with data from the request:
@@ -642,7 +648,8 @@ def GameListView(request, edit_type=None, entry_id=None):
                 return HttpResponseRedirect('/gamelist/')
         else:
             form = ManualGameForm()
-        return render(request, 'games/add_manual_game.html', {'form': form})
+        dropdown_platforms = [x for x in request.user.userprofile.enabled_platforms.all()]
+        return render(request, 'games/add_manual_game.html', {'form': form, 'dropdown_platforms': dropdown_platforms})
     else:
         raise Http404
 
@@ -760,6 +767,26 @@ def ChangeIgnoredTagsView(request):
         if tag.category in tags.keys():
             tags[tag.category].append({'id':tag.id, 'name':tag.name})
     return render(request, 'games/change_ignored_tags.html', {'tags':tags, 'banned_tags':banned_tags, 'form':form})
+
+@login_required(login_url='/login/')
+def HidePlatformsView(request):
+    user_profile = UserProfile.objects.get(user=request.user)
+    enabled_platforms = [x.id for x in user_profile.enabled_platforms.all()]
+    form = HidePlatformsForm(instance=user_profile)
+    if request.method == 'POST':
+        form = HidePlatformsForm(request.POST, instance=user_profile)
+        print(form.is_valid())
+        if form.is_valid():
+            form.save()
+            return redirect('/settings')
+    platforms = {}
+    for platform in Platform.objects.all():
+        if platform.category in platforms.keys():
+            platforms[platform.category].append({'id':platform.id, 'name':platform.name})
+        else:
+            platforms[platform.category] = [{'id':platform.id, 'name':platform.name}]
+    platform_categories = sorted(platforms.keys())
+    return render(request, 'games/change_hidden_platforms.html', {'platforms':platforms, 'platform_categories':platform_categories, 'enabled_platforms':enabled_platforms, 'form':form})
 
 @login_required(login_url='/login/')
 def ChangeCustomListsView(request):

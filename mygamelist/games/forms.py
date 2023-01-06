@@ -66,6 +66,16 @@ class ChangeIgnoredTagsForm(forms.ModelForm):
             required=False
         )
 
+class HidePlatformsForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ['enabled_platforms']
+    enabled_platforms = forms.ModelMultipleChoiceField(
+            queryset=Platform.objects.all(),
+            widget=forms.CheckboxSelectMultiple,
+            required=False
+        )
+
 class TagAdditionRequestForm(forms.ModelForm):
 	class Meta:
 		model = TagAdditionRequest
