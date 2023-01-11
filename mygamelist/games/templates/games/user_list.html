@@ -33,10 +33,10 @@
 			<tr><td colspan="6"><h3><center>{{ status }}</center></h3></td></tr>
 			<tr>
 			<th scope="col" width="5%">Actions</th>
-			<th scope="col" width="45%">Game Title</th>
-			<th scope="col" width="15%">Platform</th>
-			<th scope="col" width="10%">Score</th>
-			<th scope="col" width="10%">Hours</th>
+			<th scope="col" width="45%"><a href="{% url 'games:gamelist' %}" style="color: white">Game Title</a></th>
+			<th scope="col" width="15%"><a href="{% url 'games:gamelist' %}?sort=platform" style="color: white">Platform</a></th>
+			<th scope="col" width="10%"><a href="{% url 'games:gamelist' %}?sort=score" style="color: white">Score</a></th>
+			<th scope="col" width="10%"><a href="{% url 'games:gamelist' %}?sort=hours" style="color: white">Hours</a></th>
 			<th scope="col" width="15%">Flags</th>
 			</tr>
 				{% for entry_name, entry in game_list.items %}
