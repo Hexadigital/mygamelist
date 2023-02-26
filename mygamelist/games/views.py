@@ -184,7 +184,30 @@ def ProfileView(request, user_id, name=None, tab=None):
             total_list[status_conversion[entry.status]][entry.name] = {'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed}
         # Sort dicts
         for status in total_list.keys():
-            total_list[status] = OrderedDict(sorted(total_list[status].items()))
+            # TODO: Find a more elegant way to sort one key reversed and the other normally
+            sortingmethod = request.GET.get('sort')
+            if sortingmethod and sortingmethod in ['score', 'platform', 'hours']:
+                templist = []
+                for x in total_list[status].keys():
+                    if sortingmethod == 'score':
+                        templist.append((Decimal(11) if total_list[status][x]['score'] is None else 10 - total_list[status][x]['score'], x, total_list[status][x]))
+                    if sortingmethod == 'platform':
+                        if total_list[status][x]['platform'] is None:
+                            platform = 'None'
+                        else:
+                            if total_list[status][x]['platform'].shorthand:
+                                platform = total_list[status][x]['platform'].shorthand
+                            else:
+                                platform = total_list[status][x]['platform'].name
+                        templist.append((platform, x, total_list[status][x]))
+                    if sortingmethod == 'hours':
+                        templist.append((10000000000 if total_list[status][x]['hours'] is None else 10000000000 - total_list[status][x]['hours'], x, total_list[status][x]))
+                templist.sort()
+                total_list[status].clear()
+                for x in templist:
+                    total_list[status][x[1]] = x[2]
+            else:
+                total_list[status] = OrderedDict(sorted(total_list[status].items()))
             
         # Figure out how to display their ratings
         try:

@@ -130,10 +130,10 @@
 										<table class="table table-hover table-striped table-dark" style="text-align: center;">
 										<tr><td colspan="5"><h3><center>{{ status }}</center></h3></td></tr>
 										<tr>
-										<th scope="col" width="50%">Game Title</th>
-										<th scope="col" width="15%">Platform</th>
-										<th scope="col" width="10%">Score</th>
-										<th scope="col" width="10%">Hours</th>
+										<th scope="col" width="50%"><a href="{% url 'games:profile' selected_user.id selected_user.username|slugify 'list' %}" style="color: white">Game Title</a></th>
+										<th scope="col" width="15%"><a href="{% url 'games:profile' selected_user.id selected_user.username|slugify 'list' %}?sort=platform" style="color: white">Platform</a></th>
+										<th scope="col" width="10%"><a href="{% url 'games:profile' selected_user.id selected_user.username|slugify 'list' %}?sort=score" style="color: white">Score</a></th>
+										<th scope="col" width="10%"><a href="{% url 'games:profile' selected_user.id selected_user.username|slugify 'list' %}?sort=hours" style="color: white">Hours</a></th>
 										<th scope="col" width="15%">Flags</th>
 										</tr>
 											{% for entry_name, entry in game_list.items %}
