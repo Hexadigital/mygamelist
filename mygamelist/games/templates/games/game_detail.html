@@ -109,7 +109,7 @@ body {
 						{% endif %}
 						<a class="btn btn-outline-primary btn-sm" role="button" href="{% url 'games:tagreq' game.id %}">Add a Tag?</a></div>
 					<small class="text-muted">May contain spoilers</small><br>
-					<!-- Can I refactor this so I don't have to loop twice? -->
+					<!-- TODO: Can I refactor this so I don't have to loop twice? -->
 					<noscript>
 					JavaScript disabled, displaying all tags:<br>
 					<div id="gametags-noscript">{% for tag in game.tags.all|dictsort:"name" %}
@@ -221,6 +221,7 @@ body {
 											{% elif entry.status == "HOLD" %}
 												Paused 
 											{% endif %}
+											{% if entry.comments %} <span title="{{ entry.comments }}">&#x1F4AC;</span>{% endif %}
 											</div>
 											<div>
 												{% if entry.user.usersettings.score_type == 'SMIL' %}
