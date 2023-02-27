@@ -307,7 +307,7 @@ body {
 										<div class="card-text">
 										Average Rating (
 										{% if aspect_ratings.difficulty != 0 %}
-										{{ aspect_ratings.difficulty }}
+											<span title="Rated by {{ aspect_counts.difficulty }} user(s).">{{ aspect_ratings.difficulty }}</span>
 										{% else %}
 										N/A
 										{% endif %}
@@ -361,7 +361,7 @@ body {
 										<div class="card-text">
 										Average Rating (
 										{% if aspect_ratings.audio != 0 %}
-										{{ aspect_ratings.audio }}
+											<span title="Rated by {{ aspect_counts.audio }} user(s).">{{ aspect_ratings.audio }}</span>
 										{% else %}
 										N/A
 										{% endif %}
@@ -415,7 +415,7 @@ body {
 										<div class="card-text">
 										Average Rating (
 										{% if aspect_ratings.story != 0 %}
-										{{ aspect_ratings.story }}
+											<span title="Rated by {{ aspect_counts.story }} user(s).">{{ aspect_ratings.story }}</span>
 										{% else %}
 										N/A
 										{% endif %}
@@ -470,7 +470,7 @@ body {
 										<div class="card-text">
 											Average Rating (
 											{% if aspect_ratings.replayability != 0 %}
-											{{ aspect_ratings.replayability }}
+												<span title="Rated by {{ aspect_counts.replayability }} user(s).">{{ aspect_ratings.replayability }}</span>
 											{% else %}
 											N/A
 											{% endif %}
@@ -524,7 +524,7 @@ body {
 										<div class="card-text">
 										Average Rating (
 										{% if aspect_ratings.graphics != 0 %}
-										{{ aspect_ratings.graphics }}
+											<span title="Rated by {{ aspect_counts.graphics }} user(s).">{{ aspect_ratings.graphics }}</span>
 										{% else %}
 										N/A
 										{% endif %}
@@ -578,7 +578,7 @@ body {
 										<div class="card-text">
 										Average Rating (
 										{% if aspect_ratings.recommendability != 0 %}
-										{{ aspect_ratings.recommendability }}
+											<span title="Rated by {{ aspect_counts.recommendability }} user(s).">{{ aspect_ratings.recommendability }}</span>
 										{% else %}
 										N/A
 										{% endif %}

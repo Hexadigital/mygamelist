@@ -484,7 +484,8 @@ def GameView(request, game_id, name=None, tab=None):
             rating_dict['recommendability'] = 0
         else:
             rating_dict['recommendability'] = round(recommendability_total / recommendability_count, 2)
-        return render(request, 'games/game_detail.html', {'game': game, 'pending_tags':pending_tags, 'user_score':user_score, 'users_rated':users_rated, 'user_counts':user_counts, 'game_entry': game_entry, 'aspect_ratings': rating_dict, 'personal_rating': personal_rating, 'stubbed':stubbed, 'ignored':ignored, 'tab':tab})
+        aspect_counts = {'difficulty': difficulty_count, 'replayability': replayability_count, 'graphics': graphics_count, 'audio': audio_count, 'story': story_count, 'recommendability': recommendability_count}
+        return render(request, 'games/game_detail.html', {'game': game, 'pending_tags':pending_tags, 'user_score':user_score, 'users_rated':users_rated, 'user_counts':user_counts, 'game_entry': game_entry, 'aspect_ratings': rating_dict, 'aspect_counts': aspect_counts, 'personal_rating': personal_rating, 'stubbed':stubbed, 'ignored':ignored, 'tab':tab})
     # Tab does not exist
     else:
         raise Http404
