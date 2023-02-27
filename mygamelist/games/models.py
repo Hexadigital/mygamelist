@@ -118,6 +118,19 @@ class UserGameListEntry(models.Model):
     def __str__(self):
         return self.user.username + " - " + self.game.name
 
+class UserGameAspectRating(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    game = models.ForeignKey(Game, on_delete=models.CASCADE)
+    difficulty = models.IntegerField(default=0)
+    replayability = models.IntegerField(default=0)
+    graphics = models.IntegerField(default=0)
+    audio = models.IntegerField(default=0)
+    story = models.IntegerField(default=0)
+    recommendability = models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.user.username + " - " + self.game.name
+
 class ManualUserGameListEntry(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=150)

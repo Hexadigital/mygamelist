@@ -9,6 +9,7 @@
 	<meta name="twitter:title" content="{{ game.name }} ({{ game.year }}) :: Remember Games" />
 	<meta name="twitter:description" content="{{ game.description|truncatechars:200 }}" />
 	<meta name="twitter:image" content="{{ game.image.url }}" />
+<link href="{% static 'css/font-awesome.min.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block extracss %}
@@ -20,6 +21,43 @@ body {
 	color: white;
 }
 {% endif %}
+.rating {
+  width: 300px;
+  margin: 0 0;
+  font-size: 45px;
+  overflow:hidden;
+}
+.rating input {
+  float: right;
+  opacity: 0;
+  position: absolute;
+}
+.rating a, 
+.rating label {
+			float:right;
+			color: #aaa;
+			text-decoration: none;
+			-webkit-transition: color .4s;
+			-moz-transition: color .4s;
+			-o-transition: color .4s;
+			transition: color .4s;
+		}
+.rating label:hover ~ label,
+.rating input:focus ~ label,
+.rating label:hover,
+		.rating a:hover,
+		.rating a:hover ~ a,
+		.rating a:focus,
+		.rating a:focus ~ a		{
+			color: orange;
+			cursor: pointer;
+		}
+		.rating2 {
+			direction: rtl;
+		}
+		.rating2 a {
+			float:none
+		}
 {% endblock %}
 
 {% block navitems %}
@@ -130,6 +168,11 @@ body {
 				<li class="nav-item">
 					<a href="{% url 'games:game' game.id gameslug %}" class="nav-link{% if not tab %} active{% endif %}">
 						<div class="nav-field">Overview</div>
+					</a>
+				</li>
+				<li class="nav-item">
+					<a href="{% url 'games:game' game.id gameslug 'aspects' %}" class="nav-link{% if tab == 'aspects' %} active{% endif %}">
+						<div class="nav-field">Aspects</div>
 					</a>
 				</li>
 				<li class="nav-item">
@@ -246,6 +289,338 @@ body {
 							</div>
 						</div>
 						{% endfor %}
+					</div>
+				</div>
+			</div>
+			{% elif tab == 'aspects' %}
+			<!-- TODO: Refactor this -->
+			<div class="container">
+				<div class="row justify-content-md-center">
+					<div class="col-md-6 align-center">
+						<div class="text-white bg-dark mb-3 rounded" style="max-width: 100%">
+							<div class="row align-items-center">
+								<div class="col">
+									<div class="card-header d-flex justify-content-center container-fluid">
+										<b>Difficulty</b>
+									</div>
+									<div class="card-body">
+										<div class="card-text">
+										Average Rating (
+										{% if aspect_ratings.difficulty != 0 %}
+										{{ aspect_ratings.difficulty }}
+										{% else %}
+										N/A
+										{% endif %}
+										)<br>
+										<div class="rating rating2" align='center'>
+											{% if aspect_ratings.difficulty >= 4.5 %}<b style='color: orange;'>★</b>{% else %}★{% endif %}
+											{% if aspect_ratings.difficulty >= 3.5 %}<b style='color: orange;'>★</b>{% else %}★{% endif %}
+											{% if aspect_ratings.difficulty >= 2.5 %}<b style='color: orange;'>★</b>{% else %}★{% endif %}
+											{% if aspect_ratings.difficulty >= 1.5 %}<b style='color: orange;'>★</b>{% else %}★{% endif %}
+											{% if aspect_ratings.difficulty >= 0.5 %}<b style='color: orange;'>★</b>{% else %}★{% endif %}
+										</div>
+										Your Rating (
+										{% if personal_rating.difficulty == 1 %}
+											Very Easy
+										{% elif personal_rating.difficulty == 2 %}
+											Easy
+										{% elif personal_rating.difficulty == 3 %}
+											Average
+										{% elif personal_rating.difficulty == 4 %}
+											Hard
+										{% elif personal_rating.difficulty == 5 %}
+											Very Hard
+										{% else %}
+											N/A
+										{% endif %})<br>
+										<div class="rating rating2" align='center'>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=difficulty&rating=5" title="Very Hard" data-value="5"
+											   {% if personal_rating.difficulty == 5 %}style='color: orange;'{% endif %}>★</a>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=difficulty&rating=4" title="Hard" data-value="4"
+											   {% if personal_rating.difficulty >= 4 %}style='color: orange;'{% endif %}>★</a>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=difficulty&rating=3" title="Average" data-value="3"
+											   {% if personal_rating.difficulty >= 3 %}style='color: orange;'{% endif %}>★</a>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=difficulty&rating=2" title="Easy" data-value="2"
+											   {% if personal_rating.difficulty >= 2 %}style='color: orange;'{% endif %}>★</a>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=difficulty&rating=1" title="Very Easy" data-value="1"
+											   {% if personal_rating.difficulty >= 1 %}style='color: orange;'{% endif %}>★</a>
+										</div>{% if personal_rating.difficulty >= 1 %}<center><a class="gamelink" href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=difficulty&rating=0">Clear Rating</a></center>{% else %}<br>{% endif %}
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<br>
+						<div class="text-white bg-dark mb-3 rounded" style="max-width: 100%">
+							<div class="row align-items-center">
+								<div class="col">
+									<div class="card-header d-flex justify-content-center container-fluid">
+										<b>Audio</b>
+									</div>
+									<div class="card-body">
+										<div class="card-text">
+										Average Rating (
+										{% if aspect_ratings.audio != 0 %}
+										{{ aspect_ratings.audio }}
+										{% else %}
+										N/A
+										{% endif %}
+										)<br>
+										<div class="rating rating2" align='center'>
+											{% if aspect_ratings.audio >= 4.5 %}<b style='color: orange;'>★</b>{% else %}★{% endif %}
+											{% if aspect_ratings.audio >= 3.5 %}<b style='color: orange;'>★</b>{% else %}★{% endif %}
+											{% if aspect_ratings.audio >= 2.5 %}<b style='color: orange;'>★</b>{% else %}★{% endif %}
+											{% if aspect_ratings.audio >= 1.5 %}<b style='color: orange;'>★</b>{% else %}★{% endif %}
+											{% if aspect_ratings.audio >= 0.5 %}<b style='color: orange;'>★</b>{% else %}★{% endif %}
+										</div>
+										Your Rating (
+										{% if personal_rating.audio == 1 %}
+											Horrible
+										{% elif personal_rating.audio == 2 %}
+											Bad
+										{% elif personal_rating.audio == 3 %}
+											Average
+										{% elif personal_rating.audio == 4 %}
+											Good
+										{% elif personal_rating.audio == 5 %}
+											Excellent
+										{% else %}
+											N/A
+										{% endif %})<br>
+										<div class="rating rating2" align='center'>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=audio&rating=5" title="Excellent" data-value="5"
+											   {% if personal_rating.audio == 5 %}style='color: orange;'{% endif %}>★</a>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=audio&rating=4" title="Good" data-value="4"
+											   {% if personal_rating.audio >= 4 %}style='color: orange;'{% endif %}>★</a>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=audio&rating=3" title="Average" data-value="3"
+											   {% if personal_rating.audio >= 3 %}style='color: orange;'{% endif %}>★</a>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=audio&rating=2" title="Bad" data-value="2"
+											   {% if personal_rating.audio >= 2 %}style='color: orange;'{% endif %}>★</a>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=audio&rating=1" title="Horrible" data-value="1"
+											   {% if personal_rating.audio >= 1 %}style='color: orange;'{% endif %}>★</a>
+										</div>{% if personal_rating.audio >= 1 %}<center><a class="gamelink" href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=audio&rating=0">Clear Rating</a></center>{% else %}<br>{% endif %}
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<br>
+						<div class="text-white bg-dark mb-3 rounded" style="max-width: 100%">
+							<div class="row align-items-center">
+								<div class="col">
+									<div class="card-header d-flex justify-content-center container-fluid">
+										<b>Story</b>
+									</div>
+									<div class="card-body">
+										<div class="card-text">
+										Average Rating (
+										{% if aspect_ratings.story != 0 %}
+										{{ aspect_ratings.story }}
+										{% else %}
+										N/A
+										{% endif %}
+										)<br>
+										<div class="rating rating2" align='center'>
+											{% if aspect_ratings.story >= 4.5 %}<b style='color: orange;'>★</b>{% else %}★{% endif %}
+											{% if aspect_ratings.story >= 3.5 %}<b style='color: orange;'>★</b>{% else %}★{% endif %}
+											{% if aspect_ratings.story >= 2.5 %}<b style='color: orange;'>★</b>{% else %}★{% endif %}
+											{% if aspect_ratings.story >= 1.5 %}<b style='color: orange;'>★</b>{% else %}★{% endif %}
+											{% if aspect_ratings.story >= 0.5 %}<b style='color: orange;'>★</b>{% else %}★{% endif %}
+										</div>
+										Your Rating (
+										{% if personal_rating.story == 1 %}
+											Horrible
+										{% elif personal_rating.story == 2 %}
+											Bad
+										{% elif personal_rating.story == 3 %}
+											Average
+										{% elif personal_rating.story == 4 %}
+											Good
+										{% elif personal_rating.story == 5 %}
+											Excellent
+										{% else %}
+											N/A
+										{% endif %})<br>
+										<div class="rating rating2" align='center'>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=story&rating=5" title="Very Hard" data-value="5"
+											   {% if personal_rating.story == 5 %}style='color: orange;'{% endif %}>★</a>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=story&rating=4" title="Hard" data-value="4"
+											   {% if personal_rating.story >= 4 %}style='color: orange;'{% endif %}>★</a>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=story&rating=3" title="Average" data-value="3"
+											   {% if personal_rating.story >= 3 %}style='color: orange;'{% endif %}>★</a>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=story&rating=2" title="Easy" data-value="2"
+											   {% if personal_rating.story >= 2 %}style='color: orange;'{% endif %}>★</a>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=story&rating=1" title="Very Easy" data-value="1"
+											   {% if personal_rating.story >= 1 %}style='color: orange;'{% endif %}>★</a>
+										</div>{% if personal_rating.story >= 1 %}<center><a class="gamelink" href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=story&rating=0">Clear Rating</a></center>{% else %}<br>{% endif %}
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6 align-center">
+						<div class="text-white bg-dark mb-3 rounded" style="max-width: 100%">
+							<div class="row align-items-center">
+								<div class="col">
+									<div class="card-header d-flex justify-content-center container-fluid">
+										<b>Replayability</b>
+									</div>
+									<div class="card-body">
+										<div class="card-text">
+											Average Rating (
+											{% if aspect_ratings.replayability != 0 %}
+											{{ aspect_ratings.replayability }}
+											{% else %}
+											N/A
+											{% endif %}
+											)<br>
+											<div class="rating rating2" align='center'>
+												{% if aspect_ratings.replayability >= 4.5 %}<b style='color: orange;'>★</b>{% else %}★{% endif %}
+												{% if aspect_ratings.replayability >= 3.5 %}<b style='color: orange;'>★</b>{% else %}★{% endif %}
+												{% if aspect_ratings.replayability >= 2.5 %}<b style='color: orange;'>★</b>{% else %}★{% endif %}
+												{% if aspect_ratings.replayability >= 1.5 %}<b style='color: orange;'>★</b>{% else %}★{% endif %}
+												{% if aspect_ratings.replayability >= 0.5 %}<b style='color: orange;'>★</b>{% else %}★{% endif %}
+											</div>
+											Your Rating (
+											{% if personal_rating.replayability == 1 %}
+												None
+											{% elif personal_rating.replayability == 2 %}
+												Some
+											{% elif personal_rating.replayability == 3 %}
+												Good
+											{% elif personal_rating.replayability == 4 %}
+												Great
+											{% elif personal_rating.replayability == 5 %}
+												Endless
+											{% else %}
+												N/A
+											{% endif %})<br>
+											<div class="rating rating2" align='center'>
+												<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=replayability&rating=5" title="Endless" data-value="5"
+												   {% if personal_rating.replayability == 5 %}style='color: orange;'{% endif %}>★</a>
+												<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=replayability&rating=4" title="Great" data-value="4"
+												   {% if personal_rating.replayability >= 4 %}style='color: orange;'{% endif %}>★</a>
+												<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=replayability&rating=3" title="Good" data-value="3"
+												   {% if personal_rating.replayability >= 3 %}style='color: orange;'{% endif %}>★</a>
+												<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=replayability&rating=2" title="Some" data-value="2"
+												   {% if personal_rating.replayability >= 2 %}style='color: orange;'{% endif %}>★</a>
+												<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=replayability&rating=1" title="None" data-value="1"
+												   {% if personal_rating.replayability >= 1 %}style='color: orange;'{% endif %}>★</a>
+											</div>{% if personal_rating.replayability >= 1 %}<center><a class="gamelink" href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=replayability&rating=0">Clear Rating</a></center>{% else %}<br>{% endif %}
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<br>
+						<div class="text-white bg-dark mb-3 rounded" style="max-width: 100%">
+							<div class="row align-items-center">
+								<div class="col">
+									<div class="card-header d-flex justify-content-center container-fluid">
+										<b>Graphics</b>
+									</div>
+									<div class="card-body">
+										<div class="card-text">
+										Average Rating (
+										{% if aspect_ratings.graphics != 0 %}
+										{{ aspect_ratings.graphics }}
+										{% else %}
+										N/A
+										{% endif %}
+										)<br>
+										<div class="rating rating2" align='center'>
+											{% if aspect_ratings.graphics >= 4.5 %}<b style='color: orange;'>★</b>{% else %}★{% endif %}
+											{% if aspect_ratings.graphics >= 3.5 %}<b style='color: orange;'>★</b>{% else %}★{% endif %}
+											{% if aspect_ratings.graphics >= 2.5 %}<b style='color: orange;'>★</b>{% else %}★{% endif %}
+											{% if aspect_ratings.graphics >= 1.5 %}<b style='color: orange;'>★</b>{% else %}★{% endif %}
+											{% if aspect_ratings.graphics >= 0.5 %}<b style='color: orange;'>★</b>{% else %}★{% endif %}
+										</div>
+										Your Rating (
+										{% if personal_rating.graphics == 1 %}
+											Horrible
+										{% elif personal_rating.graphics == 2 %}
+											Bad
+										{% elif personal_rating.graphics == 3 %}
+											Average
+										{% elif personal_rating.graphics == 4 %}
+											Good
+										{% elif personal_rating.graphics == 5 %}
+											Excellent
+										{% else %}
+											N/A
+										{% endif %})<br>
+										<div class="rating rating2" align='center'>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=graphics&rating=5" title="Excellent" data-value="5"
+											   {% if personal_rating.graphics == 5 %}style='color: orange;'{% endif %}>★</a>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=graphics&rating=4" title="Good" data-value="4"
+											   {% if personal_rating.graphics >= 4 %}style='color: orange;'{% endif %}>★</a>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=graphics&rating=3" title="Average" data-value="3"
+											   {% if personal_rating.graphics >= 3 %}style='color: orange;'{% endif %}>★</a>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=graphics&rating=2" title="Bad" data-value="2"
+											   {% if personal_rating.graphics >= 2 %}style='color: orange;'{% endif %}>★</a>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=graphics&rating=1" title="Horrible" data-value="1"
+											   {% if personal_rating.graphics >= 1 %}style='color: orange;'{% endif %}>★</a>
+										</div>{% if personal_rating.graphics >= 1 %}<center><a class="gamelink" href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=graphics&rating=0">Clear Rating</a></center>{% else %}<br>{% endif %}
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<br>
+						<div class="text-white bg-dark mb-3 rounded" style="max-width: 100%">
+							<div class="row align-items-center">
+								<div class="col">
+									<div class="card-header d-flex justify-content-center container-fluid">
+										<b>Recommendability</b>
+									</div>
+									<div class="card-body">
+										<div class="card-text">
+										Average Rating (
+										{% if aspect_ratings.recommendability != 0 %}
+										{{ aspect_ratings.recommendability }}
+										{% else %}
+										N/A
+										{% endif %}
+										)<br>
+										<div class="rating rating2" align='center'>
+											{% if aspect_ratings.recommendability >= 4.5 %}<b style='color: orange;'>★</b>{% else %}★{% endif %}
+											{% if aspect_ratings.recommendability >= 3.5 %}<b style='color: orange;'>★</b>{% else %}★{% endif %}
+											{% if aspect_ratings.recommendability >= 2.5 %}<b style='color: orange;'>★</b>{% else %}★{% endif %}
+											{% if aspect_ratings.recommendability >= 1.5 %}<b style='color: orange;'>★</b>{% else %}★{% endif %}
+											{% if aspect_ratings.recommendability >= 0.5 %}<b style='color: orange;'>★</b>{% else %}★{% endif %}
+										</div>
+										Your Rating (
+										{% if personal_rating.recommendability == 1 %}
+											Strongly Disrecommend
+										{% elif personal_rating.recommendability == 2 %}
+											Disrecommend
+										{% elif personal_rating.recommendability == 3 %}
+											Neutral
+										{% elif personal_rating.recommendability == 4 %}
+											Recommend
+										{% elif personal_rating.recommendability == 5 %}
+											Strongly Recommend
+										{% else %}
+											N/A
+										{% endif %})<br>
+										<div class="rating rating2" align='center'>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=recommendability&rating=5" title="Strongly Recommend" data-value="5"
+											   {% if personal_rating.recommendability == 5 %}style='color: orange;'{% endif %}>★</a>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=recommendability&rating=4" title="Recommend" data-value="4"
+											   {% if personal_rating.recommendability >= 4 %}style='color: orange;'{% endif %}>★</a>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=recommendability&rating=3" title="Neutral" data-value="3"
+											   {% if personal_rating.recommendability >= 3 %}style='color: orange;'{% endif %}>★</a>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=recommendability&rating=2" title="Disrecommend" data-value="2"
+											   {% if personal_rating.recommendability >= 2 %}style='color: orange;'{% endif %}>★</a>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=recommendability&rating=1" title="Strongly Disrecommend" data-value="1"
+											   {% if personal_rating.recommendability >= 1 %}style='color: orange;'{% endif %}>★</a>
+										</div>{% if personal_rating.recommendability >= 1 %}<center><a class="gamelink" href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=recommendability&rating=0">Clear Rating</a></center>{% else %}<br>{% endif %}
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>

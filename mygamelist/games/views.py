@@ -12,7 +12,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Count, Q
 from django.utils.http import is_safe_url
 
-from .models import Game, Genre, Platform, Tag, User, UserGameListEntry, ManualUserGameListEntry, UserGameStatus
+from .models import Game, Genre, Platform, Tag, User, UserGameListEntry, ManualUserGameListEntry, UserGameStatus, UserGameAspectRating
 from .models import UserGameStatus, Notification, Recommendation, Collection, CollectionType, UserProfile, UserSettings, TagAdditionRequest, CustomList
 from .forms import SignUpForm, ManualGameForm, GameEntryForm, ChangeAvatarForm, ChangeIgnoredTagsForm, TagAdditionRequestForm, CustomListForm, HidePlatformsForm
 
@@ -421,6 +421,70 @@ def GameView(request, game_id, name=None, tab=None):
         else:
             following_entries = []
         return render(request, 'games/game_detail.html', {'game': game, 'pending_tags':pending_tags, 'user_score':user_score, 'users_rated':users_rated, 'user_counts':user_counts, 'game_entry': game_entry, 'recent_statuses': recent_statuses, 'following_entries': following_entries, 'stubbed':stubbed, 'ignored':ignored, 'tab':tab})
+    elif tab == 'aspects':
+        # Calculate site aspects
+        ratings = UserGameAspectRating.objects.filter(game=game)
+        try:
+            personal_rating = UserGameAspectRating.objects.get(game=game, user=request.user)
+        except:
+            personal_rating = None
+        rating_dict = {}
+        difficulty_total = 0
+        difficulty_count = 0
+        replayability_total = 0
+        replayability_count = 0
+        graphics_total = 0
+        graphics_count = 0
+        audio_total = 0
+        audio_count = 0
+        story_total = 0
+        story_count = 0
+        recommendability_total = 0
+        recommendability_count = 0
+        for rating in ratings:
+            if rating.difficulty != 0:
+                difficulty_total += rating.difficulty
+                difficulty_count += 1
+            if rating.replayability != 0:
+                replayability_total += rating.replayability
+                replayability_count += 1
+            if rating.graphics != 0:
+                graphics_total += rating.graphics
+                graphics_count += 1
+            if rating.audio != 0:
+                audio_total += rating.audio
+                audio_count += 1
+            if rating.story != 0:
+                story_total += rating.story
+                story_count += 1
+            if rating.recommendability != 0:
+                recommendability_total += rating.recommendability
+                recommendability_count += 1
+        if difficulty_count == 0:
+            rating_dict['difficulty'] = 0
+        else:
+            rating_dict['difficulty'] = round(difficulty_total / difficulty_count, 2)
+        if replayability_count == 0:
+            rating_dict['replayability'] = 0
+        else:
+            rating_dict['replayability'] = round(replayability_total / replayability_count, 2)
+        if graphics_count == 0:
+            rating_dict['graphics'] = 0
+        else:
+            rating_dict['graphics'] = round(graphics_total / graphics_count, 2)
+        if audio_count == 0:
+            rating_dict['audio'] = 0
+        else:
+            rating_dict['audio'] = round(audio_total / audio_count, 2)
+        if story_count == 0:
+            rating_dict['story'] = 0
+        else:
+            rating_dict['story'] = round(story_total / story_count, 2)
+        if recommendability_count == 0:
+            rating_dict['recommendability'] = 0
+        else:
+            rating_dict['recommendability'] = round(recommendability_total / recommendability_count, 2)
+        return render(request, 'games/game_detail.html', {'game': game, 'pending_tags':pending_tags, 'user_score':user_score, 'users_rated':users_rated, 'user_counts':user_counts, 'game_entry': game_entry, 'aspect_ratings': rating_dict, 'personal_rating': personal_rating, 'stubbed':stubbed, 'ignored':ignored, 'tab':tab})
     # Tab does not exist
     else:
         raise Http404
@@ -781,6 +845,51 @@ def LikeStatusView(request, status_id=None):
         return HttpResponse(json.dumps(js_response), content_type='application/json')
     else:
         return redirect('/')
+
+@login_required(login_url='/login/')
+def RateAspectView(request):
+    valid_aspects = ['difficulty', 'replayability', 'graphics', 'audio', 'story', 'recommendability']
+    game_id = request.GET.get('game')
+    aspect = request.GET.get('aspect')
+    rating = request.GET.get('rating')
+    # Handle invalid games
+    if not game_id:
+        return render(request, 'games/error_message.html', {'error':'No game ID given!'})
+    try:
+        game = Game.objects.get(id=game_id)
+    except Game.DoesNotExist:
+        return render(request, 'games/error_message.html', {'error':'No such game!'})
+    # Handle invalid aspects
+    if not aspect or aspect not in valid_aspects:
+        return render(request, 'games/error_message.html', {'error':'Invalid aspect!'})
+    # Handle invalid ratings
+    try:
+        rating = int(rating)
+    except:
+        return render(request, 'games/error_message.html', {'error':'Invalid rating!'})
+    if rating not in [0, 1, 2, 3, 4, 5]:
+        return render(request, 'games/error_message.html', {'error':'Invalid rating!'})
+
+    try:
+        user_rating = UserGameAspectRating.objects.get(user=request.user, game=game)
+    except UserGameAspectRating.DoesNotExist:
+        user_rating = UserGameAspectRating()
+        user_rating.user = request.user
+        user_rating.game = game
+    if aspect == 'difficulty':
+        user_rating.difficulty = rating
+    elif aspect == 'replayability':
+        user_rating.replayability = rating
+    elif aspect == 'graphics':
+        user_rating.graphics = rating
+    elif aspect == 'audio':
+        user_rating.audio = rating
+    elif aspect == 'story':
+        user_rating.story = rating
+    elif aspect == 'recommendability':
+        user_rating.recommendability = rating
+    user_rating.save()
+    return redirect('/game/%s/_/aspects' % game.id)
 
 @login_required(login_url='/login/')
 def SettingsView(request):
