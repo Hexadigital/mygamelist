@@ -421,6 +421,9 @@ def GameView(request, game_id, name=None, tab=None):
         else:
             following_entries = []
         return render(request, 'games/game_detail.html', {'game': game, 'pending_tags':pending_tags, 'user_score':user_score, 'users_rated':users_rated, 'user_counts':user_counts, 'game_entry': game_entry, 'recent_statuses': recent_statuses, 'following_entries': following_entries, 'stubbed':stubbed, 'ignored':ignored, 'tab':tab})
+    elif tab == 'aspects':
+        
+        return render(request, 'games/game_detail.html', {'game': game, 'pending_tags':pending_tags, 'user_score':user_score, 'users_rated':users_rated, 'user_counts':user_counts, 'game_entry': game_entry, 'stubbed':stubbed, 'ignored':ignored, 'tab':tab})
     # Tab does not exist
     else:
         raise Http404

@@ -9,6 +9,7 @@
 	<meta name="twitter:title" content="{{ game.name }} ({{ game.year }}) :: Remember Games" />
 	<meta name="twitter:description" content="{{ game.description|truncatechars:200 }}" />
 	<meta name="twitter:image" content="{{ game.image.url }}" />
+<link href="{% static 'css/font-awesome.min.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block extracss %}
@@ -20,6 +21,24 @@ body {
 	color: white;
 }
 {% endif %}
+.rating-list li {
+	float: right;
+	color: #ddd;
+	padding: 0px 3px;
+}
+
+.rating-list.highlight-ready li:hover,
+	.rating-list.highlight-ready li:hover ~ li {
+	color: orange;
+}
+
+.rating-list {
+	display: inline-block;
+	list-style: none;
+}
+.checked {
+	color: orange;
+}
 {% endblock %}
 
 {% block navitems %}
@@ -130,6 +149,11 @@ body {
 				<li class="nav-item">
 					<a href="{% url 'games:game' game.id gameslug %}" class="nav-link{% if not tab %} active{% endif %}">
 						<div class="nav-field">Overview</div>
+					</a>
+				</li>
+				<li class="nav-item">
+					<a href="{% url 'games:game' game.id gameslug 'aspects' %}" class="nav-link{% if tab == 'aspects' %} active{% endif %}">
+						<div class="nav-field">Aspects</div>
 					</a>
 				</li>
 				<li class="nav-item">
@@ -249,6 +273,33 @@ body {
 					</div>
 				</div>
 			</div>
+			{% elif tab == 'aspects' %}
+				<div class="col-md-6 align-center">
+					<div class="text-white bg-dark mb-3 rounded" style="max-width: 100%">
+						<div class="card-header d-flex justify-content-center container-fluid"><b>Difficulty</b></div>
+						<div class="card-body">
+							<div class="card-text" align="center">
+								<h7 class="card-title">Average Rating (0.00)</h7><br>
+									<ul class="rating-list">
+										<li><span class="fa fa-star {% if post.average_rating > 0 %} checked {% endif %}"></span></li>
+										<li><span class="fa fa-star {% if post.average_rating > 1 %} checked {% endif %}"></span></li>
+										<li><span class="fa fa-star {% if post.average_rating > 2 %} checked {% endif %}"></span></li>
+										<li><span class="fa fa-star {% if post.average_rating > 3 %} checked {% endif %}" ></span></li>
+										<li><span class="fa fa-star {% if post.average_rating > 4 %} checked {% endif %}"></span></li>
+									</ul>
+								<br>
+								<h7 class="card-title">Your Rating (0.00)</h7><br>
+									<ul class="rating-list highlight-ready">
+										<li onclick="rate(5, {{ post.id }})"><span class="fa fa-star {% if post.user_rating > 0 %} checked {% endif %}"></span></li>
+										<li onclick="rate(4, {{ post.id }})"><span class="fa fa-star {% if post.user_rating > 1 %} checked {% endif %}"></span></li>
+										<li onclick="rate(3, {{ post.id }})"><span class="fa fa-star {% if post.user_rating > 2 %} checked {% endif %}"></span></li>
+										<li onclick="rate(2, {{ post.id }})"><span class="fa fa-star {% if post.user_rating > 3 %} checked {% endif %}" ></span></li>
+										<li onclick="rate(1, {{ post.id }})"><span class="fa fa-star {% if post.user_rating > 4 %} checked {% endif %}"></span></li>
+									</ul>
+							</div>
+						</div>
+					</div>
+				</div>
 			{% endif %}
 		</div>
 	</div>
