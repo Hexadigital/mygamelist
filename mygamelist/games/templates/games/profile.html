@@ -138,7 +138,7 @@
 										</tr>
 											{% for entry_name, entry in game_list.items %}
 											<tr>
-												<td>{% if entry.game_id %}<a class="gamelink" href="{% url 'games:game' entry.game_id entry_name|slugify %}">{% endif %}{{ entry_name }}{% if entry.game_id %}</a>{% endif %}</td>
+												<td>{% if entry.game_id %}<a class="gamelink" href="{% url 'games:game' entry.game_id entry.name|slugify %}">{% endif %}{{ entry.name }}{% if entry.game_id %}</a>{% endif %}</td>
 												<td>{% if entry.platform %}{% if entry.platform.shorthand %}{{ entry.platform.shorthand }}{% else %}{{ entry.platform.name }}{% endif %}{% else %}None{% endif %}</td>
 												<td>{% if profile_score_type == 'SMIL' %}
 														{% if entry.score >= 7.0 %}

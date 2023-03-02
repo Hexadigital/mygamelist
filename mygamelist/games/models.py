@@ -118,6 +118,16 @@ class UserGameListEntry(models.Model):
     def __str__(self):
         return self.user.username + " - " + self.game.name
 
+class GameVerifiedPlatform(models.Model):
+    game = models.ForeignKey(Game, on_delete=models.CASCADE)
+    platform = models.ForeignKey(Platform, on_delete=models.CASCADE)
+    year = models.IntegerField(default=0)
+    retroachievements_id = models.IntegerField(blank=True, null=True)
+    mobygames_link = models.URLField(max_length=250, blank=True, default='', verbose_name="MobyGames Link")
+
+    def __str__(self):
+        return self.game.name + " - " + self.platform.name
+
 class UserGameAspectRating(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     game = models.ForeignKey(Game, on_delete=models.CASCADE)

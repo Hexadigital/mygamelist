@@ -176,6 +176,11 @@ body {
 					</a>
 				</li>
 				<li class="nav-item">
+					<a href="{% url 'games:game' game.id gameslug 'relations' %}" class="nav-link{% if tab == 'relations' %} active{% endif %}">
+						<div class="nav-field">Relations</div>
+					</a>
+				</li>
+				<li class="nav-item">
 					<a href="{% url 'games:game' game.id gameslug 'social' %}" class="nav-link{% if tab == 'social' %} active{% endif %}">
 						<div class="nav-field">Social</div>
 					</a>
@@ -292,6 +297,64 @@ body {
 					</div>
 				</div>
 			</div>
+			{% elif tab == 'relations' %}
+			<div class="container">
+				<div class="row justify-content-md-center">
+					<div class="col-md-12 align-center">
+						<center><h4>Confirmed Platforms</h4></center>
+						<div class="text-white bg-dark mb-3 rounded" style="max-width: 100%">
+							<div class="row align-items-center">
+								<div class="col">
+									<div class="card-body">
+										{% for platform in platforms %}
+										<div class="card-text d-flex justify-content-between">
+											<div>
+												{{ platform.platform.category}} - {{ platform.platform.name}} {% if platform.year != 0 %}({{ platform.year }}){% endif %}
+											</div>
+											<div>
+												{% if platform.retroachievements_id %}<a href="https://retroachievements.org/game/{{ platform.retroachievements_id }}" target="_blank" rel="noopener noreferrer"><img src="{% static 'icons/retroachievements.png' %}"></a>{% endif %}
+												{% if platform.mobygames_link != '' %}<a href="{{ platform.mobygames_link }}" target="_blank" rel="noopener noreferrer"><img src="{% static 'icons/mobygames.png' %}"></a>{% endif %}
+											</div>
+										</div>
+										<hr>
+										{% endfor %}
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!--<div class="col-md-6 align-center">
+						<center><h4>Related Games</h4></center>
+						<div class="text-white bg-dark mb-3 rounded" style="max-width: 100%">
+							<div class="row align-items-center">
+								<div class="col">
+									<div class="card-header d-flex justify-content-between container-fluid">
+										Test2
+									</div>
+									<div class="card-body">
+										<div class="card-text d-flex justify-content-between">
+											<div>
+												Platform Year
+											</div>
+											<div>
+												RA Link
+											</div>
+										</div>
+										<div class="card-text d-flex justify-content-between">
+											<div>
+												Platform Year
+											</div>
+											<div>
+												RA Link
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>-->
 			{% elif tab == 'aspects' %}
 			<!-- TODO: Refactor this -->
 			<div class="container">
@@ -375,7 +438,7 @@ body {
 										</div>
 										Your Rating (
 										{% if personal_rating.audio == 1 %}
-											Horrible
+											Horrible / None
 										{% elif personal_rating.audio == 2 %}
 											Bad
 										{% elif personal_rating.audio == 3 %}
@@ -396,7 +459,7 @@ body {
 											   {% if personal_rating.audio >= 3 %}style='color: orange;'{% endif %}>★</a>
 											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=audio&rating=2" title="Bad" data-value="2"
 											   {% if personal_rating.audio >= 2 %}style='color: orange;'{% endif %}>★</a>
-											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=audio&rating=1" title="Horrible" data-value="1"
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=audio&rating=1" title="Horrible / None" data-value="1"
 											   {% if personal_rating.audio >= 1 %}style='color: orange;'{% endif %}>★</a>
 										</div>{% if personal_rating.audio >= 1 %}<center><a class="gamelink" href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=audio&rating=0">Clear Rating</a></center>{% else %}<br>{% endif %}
 										</div>
@@ -429,7 +492,7 @@ body {
 										</div>
 										Your Rating (
 										{% if personal_rating.story == 1 %}
-											Horrible
+											Horrible / None
 										{% elif personal_rating.story == 2 %}
 											Bad
 										{% elif personal_rating.story == 3 %}
@@ -442,15 +505,15 @@ body {
 											N/A
 										{% endif %})<br>
 										<div class="rating rating2" align='center'>
-											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=story&rating=5" title="Very Hard" data-value="5"
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=story&rating=5" title="Excellent" data-value="5"
 											   {% if personal_rating.story == 5 %}style='color: orange;'{% endif %}>★</a>
-											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=story&rating=4" title="Hard" data-value="4"
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=story&rating=4" title="Good" data-value="4"
 											   {% if personal_rating.story >= 4 %}style='color: orange;'{% endif %}>★</a>
 											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=story&rating=3" title="Average" data-value="3"
 											   {% if personal_rating.story >= 3 %}style='color: orange;'{% endif %}>★</a>
-											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=story&rating=2" title="Easy" data-value="2"
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=story&rating=2" title="Bad" data-value="2"
 											   {% if personal_rating.story >= 2 %}style='color: orange;'{% endif %}>★</a>
-											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=story&rating=1" title="Very Easy" data-value="1"
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=story&rating=1" title="Horrible / None" data-value="1"
 											   {% if personal_rating.story >= 1 %}style='color: orange;'{% endif %}>★</a>
 										</div>{% if personal_rating.story >= 1 %}<center><a class="gamelink" href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=story&rating=0">Clear Rating</a></center>{% else %}<br>{% endif %}
 										</div>
@@ -538,7 +601,7 @@ body {
 										</div>
 										Your Rating (
 										{% if personal_rating.graphics == 1 %}
-											Horrible
+											Horrible / None
 										{% elif personal_rating.graphics == 2 %}
 											Bad
 										{% elif personal_rating.graphics == 3 %}
@@ -559,7 +622,7 @@ body {
 											   {% if personal_rating.graphics >= 3 %}style='color: orange;'{% endif %}>★</a>
 											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=graphics&rating=2" title="Bad" data-value="2"
 											   {% if personal_rating.graphics >= 2 %}style='color: orange;'{% endif %}>★</a>
-											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=graphics&rating=1" title="Horrible" data-value="1"
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=graphics&rating=1" title="Horrible / None" data-value="1"
 											   {% if personal_rating.graphics >= 1 %}style='color: orange;'{% endif %}>★</a>
 										</div>{% if personal_rating.graphics >= 1 %}<center><a class="gamelink" href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=graphics&rating=0">Clear Rating</a></center>{% else %}<br>{% endif %}
 										</div>

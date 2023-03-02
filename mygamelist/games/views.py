@@ -14,6 +14,7 @@ from django.utils.http import is_safe_url
 
 from .models import Game, Genre, Platform, Tag, User, UserGameListEntry, ManualUserGameListEntry, UserGameStatus, UserGameAspectRating
 from .models import UserGameStatus, Notification, Recommendation, Collection, CollectionType, UserProfile, UserSettings, TagAdditionRequest, CustomList
+from .models import GameVerifiedPlatform
 from .forms import SignUpForm, ManualGameForm, GameEntryForm, ChangeAvatarForm, ChangeIgnoredTagsForm, TagAdditionRequestForm, CustomListForm, HidePlatformsForm
 
 def IndexView(request, global_view=False):
@@ -178,36 +179,40 @@ def ProfileView(request, user_id, name=None, tab=None):
         game_list = UserGameListEntry.objects.prefetch_related('platform').prefetch_related('game').filter(user=user_id)
         manual_list = ManualUserGameListEntry.objects.prefetch_related('platform').filter(user=user_id)
         total_list = {"Playing": {}, "Completed": {}, "Paused": {}, "Dropped": {}, "Plan to Play": {}, "Imported": {}}
+        i = 1
         for entry in game_list:
-            total_list[status_conversion[entry.status]][entry.game.name] = {'game_id': entry.game.id, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed}
+            total_list[status_conversion[entry.status]][i] = {'id': entry.game.id, 'game_id': entry.game.id, 'name': entry.game.name, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed, 'edit_type': 'edit', 'delete_type': 'delete'}
+            i += 1
         for entry in manual_list:
-            total_list[status_conversion[entry.status]][entry.name] = {'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed}
+            total_list[status_conversion[entry.status]][i] = {'id': entry.id, 'name': entry.name, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed, 'edit_type': 'edit-manual', 'delete_type': 'delete-manual', 'never_migrate':entry.never_migrate}
+            i += 1
         # Sort dicts
         for status in total_list.keys():
             # TODO: Find a more elegant way to sort one key reversed and the other normally
             sortingmethod = request.GET.get('sort')
-            if sortingmethod and sortingmethod in ['score', 'platform', 'hours']:
-                templist = []
-                for x in total_list[status].keys():
-                    if sortingmethod == 'score':
-                        templist.append((Decimal(11) if total_list[status][x]['score'] is None else 10 - total_list[status][x]['score'], x, total_list[status][x]))
-                    if sortingmethod == 'platform':
-                        if total_list[status][x]['platform'] is None:
-                            platform = 'None'
+            if not sortingmethod or sortingmethod not in ['score', 'platform', 'hours', 'name']:
+                sortingmethod = 'name'
+            templist = []
+            for x in total_list[status].keys():
+                if sortingmethod == 'name':
+                    templist.append((total_list[status][x]['name'], x, total_list[status][x]))
+                if sortingmethod == 'score':
+                    templist.append((Decimal(11) if total_list[status][x]['score'] is None else 10 - total_list[status][x]['score'], x, total_list[status][x]))
+                if sortingmethod == 'platform':
+                    if total_list[status][x]['platform'] is None:
+                        platform = 'None'
+                    else:
+                        if total_list[status][x]['platform'].shorthand:
+                            platform = total_list[status][x]['platform'].shorthand
                         else:
-                            if total_list[status][x]['platform'].shorthand:
-                                platform = total_list[status][x]['platform'].shorthand
-                            else:
-                                platform = total_list[status][x]['platform'].name
-                        templist.append((platform, x, total_list[status][x]))
-                    if sortingmethod == 'hours':
-                        templist.append((10000000000 if total_list[status][x]['hours'] is None else 10000000000 - total_list[status][x]['hours'], x, total_list[status][x]))
-                templist.sort()
-                total_list[status].clear()
-                for x in templist:
-                    total_list[status][x[1]] = x[2]
-            else:
-                total_list[status] = OrderedDict(sorted(total_list[status].items()))
+                            platform = total_list[status][x]['platform'].name
+                    templist.append((platform, x, total_list[status][x]))
+                if sortingmethod == 'hours':
+                    templist.append((10000000000 if total_list[status][x]['hours'] is None else 10000000000 - total_list[status][x]['hours'], x, total_list[status][x]))
+            templist.sort()
+            total_list[status].clear()
+            for x in templist:
+                total_list[status][x[1]] = x[2]
             
         # Figure out how to display their ratings
         try:
@@ -421,6 +426,10 @@ def GameView(request, game_id, name=None, tab=None):
         else:
             following_entries = []
         return render(request, 'games/game_detail.html', {'game': game, 'pending_tags':pending_tags, 'user_score':user_score, 'users_rated':users_rated, 'user_counts':user_counts, 'game_entry': game_entry, 'recent_statuses': recent_statuses, 'following_entries': following_entries, 'stubbed':stubbed, 'ignored':ignored, 'tab':tab})
+    elif tab == 'relations':
+        platforms = GameVerifiedPlatform.objects.filter(game=game).prefetch_related('platform').order_by('year')
+        return render(request, 'games/game_detail.html', {'game': game, 'pending_tags':pending_tags, 'user_score':user_score, 'users_rated':users_rated, 'user_counts':user_counts, 'game_entry': game_entry, 'platforms': platforms, 'stubbed':stubbed, 'ignored':ignored, 'tab':tab})
+
     elif tab == 'aspects':
         # Calculate site aspects
         ratings = UserGameAspectRating.objects.filter(game=game)
@@ -567,36 +576,40 @@ def GameListView(request, edit_type=None, entry_id=None):
         game_list = UserGameListEntry.objects.filter(user=user_id).prefetch_related('platform').prefetch_related('game')
         manual_list = ManualUserGameListEntry.objects.filter(user=user_id).prefetch_related('platform')
         total_list = {"Playing": {}, "Completed": {}, "Paused": {}, "Dropped": {}, "Plan to Play": {}, "Imported": {}}
+        i = 1
         for entry in game_list:
-            total_list[status_conversion[entry.status]][entry.game.name] = {'id': entry.game.id, 'game_id': entry.game.id, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed, 'edit_type': 'edit', 'delete_type': 'delete'}
+            total_list[status_conversion[entry.status]][i] = {'id': entry.game.id, 'game_id': entry.game.id, 'name': entry.game.name, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed, 'edit_type': 'edit', 'delete_type': 'delete'}
+            i += 1
         for entry in manual_list:
-            total_list[status_conversion[entry.status]][entry.name] = {'id': entry.id, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed, 'edit_type': 'edit-manual', 'delete_type': 'delete-manual', 'never_migrate':entry.never_migrate}
+            total_list[status_conversion[entry.status]][i] = {'id': entry.id, 'name': entry.name, 'platform': entry.platform, 'score': entry.score, 'hours': entry.hours, 'comments': entry.comments, 'times_replayed': entry.times_replayed, 'edit_type': 'edit-manual', 'delete_type': 'delete-manual', 'never_migrate':entry.never_migrate}
+            i += 1
         # Sort dicts
         for status in total_list.keys():
             # TODO: Find a more elegant way to sort one key reversed and the other normally
             sortingmethod = request.GET.get('sort')
-            if sortingmethod and sortingmethod in ['score', 'platform', 'hours']:
-                templist = []
-                for x in total_list[status].keys():
-                    if sortingmethod == 'score':
-                        templist.append((Decimal(11) if total_list[status][x]['score'] is None else 10 - total_list[status][x]['score'], x, total_list[status][x]))
-                    if sortingmethod == 'platform':
-                        if total_list[status][x]['platform'] is None:
-                            platform = 'None'
+            if not sortingmethod or sortingmethod not in ['score', 'platform', 'hours', 'name']:
+                sortingmethod = 'name'
+            templist = []
+            for x in total_list[status].keys():
+                if sortingmethod == 'name':
+                    templist.append((total_list[status][x]['name'], x, total_list[status][x]))
+                if sortingmethod == 'score':
+                    templist.append((Decimal(11) if total_list[status][x]['score'] is None else 10 - total_list[status][x]['score'], x, total_list[status][x]))
+                if sortingmethod == 'platform':
+                    if total_list[status][x]['platform'] is None:
+                        platform = 'None'
+                    else:
+                        if total_list[status][x]['platform'].shorthand:
+                            platform = total_list[status][x]['platform'].shorthand
                         else:
-                            if total_list[status][x]['platform'].shorthand:
-                                platform = total_list[status][x]['platform'].shorthand
-                            else:
-                                platform = total_list[status][x]['platform'].name
-                        templist.append((platform, x, total_list[status][x]))
-                    if sortingmethod == 'hours':
-                        templist.append((10000000000 if total_list[status][x]['hours'] is None else 10000000000 - total_list[status][x]['hours'], x, total_list[status][x]))
-                templist.sort()
-                total_list[status].clear()
-                for x in templist:
-                    total_list[status][x[1]] = x[2]
-            else:
-                total_list[status] = OrderedDict(sorted(total_list[status].items()))
+                            platform = total_list[status][x]['platform'].name
+                    templist.append((platform, x, total_list[status][x]))
+                if sortingmethod == 'hours':
+                    templist.append((10000000000 if total_list[status][x]['hours'] is None else 10000000000 - total_list[status][x]['hours'], x, total_list[status][x]))
+            templist.sort()
+            total_list[status].clear()
+            for x in templist:
+                total_list[status][x[1]] = x[2]
         return render(request, 'games/user_list.html', {'total_list': total_list, 'edit_type': edit_type})
     # Manual game deletion
     elif edit_type == 'delete-manual':

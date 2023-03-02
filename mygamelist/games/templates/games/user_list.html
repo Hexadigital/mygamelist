@@ -45,7 +45,7 @@
 						<a href="{% url 'games:gamelist' entry.edit_type entry.id %}?next=/gamelist">&#x2699;</a>
 						<a href="{% url 'games:gamelist' entry.delete_type entry.id %}">&#x1F5D1;</a>
 					</td>
-					<td>{% if entry.game_id %}<a class="gamelink" href="{% url 'games:game' entry.game_id entry_name|slugify %}">{% endif %}{{ entry_name }}{% if entry.game_id %}</a>{% endif %}</td>
+					<td>{% if entry.game_id %}<a class="gamelink" href="{% url 'games:game' entry.game_id entry.name|slugify %}">{% endif %}{{ entry.name }}{% if entry.game_id %}</a>{% endif %}</td>
 					<td>{% if entry.platform %}{% if entry.platform.shorthand %}{{ entry.platform.shorthand }}{% else %}{{ entry.platform.name }}{% endif %}{% else %}None{% endif %}</td>
 					<td>{% if settings.score_type == 'SMIL' %}
 							{% if entry.score >= 7.0 %}
