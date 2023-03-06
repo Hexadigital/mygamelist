@@ -124,7 +124,7 @@ body {
 				{% if users_rated > 0 %}
 					<span title="Rated by {{ users_rated }} user(s).">Score: {% if user_score %}{{ user_score|floatformat:"0" }}%{% else %}None{% endif %}</span>
 				{% else %}
-					<span title="Using external data for scoring.">Score: {% if game.temp_pop_score %}{{ game.temp_pop_score|floatformat:"0" }}%{% else %}None{% endif %}</span>
+					<span title="Using external data for scoring.">Score: {% if game.temp_pop_score == 50 %}N/A{% elif game.temp_pop_score %}{{ game.temp_pop_score|floatformat:"0" }}%{% else %}None{% endif %}</span>
 				{% endif %}
 			</blockquote>
 			<blockquote class="blockquote">
