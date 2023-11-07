@@ -38,6 +38,7 @@
 </head>
 
 <body>
+    {% block navbar %}
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 		<a class="navbar-brand" href="/">Remember Games</a>
 		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -72,14 +73,17 @@
 		{% endif %}
 		</div>
 	</nav>
+    {% endblock %}
 	{% block content %}{% endblock %}
 	<br><br><br>
+    {% block footer %}
 	<div class="footer">
 		<div class="col-12" align="center">
 			<a href="https://discord.gg/ncK5gb5F34">Discord</a> | <a href="https://github.com/Hexadigital/mygamelist">GitHub</a><br>
 			Coded with ♥ &middot; &copy; 2023 Remember Games
 		</div>
 	</div>
+    {% endblock %}
 	<div id="lightbox" class="lightbox hidden"></div>
 	<div id="curtain" class="curtain hidden"></div>
 

@@ -494,7 +494,74 @@ def GameView(request, game_id, name=None, tab=None):
         else:
             rating_dict['recommendability'] = round(recommendability_total / recommendability_count, 2)
         aspect_counts = {'difficulty': difficulty_count, 'replayability': replayability_count, 'graphics': graphics_count, 'audio': audio_count, 'story': story_count, 'recommendability': recommendability_count}
-        return render(request, 'games/game_detail.html', {'game': game, 'pending_tags':pending_tags, 'user_score':user_score, 'users_rated':users_rated, 'user_counts':user_counts, 'game_entry': game_entry, 'aspect_ratings': rating_dict, 'aspect_counts': aspect_counts, 'personal_rating': personal_rating, 'stubbed':stubbed, 'ignored':ignored, 'tab':tab})
+        solo = request.GET.get('solo')
+        return render(request, 'games/game_detail.html', {'game': game, 'pending_tags':pending_tags, 'user_score':user_score, 'users_rated':users_rated, 'user_counts':user_counts, 'game_entry': game_entry, 'aspect_ratings': rating_dict, 'aspect_counts': aspect_counts, 'solo': solo, 'personal_rating': personal_rating, 'stubbed':stubbed, 'ignored':ignored, 'tab':tab})
+    elif tab == 'slide':
+        # Calculate site aspects
+        ratings = UserGameAspectRating.objects.filter(game=game)
+        try:
+            personal_rating = UserGameAspectRating.objects.get(game=game, user=request.user)
+        except:
+            personal_rating = None
+        rating_dict = {}
+        difficulty_total = 0
+        difficulty_count = 0
+        replayability_total = 0
+        replayability_count = 0
+        graphics_total = 0
+        graphics_count = 0
+        audio_total = 0
+        audio_count = 0
+        story_total = 0
+        story_count = 0
+        recommendability_total = 0
+        recommendability_count = 0
+        for rating in ratings:
+            if rating.difficulty != 0:
+                difficulty_total += rating.difficulty
+                difficulty_count += 1
+            if rating.replayability != 0:
+                replayability_total += rating.replayability
+                replayability_count += 1
+            if rating.graphics != 0:
+                graphics_total += rating.graphics
+                graphics_count += 1
+            if rating.audio != 0:
+                audio_total += rating.audio
+                audio_count += 1
+            if rating.story != 0:
+                story_total += rating.story
+                story_count += 1
+            if rating.recommendability != 0:
+                recommendability_total += rating.recommendability
+                recommendability_count += 1
+        if difficulty_count == 0:
+            rating_dict['difficulty'] = 0
+        else:
+            rating_dict['difficulty'] = round(difficulty_total / difficulty_count, 2)
+        if replayability_count == 0:
+            rating_dict['replayability'] = 0
+        else:
+            rating_dict['replayability'] = round(replayability_total / replayability_count, 2)
+        if graphics_count == 0:
+            rating_dict['graphics'] = 0
+        else:
+            rating_dict['graphics'] = round(graphics_total / graphics_count, 2)
+        if audio_count == 0:
+            rating_dict['audio'] = 0
+        else:
+            rating_dict['audio'] = round(audio_total / audio_count, 2)
+        if story_count == 0:
+            rating_dict['story'] = 0
+        else:
+            rating_dict['story'] = round(story_total / story_count, 2)
+        if recommendability_count == 0:
+            rating_dict['recommendability'] = 0
+        else:
+            rating_dict['recommendability'] = round(recommendability_total / recommendability_count, 2)
+        aspect_counts = {'difficulty': difficulty_count, 'replayability': replayability_count, 'graphics': graphics_count, 'audio': audio_count, 'story': story_count, 'recommendability': recommendability_count}
+        solo = request.GET.get('solo')
+        return render(request, 'games/game_slide.html', {'game': game, 'pending_tags':pending_tags, 'user_score':user_score, 'users_rated':users_rated, 'user_counts':user_counts, 'game_entry': game_entry, 'aspect_ratings': rating_dict, 'aspect_counts': aspect_counts, 'solo': solo, 'personal_rating': personal_rating, 'stubbed':stubbed, 'ignored':ignored, 'tab':tab})
     # Tab does not exist
     else:
         raise Http404

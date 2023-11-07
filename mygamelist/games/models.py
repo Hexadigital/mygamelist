@@ -227,6 +227,7 @@ class UserSettings(models.Model):
         ("DCML","10-Point Decimal")
     ]
     score_type = models.CharField(max_length=4, choices=rating_systems, default="DCML")
+    use_invidious = models.BooleanField(default=False)
 
 class TagAdditionRequest(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE)

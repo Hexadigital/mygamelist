@@ -28,7 +28,7 @@
 <br>{{ form.errors }}
 <div class="text-white bg-dark mb-3 rounded" style="max-width: 100%">
 <br>
-<form action="{% url 'games:gamelist' 'edit-manual' game_entry.id %}" method="post">
+<form action="{% url 'games:gamelist' 'edit-manual' game_entry.id %}" method="post" autocomplete="off">
 	<div class="row">
 		{% csrf_token %}
 		<br>

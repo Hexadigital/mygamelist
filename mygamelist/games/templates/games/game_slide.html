@@ -1,0 +1,252 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}{{ game.name }} ({{ game.year }}) :: Remember Games{% endblock %}
+
+{% block embedpreview %}
+	<meta name="twitter:card" content="summary" />
+	<meta name="twitter:title" content="{{ game.name }} ({{ game.year }}) :: Remember Games" />
+	<meta name="twitter:description" content="{{ game.description|truncatechars:200 }}" />
+	<meta name="twitter:image" content="{{ game.image.url }}" />
+<link href="{% static 'css/font-awesome.min.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block extracss %}
+{% if game.background %}
+body {
+	background-image: url("{{ game.background.url }}"), url("{% static 'bgdark.png' %}");
+	background-repeat: no-repeat, repeat;
+	background-size: cover, auto;
+	color: white;
+}
+{% endif %}
+.rating {
+  width: 240px;
+  margin: 0 0;
+  font-size: 32px;
+  overflow:hidden;
+}
+.rating input {
+  float: right;
+  opacity: 0;
+  position: absolute;
+}
+.rating a, 
+.rating label {
+			float:right;
+			color: #aaa;
+			text-decoration: none;
+			-webkit-transition: color .4s;
+			-moz-transition: color .4s;
+			-o-transition: color .4s;
+			transition: color .4s;
+		}
+.rating label:hover ~ label,
+.rating input:focus ~ label,
+.rating label:hover,
+		.rating a:hover,
+		.rating a:hover ~ a,
+		.rating a:focus,
+		.rating a:focus ~ a		{
+			color: orange;
+			cursor: pointer;
+		}
+		.rating2 {
+			direction: rtl;
+		}
+		.rating2 a {
+			float:none
+		}
+{% endblock %}
+
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+{% firstof game.name|slugify '_' as gameslug %}
+<div class="container-fluid firstrow">
+	<div class="row justify-content-md-center">
+		<div class="col-md-12" align="center">
+			<br>
+			<h1>{{ game.name }} ({{ game.year }})</h1><br>
+		</div>
+		<div class="col-md-4" align="center">
+            <img style="max-height:400px;max-width:100%;" src="{{ game.image.url }}"><br><br>
+			<br>
+			</div>
+		<div class="col-md-4" align="center">
+			<h2>Platform: {{ game_entry.platform.category }} {{ game_entry.platform.name }}</h2>{% if game_entry.status != 'Plan to Play' %}
+            <h2>{{ game_entry.start_date|date:'Y-m-d' }} -> {{ game_entry.stop_date|date:'Y-m-d' }}</h2>
+            <h2>{{ game_entry.status }} after {{ game_entry.hours.normalize }}h</h2>
+            <h2><b>{{ game_entry.score.normalize }}/10</b></h2>
+            {% else %}<h2>Planning</h2>{% endif %}
+			<br>
+		</div>
+		<div class="col-md-4" align="center">
+			<div class="container">
+				<div class="row justify-content-md-center">
+					<div class="col-md-6 align-center">
+						<div class="text-white bg-dark mb-3 rounded" style="max-width: 100%">
+							<div class="row align-items-center">
+								<div class="col">
+									<div class="card-header d-flex justify-content-center container-fluid">
+										<b>Difficulty</b>
+									</div>
+									<div class="card-body">
+										<div class="card-text">
+										<div class="rating rating2" align='center'>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=difficulty&rating=5" title="Very Hard" data-value="5"
+											   {% if personal_rating.difficulty == 5 %}style='color: orange;'{% endif %}>★</a>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=difficulty&rating=4" title="Hard" data-value="4"
+											   {% if personal_rating.difficulty >= 4 %}style='color: orange;'{% endif %}>★</a>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=difficulty&rating=3" title="Average" data-value="3"
+											   {% if personal_rating.difficulty >= 3 %}style='color: orange;'{% endif %}>★</a>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=difficulty&rating=2" title="Easy" data-value="2"
+											   {% if personal_rating.difficulty >= 2 %}style='color: orange;'{% endif %}>★</a>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=difficulty&rating=1" title="Very Easy" data-value="1"
+											   {% if personal_rating.difficulty >= 1 %}style='color: orange;'{% endif %}>★</a>
+										</div></div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<br>
+						<div class="text-white bg-dark mb-3 rounded" style="max-width: 100%">
+							<div class="row align-items-center">
+								<div class="col">
+									<div class="card-header d-flex justify-content-center container-fluid">
+										<b>Audio</b>
+									</div>
+									<div class="card-body">
+										<div class="card-text">
+										<div class="rating rating2" align='center'>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=audio&rating=5" title="Excellent" data-value="5"
+											   {% if personal_rating.audio == 5 %}style='color: orange;'{% endif %}>★</a>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=audio&rating=4" title="Good" data-value="4"
+											   {% if personal_rating.audio >= 4 %}style='color: orange;'{% endif %}>★</a>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=audio&rating=3" title="Average" data-value="3"
+											   {% if personal_rating.audio >= 3 %}style='color: orange;'{% endif %}>★</a>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=audio&rating=2" title="Bad" data-value="2"
+											   {% if personal_rating.audio >= 2 %}style='color: orange;'{% endif %}>★</a>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=audio&rating=1" title="Horrible / None" data-value="1"
+											   {% if personal_rating.audio >= 1 %}style='color: orange;'{% endif %}>★</a>
+										</div></div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<br>
+						<div class="text-white bg-dark mb-3 rounded" style="max-width: 100%">
+							<div class="row align-items-center">
+								<div class="col">
+									<div class="card-header d-flex justify-content-center container-fluid">
+										<b>Story</b>
+									</div>
+									<div class="card-body">
+										<div class="card-text">
+										<div class="rating rating2" align='center'>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=story&rating=5" title="Excellent" data-value="5"
+											   {% if personal_rating.story == 5 %}style='color: orange;'{% endif %}>★</a>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=story&rating=4" title="Good" data-value="4"
+											   {% if personal_rating.story >= 4 %}style='color: orange;'{% endif %}>★</a>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=story&rating=3" title="Average" data-value="3"
+											   {% if personal_rating.story >= 3 %}style='color: orange;'{% endif %}>★</a>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=story&rating=2" title="Bad" data-value="2"
+											   {% if personal_rating.story >= 2 %}style='color: orange;'{% endif %}>★</a>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=story&rating=1" title="Horrible / None" data-value="1"
+											   {% if personal_rating.story >= 1 %}style='color: orange;'{% endif %}>★</a>
+										</div></div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6 align-center">
+						<div class="text-white bg-dark mb-3 rounded" style="max-width: 100%">
+							<div class="row align-items-center">
+								<div class="col">
+									<div class="card-header d-flex justify-content-center container-fluid">
+										<b>Replayability</b>
+									</div>
+									<div class="card-body">
+										<div class="card-text">
+											<div class="rating rating2" align='center'>
+												<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=replayability&rating=5" title="Endless" data-value="5"
+												   {% if personal_rating.replayability == 5 %}style='color: orange;'{% endif %}>★</a>
+												<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=replayability&rating=4" title="Great" data-value="4"
+												   {% if personal_rating.replayability >= 4 %}style='color: orange;'{% endif %}>★</a>
+												<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=replayability&rating=3" title="Good" data-value="3"
+												   {% if personal_rating.replayability >= 3 %}style='color: orange;'{% endif %}>★</a>
+												<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=replayability&rating=2" title="Some" data-value="2"
+												   {% if personal_rating.replayability >= 2 %}style='color: orange;'{% endif %}>★</a>
+												<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=replayability&rating=1" title="None" data-value="1"
+												   {% if personal_rating.replayability >= 1 %}style='color: orange;'{% endif %}>★</a>
+											</div></div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<br>
+						<div class="text-white bg-dark mb-3 rounded" style="max-width: 100%">
+							<div class="row align-items-center">
+								<div class="col">
+									<div class="card-header d-flex justify-content-center container-fluid">
+										<b>Graphics</b>
+									</div>
+									<div class="card-body">
+										<div class="card-text">
+										<div class="rating rating2" align='center'>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=graphics&rating=5" title="Excellent" data-value="5"
+											   {% if personal_rating.graphics == 5 %}style='color: orange;'{% endif %}>★</a>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=graphics&rating=4" title="Good" data-value="4"
+											   {% if personal_rating.graphics >= 4 %}style='color: orange;'{% endif %}>★</a>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=graphics&rating=3" title="Average" data-value="3"
+											   {% if personal_rating.graphics >= 3 %}style='color: orange;'{% endif %}>★</a>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=graphics&rating=2" title="Bad" data-value="2"
+											   {% if personal_rating.graphics >= 2 %}style='color: orange;'{% endif %}>★</a>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=graphics&rating=1" title="Horrible / None" data-value="1"
+											   {% if personal_rating.graphics >= 1 %}style='color: orange;'{% endif %}>★</a>
+										</div></div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<br>
+						<div class="text-white bg-dark mb-3 rounded" style="max-width: 100%">
+							<div class="row align-items-center">
+								<div class="col">
+									<div class="card-header d-flex justify-content-center container-fluid">
+										<b>Recommendability</b>
+									</div>
+									<div class="card-body">
+										<div class="card-text">
+										<div class="rating rating2" align='center'>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=recommendability&rating=5" title="Strongly Recommend" data-value="5"
+											   {% if personal_rating.recommendability == 5 %}style='color: orange;'{% endif %}>★</a>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=recommendability&rating=4" title="Recommend" data-value="4"
+											   {% if personal_rating.recommendability >= 4 %}style='color: orange;'{% endif %}>★</a>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=recommendability&rating=3" title="Neutral" data-value="3"
+											   {% if personal_rating.recommendability >= 3 %}style='color: orange;'{% endif %}>★</a>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=recommendability&rating=2" title="Disrecommend" data-value="2"
+											   {% if personal_rating.recommendability >= 2 %}style='color: orange;'{% endif %}>★</a>
+											<a href="{% url 'games:rateaspect' %}?game={{ game.id }}&aspect=recommendability&rating=1" title="Strongly Disrecommend" data-value="1"
+											   {% if personal_rating.recommendability >= 1 %}style='color: orange;'{% endif %}>★</a>
+										</div></div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<br><br><div class="col-md-12" align="center">
+			{% if game.screen1 %}<a href="{{ game.screen1.url }}" target="_blank"><img data-fancybox="gallery" style="max-height:500px;max-width:24%;object-fit: contain;" src="{{ game.screen1.url }}"></a>{% endif %}
+            {% if game.screen2 %}<a href="{{ game.screen2.url }}" target="_blank"><img data-fancybox="gallery" style="max-height:500px;max-width:24%;object-fit: contain;" src="{{ game.screen2.url }}"></a>{% endif %}
+            {% if game.screen3 %}<a href="{{ game.screen3.url }}" target="_blank"><img data-fancybox="gallery" style="max-height:500px;max-width:24%;object-fit: contain;" src="{{ game.screen3.url }}"></a>{% endif %}
+            {% if game.screen4 %}<a href="{{ game.screen4.url }}" target="_blank"><img data-fancybox="gallery" style="max-height:500px;max-width:24%;object-fit: contain;" src="{{ game.screen4.url }}"></a>{% endif %}
+		</div>
+    </div>
+</div>
+{% endblock %}
