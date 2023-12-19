@@ -273,6 +273,7 @@ body {
 											{% elif entry.status == "HOLD" %}
 												Paused 
 											{% endif %}
+											{% if entry.platform %}[{% if entry.platform.shorthand %}{{ entry.platform.shorthand }}{% else %}{{ entry.platform.name }}{% endif %}]{% endif %}
 											{% if entry.comments %} <span title="{{ entry.comments }}">&#x1F4AC;</span>{% endif %}
 											</div>
 											<div>

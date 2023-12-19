@@ -427,7 +427,7 @@ def GameView(request, game_id, name=None, tab=None):
             following_entries = []
         return render(request, 'games/game_detail.html', {'game': game, 'pending_tags':pending_tags, 'user_score':user_score, 'users_rated':users_rated, 'user_counts':user_counts, 'game_entry': game_entry, 'recent_statuses': recent_statuses, 'following_entries': following_entries, 'stubbed':stubbed, 'ignored':ignored, 'tab':tab})
     elif tab == 'relations':
-        platforms = GameVerifiedPlatform.objects.filter(game=game).prefetch_related('platform').order_by('year')
+        platforms = GameVerifiedPlatform.objects.filter(game=game).prefetch_related('platform').order_by('platform__category', 'platform__name')
         return render(request, 'games/game_detail.html', {'game': game, 'pending_tags':pending_tags, 'user_score':user_score, 'users_rated':users_rated, 'user_counts':user_counts, 'game_entry': game_entry, 'platforms': platforms, 'stubbed':stubbed, 'ignored':ignored, 'tab':tab})
 
     elif tab == 'aspects':
