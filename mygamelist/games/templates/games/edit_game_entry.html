@@ -92,7 +92,7 @@
 	<br>
 	<div class="row">
 		<div class="col-12" align="center">
-			<button class="btn btn-primary" type="submit">Edit</button><br>
+			<button class="btn btn-primary" type="submit">Edit</button> <a class="btn btn-danger" href="{% url 'games:gamelist' 'delete' game_id %}" role="button">Delete</a><br>
 			{% if settings.score_type != 'SMIL' and settings.score_type != 'STAR' %}<br>
 			Scoring Guide:<br>
 			10 = Masterpiece, 9 = Great, 8 = Very Good, 7 = Good, 6 = Fine, 5 = Average, 4 = Bad, 3 = Very Bad, 2 = Horrible, 1 = Appalling<br>{% endif %}
