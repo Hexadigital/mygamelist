@@ -5,94 +5,104 @@
 {% block title %}My Games :: Remember.Games{% endblock %}
 
 {% block embedpreview %}
-	<meta name="twitter:card" content="summary" />
-	<meta name="twitter:title" content="My Games :: Remember Games" />
-	<meta name="twitter:description" content="Remember Games is a website you can use to track games you've played." />
-	<meta name="twitter:image" content="" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="My Games :: Remember Games" />
+    <meta name="twitter:description" content="Remember Games is a website you can use to track games you've played." />
+    <meta name="twitter:image" content="" />
 {% endblock %}
 
 {% block navitems %}
-	<li class="nav-item">
-	<a class="nav-link" href="/">Home</a>
-	</li>
-	<li class="nav-item">
-	<a class="nav-link active" href="{% url 'games:gamelist' %}">My Games</a>
-	</li>
-	<li class="nav-item">
-	<a class="nav-link" href="{% url 'games:browse' %}">Browse</a>
-	</li>
+    <li class="nav-item">
+    <a class="nav-link" href="/">Home</a>
+    </li>
+    <li class="nav-item">
+    <a class="nav-link active" href="{% url 'games:gamelist' %}">My Games</a>
+    </li>
+    <li class="nav-item">
+    <a class="nav-link" href="{% url 'games:browse' %}">Browse</a>
+    </li>
 {% endblock %}
 
 {% block content %}
 <div class="container">
-<br>{{ form.errors }}
-<div class="text-white bg-dark mb-3 rounded" style="max-width: 100%">
-<br>
-<form action="{% url 'games:gamelist' 'edit-manual' game_entry.id %}" method="post" autocomplete="off">
-	<div class="row">
-		{% csrf_token %}
-		<br>
-		<div class="col-4" align="center">
-			<label for="id_name"><b>Game Name:</b></label><br>
-			<input type="text" name="name" maxlength="150" required="" value="{{ game_entry.name }}" id="id_name"><br>
-			<br>
-			<label for="id_score">Score:</label><br>
-			{% if settings.score_type == 'SMIL' %}
-			<link href="{% static 'css/smile.css' %}" rel="stylesheet">
-			<input type="radio" name="score" value="7.5" class="happy" {% if game_entry.score >= 7.0 %}checked{% endif %}>
-			<input type="radio" name="score" value="5.0" class="neutral" {% if game_entry.score < 7.0 and game_entry.score >= 5.0 %}checked{% endif %}>
-			<input type="radio" name="score" value="2.5" class="sad" {% if game_entry.score < 5.0 %}checked{% endif %}>
-			<input type="radio" name="score" value="" class="none" {% if not game_entry.score %}checked{% endif %}><br>
-			{% else %}
-			<input type="number" name="score" step="0.01" value="{{ game_entry.score }}" id="id_score"><br>
-			{% endif %}
-			<br>
-			<label for="id_hours">Hours:</label><br>
-			<input type="number" name="hours" step="0.01" value="{{ game_entry.hours }}" id="id_hours"><br>
-		</div>
-		<div class="col-4" align="center">
-			<label for="id_platform"><b>Platform:</b></label><br>
-			<select name="platform">
-				<option value="">---------</option>
-				{% for platform in dropdown_platforms %}
-					<option value="{{ platform.id }}"{% if platform.id == game_entry.platform.id %} selected{% endif %}>{{ platform.category }} - {{ platform.name }}</option>
-				{% endfor %}
-			</select><br>
-			<br>
-			<label for="id_start_date">Start Date:</label><br>
-			<input type="text" name="start_date" id="id_start_date" value="{{ game_entry.start_date|date:'Y-m-d' }}" placeholder="YYYY-MM-DD"><br>
-			<br>
-			<label for="id_times_replayed">Times Replayed:</label><br>
-			<input type="number" name="times_replayed" required="" value="{{ game_entry.times_replayed }}" id="id_times_replayed"><br>
-		</div>
-		<div class="col-4" align="center">
-			<label for="id_status"><b>Status:</b></label><br>
-			<select name="status" id="id_status">
-				<option value="PLAN"{% if game_entry.status == 'PLAN' %} selected=""{% endif %}>Plan to Play</option>
-				<option value="PLAY"{% if game_entry.status == 'PLAY' %} selected=""{% endif %}>Playing</option>
-				<option value="CMPL"{% if game_entry.status == 'CMPL' %} selected=""{% endif %}>Completed</option>
-				<option value="DROP"{% if game_entry.status == 'DROP' %} selected=""{% endif %}>Dropped</option>
-				<option value="HOLD"{% if game_entry.status == 'HOLD' %} selected=""{% endif %}>Paused</option>
-			</select><br>
-			<br>
-			<label for="id_stop_date">Stop Date:</label><br>
-			<input type="text" name="stop_date" id="id_stop_date" value="{{ game_entry.stop_date|date:'Y-m-d' }}" placeholder="YYYY-MM-DD"><br>
-			<br>
-			<label for="id_comments">Comments:</label><br>
-			<input type="text" name="comments" maxlength="500" value="{{ game_entry.comments }}" id="id_comments"><br>
-		</div>
-	</div>
-	<br>
-	<div class="row">
-		<div class="col-12" align="center">
-			<a class="btn btn-danger" href="{% url 'games:gamelist' 'delete-manual' game_entry.id %}" role="button">Delete</a> <button class="btn btn-primary" type="submit">Edit</button><br>
-			{% if settings.score_type != 'SMIL' and settings.score_type != 'STAR' %}<br>
-			Scoring Guide:<br>
-			10 = Masterpiece, 9 = Great, 8 = Very Good, 7 = Good, 6 = Fine, 5 = Average, 4 = Bad, 3 = Very Bad, 2 = Horrible, 1 = Appalling<br>{% endif %}
-		</div>
-	</div></form>
-	<br><br>
-</div>
+    <br>{{ form.errors }}
+    <div class="text-white bg-dark mb-3 rounded" style="max-width: 100%">
+    <br>
+    <form action="{% url 'games:gamelist' 'edit-manual' game_entry.id %}" method="post" autocomplete="off">
+        <div class="row">
+            {% csrf_token %}
+            <br>
+            <div class="col-4" align="center">
+                <label for="id_name"><b>Game Name:</b></label><br>
+                <input type="text" name="name" maxlength="150" required="" value="{{ game_entry.name }}" id="id_name"><br>
+                <br>
+                <label for="id_score">Score:</label><br>
+                {% if settings.score_type == 'SMIL' %}
+                <link href="{% static 'css/smile.css' %}" rel="stylesheet">
+                <input type="radio" name="score" value="7.5" class="happy" {% if game_entry.score >= 7.0 %}checked{% endif %}>
+                <input type="radio" name="score" value="5.0" class="neutral" {% if game_entry.score < 7.0 and game_entry.score >= 5.0 %}checked{% endif %}>
+                <input type="radio" name="score" value="2.5" class="sad" {% if game_entry.score < 5.0 %}checked{% endif %}>
+                <input type="radio" name="score" value="" class="none" {% if not game_entry.score %}checked{% endif %}><br>
+                {% else %}
+                <input type="number" name="score" step="0.01" value="{{ game_entry.score }}" id="id_score"><br>
+                {% endif %}
+                <br>
+                <label for="id_hours">Hours:</label><br>
+                <input type="number" name="hours" step="0.01" value="{{ game_entry.hours }}" id="id_hours"><br>
+            </div>
+            <div class="col-4" align="center">
+                <label for="id_platform"><b>Platform:</b></label><br>
+                <select name="platform">
+                    <option value="">---------</option>
+                    {% for platform in dropdown_platforms %}
+                        <option value="{{ platform.id }}"{% if platform.id == game_entry.platform.id %} selected{% endif %}>{{ platform.category }} - {{ platform.name }}</option>
+                    {% endfor %}
+                </select><br>
+                <br>
+                <label for="id_start_date">Start Date:</label><br>
+                <input type="text" name="start_date" id="id_start_date" value="{{ game_entry.start_date|date:'Y-m-d' }}" placeholder="YYYY-MM-DD"><br>
+                <br>
+                <label for="id_times_replayed">Times Replayed:</label><br>
+                <input type="number" name="times_replayed" required="" value="{{ game_entry.times_replayed }}" id="id_times_replayed"><br>
+            </div>
+            <div class="col-4" align="center">
+                <label for="id_status"><b>Status:</b></label><br>
+                <select name="status" id="id_status">
+                    <option value="PLAN"{% if game_entry.status == 'PLAN' %} selected=""{% endif %}>Plan to Play</option>
+                    <option value="PLAY"{% if game_entry.status == 'PLAY' %} selected=""{% endif %}>Playing</option>
+                    <option value="CMPL"{% if game_entry.status == 'CMPL' %} selected=""{% endif %}>Completed</option>
+                    <option value="DROP"{% if game_entry.status == 'DROP' %} selected=""{% endif %}>Dropped</option>
+                    <option value="HOLD"{% if game_entry.status == 'HOLD' %} selected=""{% endif %}>Paused</option>
+                </select><br>
+                <br>
+                <label for="id_stop_date">Stop Date:</label><br>
+                <input type="text" name="stop_date" id="id_stop_date" value="{{ game_entry.stop_date|date:'Y-m-d' }}" placeholder="YYYY-MM-DD"><br>
+                <br>
+                <label for="id_comments">Comments:</label><br>
+                <input type="text" name="comments" maxlength="500" value="{{ game_entry.comments }}" id="id_comments"><br>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-4" align="center">
+                <a class="btn btn-danger" href="{% url 'games:gamelist' 'delete-manual' game_entry.id %}" role="button">Delete</a>
+            </div>
+            <div class="col-4" align="center"></div>
+            <div class="col-4" align="center">
+                <button class="btn btn-primary" type="submit">Edit</button><br>
+            </div>
+            <input type="hidden" name="next" value="{{ next }}">
+        </div>
+        </form>
+        <br><br>
+    </div>
+    <div class="row">
+        <div class="col-12" align="center">
+            {% if settings.score_type != 'SMIL' and settings.score_type != 'STAR' %}<br>
+            Scoring Guide:<br>
+            10 = Masterpiece, 9 = Great, 8 = Very Good, 7 = Good, 6 = Fine, 5 = Average, 4 = Bad, 3 = Very Bad, 2 = Horrible, 1 = Appalling<br>{% endif %}
+        </div>
+    </div>
 </div>
 <br><br>
 {% endblock %}

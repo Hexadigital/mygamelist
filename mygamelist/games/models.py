@@ -173,11 +173,13 @@ class UserGameStatus(models.Model):
         ("CMPL", "Completed"),
         ("DROP", "Dropped"),
         ("HOLD", "Paused"),
-        ("PLAN", "Plan to Play")
+        ("PLAN", "Plan to Play"),
+        ("LOGD", "Logged")
     ]
     status = models.CharField(max_length=4, choices=statuses)
     created_at = models.DateTimeField(auto_now_add=True)
     liked_by = models.ManyToManyField(User, blank=True, related_name='usergamestatus_liked_by')
+    data = models.CharField(max_length=150, blank=True, null=True)
 
     def __str__(self):
         return self.user.username + " " + self.status + " " + self.game.name
@@ -213,6 +215,7 @@ class Collection(models.Model):
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     avatar = models.ImageField(upload_to=random_avatar_filename, default='avatars/default.png')
+    contribution_score = models.DecimalField(max_digits=4, decimal_places=2, default=0)
     banned_tags = models.ManyToManyField(Tag, blank=True)
     ignored_games = models.ManyToManyField(Game, blank=True)
     ignored_collections = models.ManyToManyField(Collection, blank=True)
@@ -228,6 +231,20 @@ class UserSettings(models.Model):
     ]
     score_type = models.CharField(max_length=4, choices=rating_systems, default="DCML")
     use_invidious = models.BooleanField(default=False)
+
+class UserContributionStats(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    approved = models.IntegerField(default=0)
+    rejected = models.IntegerField(default=0)
+    links = models.IntegerField(default=0)
+    videos = models.IntegerField(default=0)
+    descriptions = models.IntegerField(default=0)
+    screenshots = models.IntegerField(default=0)
+    tags = models.IntegerField(default=0)
+    aspect_ratings = models.IntegerField(default=0)
+    platforms = models.IntegerField(default=0)
+    reviews = models.IntegerField(default=0)
+    other = models.IntegerField(default=0)
 
 class TagAdditionRequest(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE)

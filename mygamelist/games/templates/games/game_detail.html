@@ -241,6 +241,8 @@ body {
 												Dropped 
 											{% elif activity.status == "HOLD" %}
 												Paused 
+											{% elif activity.status == "LOGD" %}
+												Played for {{activity.data}}h, 
 											{% endif %} {{ activity.created_at|naturaltime }}
 											</center>
 										</div>

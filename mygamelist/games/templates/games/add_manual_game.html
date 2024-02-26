@@ -25,74 +25,83 @@
 
 {% block content %}
 <div class="container">
-<br>{{ form.errors }}
-<div class="text-white bg-dark mb-3 rounded" style="max-width: 100%">
-<br>
-<form action="{% url 'games:gamelist' 'add-manual' %}" method="post" autocomplete="off">
-	<div class="row">
-		{% csrf_token %}
-		<br>
-		<div class="col-4" align="center">
-			<label for="id_name"><b>Game Name:</b></label><br>
-			<input type="text" name="name" maxlength="150" required="" value="{{ form.name.value|default_if_none:"" }}" id="id_name"><br>
-			<br>
-			<label for="id_score">Score:</label><br>
-			{% if settings.score_type == 'SMIL' %}
-			<link href="{% static 'css/smile.css' %}" rel="stylesheet">
-			<input type="radio" name="score" value="7.5" class="happy" {% if form.score.value >= 7.0 %}checked{% endif %}>
-			<input type="radio" name="score" value="5.0" class="neutral" {% if form.score.value < 7.0 and form.score.value >= 5.0 %}checked{% endif %}>
-			<input type="radio" name="score" value="2.5" class="sad" {% if form.score.value < 5.0 %}checked{% endif %}>
-			<input type="radio" name="score" value="" class="none" {% if not form.score.value %}checked{% endif %}><br>
-			{% else %}
-			<input type="number" name="score" step="0.01" value="{{ form.score.value|default_if_none:"" }}" id="id_score"><br>
-			{% endif %}
-			<br>
-			<label for="id_hours">Hours:</label><br>
-			<input type="number" name="hours" step="0.01" value="{{ form.hours.value|default_if_none:"" }}" id="id_hours"><br>
-		</div>
-		<div class="col-4" align="center">
-			<label for="id_platform"><b>Platform:</b></label><br>
-			<select name="platform">
-				<option value="">---------</option>
-				{% for platform in dropdown_platforms %}
-					<option value="{{ platform.id }}"{% if platform.id|slugify == form.platform.value|slugify %} selected{% endif %}>{{ platform.category }} - {{ platform.name }}</option>
-				{% endfor %}
-			</select><br>
-			<br>
-			<label for="id_start_date">Start Date:</label><br>
-			<input type="text" name="start_date" id="id_start_date" value="{{ form.start_date.value|default_if_none:"" }}" placeholder="YYYY-MM-DD"><br>
-			<br>
-			<label for="id_times_replayed">Times Replayed:</label><br>
-			<input type="number" name="times_replayed" required="" value="{{ form.times_replayed.value }}" id="id_times_replayed"><br>
-		</div>
-		<div class="col-4" align="center">
-			<label for="id_status"><b>Status:</b></label><br>
-			<select name="status" id="id_status">
-				<option value="PLAN"{% if form.status.value == 'PLAN' %} selected=""{% endif %}>Plan to Play</option>
-				<option value="PLAY"{% if form.status.value == 'PLAY' %} selected=""{% endif %}>Playing</option>
-				<option value="CMPL"{% if form.status.value == 'CMPL' %} selected=""{% endif %}>Completed</option>
-				<option value="DROP"{% if form.status.value == 'DROP' %} selected=""{% endif %}>Dropped</option>
-				<option value="HOLD"{% if form.status.value == 'HOLD' %} selected=""{% endif %}>Paused</option>
-			</select><br>
-			<br>
-			<label for="id_stop_date">Stop Date:</label><br>
-			<input type="text" name="stop_date" id="id_stop_date" value="{{ form.stop_date.value|default_if_none:"" }}" placeholder="YYYY-MM-DD"><br>
-			<br>
-			<label for="id_comments">Comments:</label><br>
-			<input type="text" name="comments" maxlength="500" value="{{ form.comments.value|default_if_none:"" }}" id="id_comments"><br>
-		</div>
-	</div>
-	<br>
-	<div class="row">
-		<div class="col-12" align="center">
-			<button class="btn btn-primary" type="submit">Add</button><br>
-			{% if settings.score_type != 'SMIL' and settings.score_type != 'STAR' %}<br>
-			Scoring Guide:<br>
-			10 = Masterpiece, 9 = Great, 8 = Very Good, 7 = Good, 6 = Fine, 5 = Average, 4 = Bad, 3 = Very Bad, 2 = Horrible, 1 = Appalling<br>{% endif %}
-		</div>
-	</div></form>
-	<br><br>
-</div>
+    <br>{{ form.errors }}
+    <div class="text-white bg-dark mb-3 rounded" style="max-width: 100%">
+    <br>
+    <form action="{% url 'games:gamelist' 'add-manual' %}" method="post" autocomplete="off">
+        <div class="row">
+            {% csrf_token %}
+            <br>
+            <div class="col-4" align="center">
+                <label for="id_name"><b>Game Name:</b></label><br>
+                <input type="text" name="name" maxlength="150" required="" value="{{ form.name.value|default_if_none:"" }}" id="id_name"><br>
+                <br>
+                <label for="id_score">Score:</label><br>
+                {% if settings.score_type == 'SMIL' %}
+                <link href="{% static 'css/smile.css' %}" rel="stylesheet">
+                <input type="radio" name="score" value="7.5" class="happy" {% if form.score.value >= 7.0 %}checked{% endif %}>
+                <input type="radio" name="score" value="5.0" class="neutral" {% if form.score.value < 7.0 and form.score.value >= 5.0 %}checked{% endif %}>
+                <input type="radio" name="score" value="2.5" class="sad" {% if form.score.value < 5.0 %}checked{% endif %}>
+                <input type="radio" name="score" value="" class="none" {% if not form.score.value %}checked{% endif %}><br>
+                {% else %}
+                <input type="number" name="score" step="0.01" value="{{ form.score.value|default_if_none:"" }}" id="id_score"><br>
+                {% endif %}
+                <br>
+                <label for="id_hours">Hours:</label><br>
+                <input type="number" name="hours" step="0.01" value="{{ form.hours.value|default_if_none:"" }}" id="id_hours"><br>
+            </div>
+            <div class="col-4" align="center">
+                <label for="id_platform"><b>Platform:</b></label><br>
+                <select name="platform">
+                    <option value="">---------</option>
+                    {% for platform in dropdown_platforms %}
+                        <option value="{{ platform.id }}"{% if platform.id|slugify == form.platform.value|slugify %} selected{% endif %}>{{ platform.category }} - {{ platform.name }}</option>
+                    {% endfor %}
+                </select><br>
+                <br>
+                <label for="id_start_date">Start Date:</label><br>
+                <input type="text" name="start_date" id="id_start_date" value="{{ form.start_date.value|default_if_none:"" }}" placeholder="YYYY-MM-DD"><br>
+                <br>
+                <label for="id_times_replayed">Times Replayed:</label><br>
+                <input type="number" name="times_replayed" required="" value="{{ form.times_replayed.value }}" id="id_times_replayed"><br>
+            </div>
+            <div class="col-4" align="center">
+                <label for="id_status"><b>Status:</b></label><br>
+                <select name="status" id="id_status">
+                    <option value="PLAN"{% if form.status.value == 'PLAN' %} selected=""{% endif %}>Plan to Play</option>
+                    <option value="PLAY"{% if form.status.value == 'PLAY' %} selected=""{% endif %}>Playing</option>
+                    <option value="CMPL"{% if form.status.value == 'CMPL' %} selected=""{% endif %}>Completed</option>
+                    <option value="DROP"{% if form.status.value == 'DROP' %} selected=""{% endif %}>Dropped</option>
+                    <option value="HOLD"{% if form.status.value == 'HOLD' %} selected=""{% endif %}>Paused</option>
+                </select><br>
+                <br>
+                <label for="id_stop_date">Stop Date:</label><br>
+                <input type="text" name="stop_date" id="id_stop_date" value="{{ form.stop_date.value|default_if_none:"" }}" placeholder="YYYY-MM-DD"><br>
+                <br>
+                <label for="id_comments">Comments:</label><br>
+                <input type="text" name="comments" maxlength="500" value="{{ form.comments.value|default_if_none:"" }}" id="id_comments"><br>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-4" align="center">
+            </div>
+            <div class="col-4" align="center"></div>
+            <div class="col-4" align="center">
+                <button class="btn btn-primary" type="submit">Add</button><br>
+            </div>
+            <input type="hidden" name="next" value="{{ next }}">
+        </div>
+        </form>
+        <br><br>
+    </div>
+    <div class="row">
+        <div class="col-12" align="center">
+            {% if settings.score_type != 'SMIL' and settings.score_type != 'STAR' %}<br>
+            Scoring Guide:<br>
+            10 = Masterpiece, 9 = Great, 8 = Very Good, 7 = Good, 6 = Fine, 5 = Average, 4 = Bad, 3 = Very Bad, 2 = Horrible, 1 = Appalling<br>{% endif %}
+        </div>
+    </div>
 </div>
 <br><br>
 {% endblock %}

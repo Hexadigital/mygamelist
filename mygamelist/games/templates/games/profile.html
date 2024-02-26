@@ -114,6 +114,8 @@
 															Completed
 														{% elif activity.status == "DROP" %}
 															Dropped 
+														{% elif activity.status == "LOGD" %}
+															Logged {{activity.data}}h for 
 														{% elif activity.status == "HOLD" %}
 															Paused 
 														{% endif %}

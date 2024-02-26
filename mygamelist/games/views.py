@@ -778,6 +778,17 @@ def GameListView(request, edit_type=None, entry_id=None):
                     activity.game = game
                     activity.status = form.cleaned_data['status']
                     activity.save()
+                # Create a time log IF this is the first time hours are put in while it was marked as playing, or the hours incremented while it was marked as playing
+                elif (form.cleaned_data['status'] == 'PLAY') and (((form.cleaned_data['hours'] != None) and (game_entry.hours == None)) or ((game_entry.hours != None) and (form.cleaned_data['hours'] != None) and (game_entry.hours < form.cleaned_data['hours']))):
+                    activity = UserGameStatus()
+                    activity.user = request.user
+                    activity.game = game
+                    activity.status = 'LOGD'
+                    if game_entry.hours == None:
+                        activity.data = str(round(form.cleaned_data['hours'], 2))
+                    else:
+                        activity.data = str(round(form.cleaned_data['hours'] - game_entry.hours, 2))
+                    activity.save()
                 game_entry.platform = form.cleaned_data['platform']
                 game_entry.status = form.cleaned_data['status']
                 if form.cleaned_data['score'] == 0.0 or form.cleaned_data['score'] == None:
